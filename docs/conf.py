@@ -44,7 +44,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Rovercode Web'
-copyright = """2017, rovercode.org"""
+copyright = """2017, rovercode.com"""
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -189,7 +189,7 @@ latex_documents = [
     ('index',
      'rovercode_web.tex',
      'Rovercode Web Documentation',
-     """rovercode.org""", 'manual'),
+     """rovercode.com""", 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -219,7 +219,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'rovercode_web', 'Rovercode Web Documentation',
-     ["""rovercode.org"""], 1)
+     ["""rovercode.com"""], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -233,7 +233,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     ('index', 'rovercode_web', 'Rovercode Web Documentation',
-     """rovercode.org""", 'Rovercode Web',
+     """rovercode.com""", 'Rovercode Web',
      """Block-based programming for educational robots.""", 'Miscellaneous'),
 ]
 
