@@ -34,10 +34,10 @@
   font-size: 2rem; }
 
 .jumbotron {
-  margin-top: -70px;
+  margin-top: -150px;
   background: url("../images/traslasierra.jpg") no-repeat center center;
   background-size: cover;
-  height: 100vh; }
+  height: calc(100vh + 150px); }
 
 body {
   color: #373737; }
