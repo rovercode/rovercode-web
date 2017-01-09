@@ -67,6 +67,15 @@ li a {
   text-decoration: none;
   color: #373737; }
 
+/* WORDS SWAP */
+[data-words] {
+  vertical-align: top;
+  position: static; }
+
+[data-words] > span {
+  position: absolute;
+  color: chocolate; }
+
 [hidden][style="display: block;"] {
   display: block !important; }
 
