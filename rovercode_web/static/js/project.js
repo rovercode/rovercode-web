@@ -20,6 +20,20 @@ Issues with the above approach:
 */
 $('.form-group').removeClass('row');
 
+var highlightColors = ["#76608a"];
+
+function* colorMaker() {
+  var index = 0;
+  while(true) {
+    yield highlightColors[index];
+    index = (index+1)%highlightColors.length;
+  }
+}
+colorGen = colorMaker();
+
+
+
+
 $("#js-rotating").Morphext({
     // The [in] animation type. Refer to Animate.css for a list of available animations.
     animation: "fadeInUp",
@@ -29,5 +43,6 @@ $("#js-rotating").Morphext({
     speed: 5000,
     complete: function () {
         // Called after the entrance animation is executed.
+        $("#js-rotating").css("color", colorGen.next().value);
     }
 });
