@@ -1,38 +1,73 @@
-/* These styles are generated from project.scss. */
-
 .alert-debug {
-  color: black;
-  background-color: white;
+  background-color: #fff;
   border-color: #d6e9c6;
-}
+  color: #000; }
 
 .alert-error {
-  color: #b94a48;
   background-color: #f2dede;
   border-color: #eed3d7;
-}
+  color: #b94a48; }
 
-/* This is a fix for the bootstrap4 alpha release */
+.navbar {
+  border-radius: 0px; }
+
 @media (max-width: 47.9em) {
   .navbar-nav .nav-item {
-    float: none;
-    width: 100%;
     display: inline-block;
-  }
+    float: none;
+    width: 100%; }
 
   .navbar-nav .nav-item + .nav-item {
-    margin-left: 0;
-  }
+    margin-left: 0; }
 
   .nav.navbar-nav.pull-xs-right {
-    float: none !important;
-  }
-}
+    float: none !important; } }
+.navbar {
+  background-color: transparent;
+  background: transparent;
+  border-color: transparent; }
 
-/* Display django-debug-toolbar.
-   See https://github.com/django-debug-toolbar/django-debug-toolbar/issues/742
-   and https://github.com/pydanny/cookiecutter-django/issues/317
-*/
+.navbar li {
+  color: #000; }
+
+.welcome-message {
+  font-size: 2rem; }
+
+.jumbotron {
+  margin-top: -70px;
+  background: url("../images/traslasierra.jpg") no-repeat center center;
+  background-size: cover;
+  height: 100vh; }
+
+body {
+  color: #373737; }
+
+.nice-underlines a {
+  text-shadow: 0.03em 0 #bed0cd, -0.03em 0 #bed0cd, 0 0.03em #bed0cd, 0 -0.03em #bed0cd, 0.06em 0 #bed0cd, -0.06em 0 #bed0cd, 0.09em 0 #bed0cd, -0.09em 0 #bed0cd, 0.12em 0 #bed0cd, -0.12em 0 #bed0cd, 0.15em 0 #bed0cd, -0.15em 0 #bed0cd;
+  background-image: linear-gradient(#d80073, #d80073);
+  background-size: 1px 1px;
+  background-repeat: repeat-x;
+  background-position: 0% 95%;
+  color: #d80073;
+  text-decoration: none; }
+  .nice-underlines a::selection {
+    text-shadow: 0.03em 0 #CBF, -0.03em 0 #CBF, 0 0.03em #CBF, 0 -0.03em #CBF, 0.06em 0 #CBF, -0.06em 0 #CBF, 0.09em 0 #CBF, -0.09em 0 #CBF, 0.12em 0 #CBF, -0.12em 0 #CBF, 0.15em 0 #CBF, -0.15em 0 #CBF;
+    background: #CBF; }
+  .nice-underlines a::-moz-selection {
+    text-shadow: 0.03em 0 #CBF, -0.03em 0 #CBF, 0 0.03em #CBF, 0 -0.03em #CBF, 0.06em 0 #CBF, -0.06em 0 #CBF, 0.09em 0 #CBF, -0.09em 0 #CBF, 0.12em 0 #CBF, -0.12em 0 #CBF, 0.15em 0 #CBF, -0.15em 0 #CBF;
+    background: #CBF; }
+  .nice-underlines a *,
+  .nice-underlines a *:after, .nice-underlines a:after,
+  .nice-underlines a *:before, .nice-underlines a:before {
+    text-shadow: none; }
+  .nice-underlines a:visited {
+    color: #d80073; }
+
+li a {
+  text-decoration: none;
+  color: #373737; }
+
 [hidden][style="display: block;"] {
-  display: block !important;
-}
+  display: block !important; }
+
+/*# sourceMappingURL=project.css.map */

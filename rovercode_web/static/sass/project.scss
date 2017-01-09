@@ -59,6 +59,93 @@ $red: #b94a48;
   }
 }
 
+.navbar {
+   background-color: transparent;
+   background: transparent;
+   border-color: transparent;
+}
+
+.navbar li { color: #000 }
+
+.welcome-message {
+  font-size: 2rem;
+}
+
+.jumbotron {
+  margin-top: -70px;
+  background:url("../images/traslasierra.jpg") no-repeat center center;
+  background-size: cover;
+  height: 100vh;
+}
+
+body {
+  color: rgb(55,55,55);
+}
+
+@mixin text-underline-crop($background) {
+  text-shadow:  .03em 0 $background,
+                  -.03em 0 $background,
+                  0 .03em $background,
+                  0 -.03em $background,
+                  .06em 0 $background,
+                  -.06em 0 $background,
+                  .09em 0 $background,
+                  -.09em 0 $background,
+                  .12em 0 $background,
+                  -.12em 0 $background,
+                  .15em 0 $background,
+                  -.15em 0 $background;
+}
+
+@mixin text-background($color-bg, $color-text) {
+  background-image: linear-gradient($color-text, $color-text);
+  background-size: 1px 1px;
+  background-repeat: repeat-x;
+  background-position:  0% 95%;
+}
+
+@mixin text-selection($selection) {
+  &::selection {
+    @include text-underline-crop($selection);
+    background: $selection;
+  }
+
+  &::-moz-selection {
+  @include text-underline-crop($selection);
+  background: $selection;
+  }
+}
+
+@mixin link-underline($background, $text, $selection){
+  @include text-underline-crop($background);
+  @include text-background($background, $text);
+  @include text-selection($selection);
+
+  color: $text;
+  text-decoration: none;
+
+  *,
+  *:after,
+  &:after,
+  *:before,
+  &:before {
+    text-shadow: none;
+  }
+
+  &:visited {
+    color: $text;
+  }
+}
+
+.nice-underlines a {
+  @include link-underline(#bed0cd, #d80073, #CBF);
+}
+
+li a {
+  text-decoration: none;
+  color: rgb(55,55,55);
+}
+
 ////////////////////////////////
 		//Django Toolbar//
 ////////////////////////////////
