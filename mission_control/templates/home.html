@@ -1,0 +1,299 @@
+{% load staticfiles i18n %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>rovercode</title>
+  <link rel="icon" href="img/favicon.png">
+  <!-- Latest compiled and minified Bootstrap 4 Alpha 4 CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/css/bootstrap.min.css" integrity="sha384-2hfp1SzUoho7/TsGGGDaFdsuuDL0LX2hnUp6VkX3CUQ2K4K+xjboZdsXyp4oUHZj" crossorigin="anonymous">
+  <link rel="stylesheet" href="{% static 'css/mission-control.css' %}"/>
+  <link rel="stylesheet" href="{% static 'css/blockly.css' %}"/>
+
+  <!-- Required by Bootstrap v4 Alpha 4 -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" integrity="sha384-3ceskX3iaEnIogmQchP8opvBy3Mi7Ce34nWjpBIwVTHfGYWQS9jwHDVRnpKKHJg7" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.3.7/js/tether.min.js" integrity="sha384-XTs3FgkjiBgo8qjEjBk0tGmf3wPrWtA6coPfQDfFEY8AnYJwjalXCiosYRBIBZX8" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/js/bootstrap.min.js" integrity="sha384-VjEeINv9OSwtWFLAtmc4JCtEJXXBub00gtSnszmspDLCtC0I4z4nqz7rEFbIZLLU" crossorigin="anonymous"></script>
+
+  <script src="https://use.fontawesome.com/60eff1bf54.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
+
+  <script src="{% static 'blockly/blockly_uncompressed.js' %}"></script>
+  <script src="{% static 'blockly/generators/javascript.js' %}"></script>
+  <script src="{% static 'blockly/generators/javascript/logic.js' %}"></script>
+  <script src="{% static 'blockly/generators/javascript/loops.js' %}"></script>
+  <script src="{% static 'blockly/generators/javascript/math.js' %}"></script>
+  <script src="{% static 'blockly/generators/javascript/text.js' %}"></script>
+  <script src="{% static 'blockly/generators/javascript/lists.js' %}"></script>
+  <script src="{% static 'blockly/generators/javascript/colour.js' %}"></script>
+  <script src="{% static 'blockly/generators/javascript/variables.js' %}"></script>
+  <script src="{% static 'blockly/generators/javascript/procedures.js' %}"></script>
+  <script src="{% static 'blockly/generators/javascript/motors.js' %}"></script>
+  <script src="{% static 'blockly/generators/javascript/events.js' %}"></script>
+  <script src="{% static 'blockly/generators/javascript/sensors.js' %}"></script>
+  <script src="{% static 'blockly/generators/javascript/time.js' %}"></script>
+  <script src="{% static 'blockly/blocks/logic.js' %}"></script>
+  <script src="{% static 'blockly/blocks/loops.js' %}"></script>
+  <script src="{% static 'blockly/blocks/math.js' %}"></script>
+  <script src="{% static 'blockly/blocks/text.js' %}"></script>
+  <script src="{% static 'blockly/blocks/lists.js' %}"></script>
+  <script src="{% static 'blockly/blocks/colour.js' %}"></script>
+  <script src="{% static 'blockly/blocks/variables.js' %}"></script>
+  <script src="{% static 'blockly/blocks/procedures.js' %}"></script>
+  <script src="{% static 'blockly/blocks/motors.js' %}"></script>
+  <script src="{% static 'blockly/blocks/events.js' %}"></script>
+  <script src="{% static 'blockly/blocks/sensors.js' %}"></script>
+  <script src="{% static 'blockly/blocks/time.js' %}"></script>
+  <script src="{% static 'blockly/msg/js/en.js' %}"></script>
+  <script src="{% static 'blockly/appengine/storage.js' %}"></script>
+
+  <script src="{% static 'JS-Interpreter/acorn_interpreter.js' %}"></script>
+  <link href='http://fonts.googleapis.com/css?family=Merriweather' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/css?family=Faster+One" rel="stylesheet">
+  <script src="{% static 'js/rover-api.js' %}"></script>
+  <script src="{% static 'js/blockly-api.js' %}"></script>
+
+</head>
+
+<body>
+  <div class="m-b-1">
+    <nav class="navbar navbar-static-top navbar-inverse bg-inverse">
+        <button type="button" class="navbar-toggler hidden-sm-up pull-xs-right" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
+          &#9776;
+        </button>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-toggleable-xs" id="bs-navbar-collapse-1">
+          <ul class="nav navbar-nav pull-xs-left">
+            <li class="nav-item" id="main-title">rovercode</li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">File</a>
+              <div class="dropdown-menu">
+                <a href="#" onclick="return chooseDesign()">Load Previous Design</a>
+                <a href="#" onclick="$('#nameModal').modal()">Copy This Design</a>
+                <a href="#" id="downloadLink">Download This Design</a>
+              </div>
+            </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Show</a>
+              <div class="dropdown-menu">
+                <a href="#" onclick="toggleBlock('initially')">initially</a>
+                <a href="#" onclick="toggleBlock('always')">always</a>
+                <a href="#" onclick="toggleBlock('whenLeftEyeSeesSomething')">whenLeftEyeSeesSomething</a>
+                <a href="#" onclick="toggleBlock('whenRightEyeSeesSomething')">whenRightEyeSeesSomething</a>
+              </div>
+            </li>
+
+            {% if request.user.is_authenticated %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a>
+              </li>
+            {% else %}
+              <li class="nav-item">
+                <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a>
+              </li>
+              <li class="nav-item">
+                <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% trans "Sign In" %}</a>
+              </li>
+            {% endif %}
+            <li class="nav-item"><a href="#" class="nav-link" style="background-color: #000000; font-weight: bold" onclick="$('#nameModal').modal()" id="designNameArea"></a></li>
+          </ul>
+
+          <ul class="nav navbar-nav pull-xs-right">
+            <li class="nav-item code-control-button-container"><a id="runButton" style="background-color:#F04124; font-size:400%; line-height: 5.8rem; box-shadow: 1px 1px 1px #333333;
+                    position:relative; z-index:999" href="#" onclick="return goToRunningState()">
+                    <i class="fa fa-play code-control-button"></i></a></li>
+            <li class="nav-item code-control-button-container"><a style="background-color:#43AC6A; font-size:350%; box-shadow: 1px 1px 1px #333333;
+                    position:relative; z-index:998" href="#" onclick="return stepCode()">
+                    <i class='fa fa-arrow-right code-control-button'></i></a></li>
+            <li class="nav-item code-control-button-container"><a style="background-color:#008CBA; font-size:350%; box-shadow: 1px 1px 1px #333333;
+                    position:relative; z-index:998" href="#" onclick="runningEnabled=false">
+                    <i class='fa fa-pause code-control-button'></i></a></li>
+            <li class="nav-item code-control-button-container"><a style="background-color:#4DAECF; font-size:350%; box-shadow: 1px 1px 1px #333333;
+                    position:relative; z-index:998" href="#" onclick="return resetCode()">
+                    <i class='fa fa-refresh code-control-button'></i></a></li>
+            <li class="nav-item"><a class="nav-link" href="video-stream.html">Open Video Feed</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" id="sidebarButton" onclick="return toggleSidebar()">Sidebar</a></li>
+          </ul>
+        </div>
+    </nav>
+  </div>
+
+  <div id="tableArea">
+    <table id="theTable" style="margin: 0 0 0 0">
+      <tr>
+        <td rowspan="3" id="blocklyArea"> </td>
+        <td style="padding: 0 0 0 0;"><div id="consoleArea"></div></td>
+      </tr>
+      <tr>
+        <td id="videoBackground">
+        </td>
+      </tr>
+      <tr>
+        <td id="indicatorsArea">
+          <div class="row">
+            <div class="col-md-6"><div class="indicator leftEyeIndicator well"></div></div>
+            <div class="col-md-6"><div class="indicator rightEyeIndicator well"></div></div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div id="blocklyDiv" style="position: absolute"></div>
+
+  <div class="modal fade" role="dialog" id="nameModal" aria-labelledby="nameModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div clas="modal-body">
+          <div class="container-fluid">
+            <div class="row text-md-center" style="padding-top: 40px; padding-bottom: 40px">
+              <div class="col-md-12">
+                <h2>Name your design</h2>
+                <p id="nameErrorArea"></p>
+                <form action="javascript:acceptName();">
+                  <input type="text" name="designName">
+                  <input type="submit" value="Ok" class="btn btn-primary">
+                </form>
+              </div>
+            </div>
+            <div class="row text-md-center" style="padding-top: 40px; padding-bottom: 40px">
+              <div class="col-md-12">
+                <h2>Or, load a saved design</h2>
+                <a role="button" onclick="return chooseDesign()" style="color: white;" class="btn btn-primary">Go</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" role="dialog" id="loadModal" aria-labelledby="loadModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div clas="modal-body">
+          <div class="container-fluid">
+            <div class="row" style="padding-top: 40px; padding-bottom: 40px">
+              <div class="col-md-12">
+                <h2>Here are the designs saved on this rover:</h2>
+                <div class="panel" id="savedDesignsArea"></div>
+              </div>
+            </div>
+            <div class="row" style="padding-top: 40px; padding-bottom: 40px">
+              <div class="col-md-12">
+                <p>Or, upload a design from your computer.</p>
+                <div class="content">
+                  <div class="panel">
+                    <div id="loadErrorArea"></div>
+                    <form enctype="multipart/form-data" id="uploadForm">
+                      <div style="position: relative">
+                        <input id="fileToUpload" name="fileToUpload" type="file" accept="text/xml"/>
+                      </div>
+                      <input class="btn btn-primary" name="button" type="button" value="Upload" style="margin-top:10px;"/>
+                    </form>
+                    <div id="loadStatusArea"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <xml id="toolbox" style="display: none">
+    <category name="loops" colour="282">
+      <block type="controls_whileUntil"></block>
+      <block type="controls_repeat_ext"></block>
+      <block type="controls_for"></block>
+      <block type="controls_forEach"></block>
+    </category>
+    <category name="logic" colour="210">
+      <block type="controls_if"></block>
+      <block type="logic_compare"></block>
+      <block type="logic_operation"></block>
+      <block type="logic_negate"></block>
+      <block type="logic_boolean"></block>
+    </category>
+    <category name="time" colour="330">
+      <block type="continue"></block>
+    </category>
+    <category name="motors" colour="42">
+      <block type="motors_start"></block>
+      <block type="motors_stop"></block>
+    </category>
+    <category name="sensors" colour="160">
+      <block type="sensors_get_covered"></block>
+    </category>
+    <category name="colour" colour="20">
+      <block type="colour_random"></block>
+      <block type="colour_rgb"></block>
+      <block type="colour_blend"></block>
+    </category>
+    <category name="numbers" colour="230">
+      <block type="math_number"></block>
+      <block type="math_arithmetic"></block>
+      <block type="math_single"></block>
+      <block type="math_trig"></block>
+      <block type="math_constant"></block>
+      <block type="math_number_property"></block>
+      <block type="math_change"></block>
+      <block type="math_round"></block>
+      <block type="math_on_list"></block>
+      <block type="math_modulo"></block>
+      <block type="math_constrain"></block>
+      <block type="math_random_int"></block>
+      <block type="math_random_float"></block>
+    </category>
+    <category name="text" colour="20">
+      <block type="text"></block>
+      <block type="text_print"></block>
+      <block type="text_append"></block>
+      <block type="text_length"></block>
+      <block type="text_isEmpty"></block>
+      <block type="text_indexOf"></block>
+      <block type="text_charAt"></block>
+      <block type="text_getSubstring"></block>
+      <block type="text_changeCase"></block>
+      <block type="text_trim"></block>
+      <block type="text_join"></block>
+    </category>
+    <category name="advanced" colour="200">
+      <category name="events" colour="230">
+        <block type="pop_event_queue"></block>
+      </category>
+      <category name="lists" colour="260">
+        <block type="lists_create_empty"></block>
+        <block type="lists_create_with"></block>
+        <block type="lists_repeat"></block>
+        <block type="lists_length"></block>
+        <block type="lists_isEmpty"></block>
+        <block type="lists_indexOf"></block>
+        <block type="lists_getIndex"></block>
+        <block type="lists_setIndex"></block>
+        <block type="lists_getSublist"></block>
+        <block type="lists_split"></block>
+      </category>
+    </category>
+    <sep></sep>
+    <category name="variables" colour="20" custom="VARIABLE">
+    </category>
+    <category name="functions" colour="80" custom="PROCEDURE">
+    </category>
+  </xml>
+
+  <script src="{% static 'js/mission-control.js' %}"></script>
+
+  <script type="text/javascript">
+  $(document).foundation();
+  </script>
+
+</body>
+
+</html>

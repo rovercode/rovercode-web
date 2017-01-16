@@ -1,0 +1,91 @@
+body{
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+
+h1 { 
+	font-family: "Open Sans";
+	font-weight:lighter;
+	font-size: 120px;
+	text-align: center;
+	color: #fff;
+	margin: 0;
+	padding: 0;
+}
+
+
+
+h2 {
+	font-family: "Open Sans";
+	font-weight: normal;
+	font-size: 40px;
+	text-align: center;
+	color: #000;
+	margin: 0;
+	padding-top: 200px;
+}
+
+h3 {
+	font-family: "Open Sans";
+	font-weight: normal;
+	font-size: 30px;
+	text-align: center;
+	margin: 5px 0;
+	padding: 0;
+	z-index: 1;
+	position: relative;
+}
+
+p {
+   font-family: "Merriweather";
+}
+
+
+
+.handwritten-center{
+   font-family: "Just Another Hand";
+   font-weight:lighter;
+   font-size: 160px;
+   text-align: center;
+   line-height: 90%;
+   height: 200px;
+}
+
+.button{
+	font-family: "Open Sans";
+	font-weight:lighter;
+	font-size: 36px;
+    text-align: center;
+}
+
+.panel{
+   margin:0px 0 20px 0;
+   border:none;
+   background-color:#EAEAEA;
+}
+
+#hero{
+	background:linear-gradient(rgba(32, 32, 32, 0.7), rgba(32, 32, 32, 0.7)), url('../img/bot.gif') 50% 0 no-repeat fixed;
+	color: #fff;
+	height: 1080px;
+	margin: 0;
+	padding: 200px 0 260px 0;
+	background-size: cover;
+}
+
+
+#config_link{
+    text-align: center;
+	padding: 100px 0 0px 0;
+}
+
+#config_link a{
+	color: #B2B2CC;
+	text-decoration: underline;
+}
+
+#config_link a:hover{
+	color: #FFFFFF;
+}
+
