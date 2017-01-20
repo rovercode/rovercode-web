@@ -50,7 +50,6 @@ function refreshSavedBds() {
 }
 
 function loadDesign(name) {
-  //$('#loadModal').modal('hide');
   $.get(roverResource(['blockdiagrams', name]), function(response){
     workspace.clear();
 
@@ -94,7 +93,7 @@ function acceptName() {
         $('#nameErrorArea').empty();
         $('a#designNameArea').text(designName);
         $('a#downloadLink').attr("onclick", "return downloadDesign(\""+designName+".xml\")");
-        $('#nameModal').foundation('reveal', 'close');
+        $('#nameModal').modal('hide');
       }
     });
   }
