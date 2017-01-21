@@ -92,24 +92,3 @@ function initApi(interpreter, scope) {
 	interpreter.setProperty(scope, 'popEventQueue',
 		interpreter.createNativeFunction(wrapper));
 }
-
-// function checkSensor(sensor) {
-// 	sensorVal = 0;
-//   if (sensor == 'SENSORS_left') {
-// 		pin = "XIO-P3";
-// 	} else if (sensor == 'SENSORS_right') {
-// 		pin = "XIO-P4";
-// 	} else {
-// 		return 0;
-// 	}
-//
-// 	$.ajax({
-// 			url: 'get-sensor-val.php',
-// 			data: {command: 'GET_SENSOR_VAL_BOOL', pin: pin},
-// 			success: function (result) {
-// 					sensorVal = result;
-// 			},
-// 			async: false
-// 	});
-// 	return sensorVal;
-// }
