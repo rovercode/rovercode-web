@@ -13,7 +13,7 @@ from __future__ import absolute_import, unicode_literals
 import environ
 
 ROOT_DIR = environ.Path(__file__) - 3  # (rovercode_web/config/settings/common.py - 3 = rovercode_web/)
-APPS_DIR = ROOT_DIR.path('rovercode_web')
+APPS_DIR = ROOT_DIR
 
 env = environ.Env()
 env.read_env()
@@ -79,7 +79,8 @@ DEBUG = env.bool('DJANGO_DEBUG', False)
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-FIXTURE_DIRS
 FIXTURE_DIRS = (
-    str(APPS_DIR.path('fixtures')),
+    str(APPS_DIR.path('rovercode_web/fixtures')),
+    str(APPS_DIR.path('mission-control/fixtures')),
 )
 
 # EMAIL CONFIGURATION
@@ -137,7 +138,8 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
         'DIRS': [
-            str(APPS_DIR.path('templates')),
+            str(APPS_DIR.path('rovercode_web/templates')),
+            str(APPS_DIR.path('mission_control/templates')),
         ],
         'OPTIONS': {
             # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
@@ -177,7 +179,8 @@ STATIC_URL = '/static/'
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = (
-    str(APPS_DIR.path('static')),
+    str(APPS_DIR.path('rovercode_web/static')),
+    str(APPS_DIR.path('mission_control/static')),
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
@@ -189,7 +192,7 @@ STATICFILES_FINDERS = (
 # MEDIA CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
-MEDIA_ROOT = str(APPS_DIR('media'))
+MEDIA_ROOT = str(APPS_DIR('rovercode_web/media'))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
 MEDIA_URL = '/media/'
