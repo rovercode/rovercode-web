@@ -6,4 +6,5 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.home, name='mission-control-home'),
+    url(r'^rovers/$', views.rovers, name='rovers')
 ]

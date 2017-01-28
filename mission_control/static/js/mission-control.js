@@ -147,6 +147,31 @@ function updateLocalStateAfterEvent(event){
   }
 }
 
+/*----- ROVER CONNECTION FUNCTIONS -----*/
+function getRovers() {
+  $('#registeredRoversArea').empty();
+  $('#connectModal').modal('toggle');
+  $.getJSON("/mission-control/rovers", function(result){
+      $.each(result, function(i, field){
+        console.log(field.fields.name);
+        $(document.createElement('a')).addClass('btn btn-primary')
+        .html(field.fields.name + " | " + field.fields.owner)
+        .attr('href', '#')
+        .css('margin', '10px')
+        .appendTo($("#registeredRoversArea"))
+        .click(function() {
+          setRoverIp(field.fields.local_ip);
+          $('#connectModal').modal('hide');
+        });
+      });
+  });
+}
+
+function setRoverIp(ip) {
+  writeToConsole('Talking to rover at ' + ip);
+  roverDomain = ip;
+}
+
 /*----- DESIGN SAVING/LOADING FUNCTIONS -----*/
 
 function chooseDesign() {
