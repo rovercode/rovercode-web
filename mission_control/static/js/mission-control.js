@@ -154,14 +154,14 @@ function getRovers() {
   $('#connectModal').modal('toggle');
   $.getJSON("/mission-control/rovers", function(result){
       $.each(result, function(i, field){
-        console.log(field.fields.name);
+        console.log(field.name);
         $(document.createElement('a')).addClass('btn btn-primary')
-        .html(field.fields.name + " | " + field.fields.owner)
+        .html(field.name + " | " + field.owner)
         .attr('href', '#')
         .css('margin', '10px')
         .appendTo($("#registeredRoversArea"))
         .click(function() {
-          setRoverIp(field.fields.local_ip);
+          setRoverIp(field.local_ip);
           $('#connectModal').modal('hide');
         });
       });
