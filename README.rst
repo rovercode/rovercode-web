@@ -13,13 +13,12 @@ rovercode-web
 .. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg
       :target: https://github.com/pydanny/cookiecutter-django/
       :alt: Built with Cookiecutter Django
+:License: GPLv3
 
 rovercode is easy-to-use package for controlling robots (rovers) that can sense and react to their environment. The Blockly editor makes it easy to program and run your bot straight from your browser. Just drag and drop your commands to drive motors, read values from a variety of supported sensors, and see what your rover sees with the built in webcam viewer.
 rovercode runs on any single-board-computer supported by the `Adafruit Python GPIO wrapper library <https://github.com/adafruit/Adafruit_Python_GPIO>`_, including the NextThingCo CHIP, Raspberry Pi, and BeagleBone Black. Once installed, just connect to your rover and get started.
 
-**rovercode is made up of two parts.** rovercode-web (this repo) is the web app that is hosted on the Internet. rovercode (`a different repo<https://github.com/aninternetof/rovercode>`_) is the service that runs on the rover.
-
-:License: GPLv3
+**rovercode is made up of two parts.** rovercode-web (this repo) is the web app that is hosted on the Internet. rovercode (`a different repo <https://github.com/aninternetof/rovercode>`_) is the service that runs on the rover.
 
 Setup
 -----
