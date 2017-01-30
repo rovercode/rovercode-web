@@ -22,11 +22,12 @@ rovercode runs on any single-board-computer supported by the `Adafruit Python GP
 
 Setup
 -----
-Install `docker <https://docs.docker.com/engine/installation/>`_ and `docker-compose <https://docs.docker.com/compose/install/>`_ , then
+Install `docker <https://docs.docker.com/engine/installation/>`_ and `docker-compose <https://docs.docker.com/compose/install/>`_, then
 
 .. code-block:: bash
 
     $ git clone https://github.com/aninternetof/rovercode-web.git && cd rovercode-web
+    $ git checkout development
     $ docker-compose -f dev.yml build
     $ docker-compose -f dev.yml up
     $ google-chrome localhost:8000
