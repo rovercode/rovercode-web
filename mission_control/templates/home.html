@@ -104,6 +104,7 @@
           </ul>
 
           <ul class="nav navbar-nav pull-xs-right">
+            <li class="nav-item" style="margin-right:20px"><a class="nav-link" href="#" onclick="return getRovers()">Connect To A Rover</a></li>
             <li class="nav-item code-control-button-container"><a id="runButton" style="background-color:#F04124; font-size:400%; line-height: 5.8rem; box-shadow: 1px 1px 1px #333333;
                     position:relative; z-index:999" href="#" onclick="return goToRunningState()">
                     <i class="fa fa-play code-control-button"></i></a></li>
@@ -199,6 +200,23 @@
                     <div id="loadStatusArea"></div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" role="dialog" id="connectModal" aria-labelledby="connectModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div clas="modal-body">
+          <div class="container-fluid">
+            <div class="row" style="padding-top: 40px; padding-bottom: 40px">
+              <div class="col-md-12">
+                <h2>Here are the online rovers:</h2>
+                <div class="panel" id="registeredRoversArea"></div>
               </div>
             </div>
           </div>
