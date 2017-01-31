@@ -112,12 +112,12 @@ function keyEvent(e) {
 }
 
 /* Add video stream */
-videoSource = 'http://' + window.location.hostname + ':8080/?action=stream';
-$('#videoBackground').append('<img src=' + videoSource + ' />');
-$('#videoBackground').find('img').on("error", function() {
+/* videoSource = 'http://' + window.location.hostname + ':8080/?action=stream'; */
+/* $('#videoBackground').append('<img src=' + videoSource + ' />'); */
+/* $('#videoBackground').find('img').on("error", function() { */
   $('#videoBackground').empty();
   $('#videoBackground').append("[no Rover webcam detected]");
-});
+/* }); */
 
 $('#nameModal').modal();
 
