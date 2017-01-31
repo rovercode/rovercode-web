@@ -9,6 +9,7 @@ before_install:
 install:
   - pip install -r requirements/test.txt
 script:
+  - cd $TRAVIS_BUILD_DIR/rovercode-web
   - py.test
 language: python
 python:
