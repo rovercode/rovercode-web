@@ -9,7 +9,7 @@ before_install:
 install:
   - pip install -r requirements/local.txt
 script:
-  - py.test
+  - py.test --cov-report=
 language: python
 python:
 - "3.5"
