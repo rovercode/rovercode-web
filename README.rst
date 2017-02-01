@@ -6,6 +6,7 @@ rovercode
 rovercode-web
 -------------
 
+:License: GPLv3
 .. image:: https://badges.gitter.im/aninternetof/rovercode.svg
       :target: https://gitter.im/aninternetof/rovercode?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 .. image:: https://img.shields.io/badge/join-mailing%20list-yellow.svg?style=flat
@@ -13,7 +14,6 @@ rovercode-web
 .. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg
       :target: https://github.com/pydanny/cookiecutter-django/
       :alt: Built with Cookiecutter Django
-:License: GPLv3
 
 rovercode is easy-to-use package for controlling robots (rovers) that can sense and react to their environment. The Blockly editor makes it easy to program and run your bot straight from your browser. Just drag and drop your commands to drive motors, read values from a variety of supported sensors, and see what your rover sees with the built in webcam viewer.
 rovercode runs on any single-board-computer supported by the `Adafruit Python GPIO wrapper library <https://github.com/adafruit/Adafruit_Python_GPIO>`_, including the NextThingCo CHIP, Raspberry Pi, and BeagleBone Black. Once installed, just connect to your rover and get started.
@@ -27,8 +27,8 @@ Install `docker <https://docs.docker.com/engine/installation/>`_ and `docker-com
 .. code-block:: bash
 
     $ git clone --recursive -j8 https://github.com/aninternetof/rovercode-web.git && cd rovercode-web
-    $ docker-compose -f dev.yml build
-    $ docker-compose -f dev.yml up
+    $ sudo docker-compose -f dev.yml build
+    $ sudo docker-compose -f dev.yml up
     $ google-chrome localhost:8000
 
 Basic Commands
