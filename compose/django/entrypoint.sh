@@ -15,6 +15,7 @@ fi
 
 export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_USER
 
+export CELERY_BROKER_URL=$REDIS_URL/0export CELERY_BROKER_URL=$REDIS_URL/0
 
 function postgres_ready(){
 python << END

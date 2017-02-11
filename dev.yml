@@ -20,6 +20,7 @@ services:
     command: /start-dev.sh
     depends_on:
       - postgres
+      - redis
     environment:
       - POSTGRES_USER=rovercode_web
       - USE_DOCKER=yes
@@ -32,12 +33,32 @@ services:
 
       - mailhog
 
+  redis:
+    image: redis:latest
 
+  celeryworker:
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile
+    user: django
+    env_file: .env
+    depends_on:
+     - postgres
+     - redis
+    command: celery -A rovercode_web.taskapp worker -l INFO
 
-
+  celerybeat:
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile
+    user: django
+    env_file: .env
+    depends_on:
+      - postgres
+      - redis
+    command: celery -A rovercode_web.taskapp beat -l INFO
 
   mailhog:
     image: mailhog/mailhog
     ports:
       - "8025:8025"
-

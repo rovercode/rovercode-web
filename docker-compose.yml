@@ -59,3 +59,25 @@ services:
   redis:
     image: redis:latest
 
+
+  celeryworker:
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile
+    user: django
+    env_file: .env
+    depends_on:
+     - postgres
+     - redis
+    command: celery -A rovercode_web.taskapp worker -l INFO
+
+  celerybeat:
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile
+    user: django
+    env_file: .env
+    depends_on:
+      - postgres
+      - redis
+    command: celery -A rovercode_web.taskapp beat -l INFO
