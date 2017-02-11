@@ -34,7 +34,7 @@ services:
       - mailhog
 
   redis:
-    image: redis:latest
+    image: redis:alpine
 
   celeryworker:
     build:
