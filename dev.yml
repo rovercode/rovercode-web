@@ -39,23 +39,24 @@ services:
   celeryworker:
     build:
       context: .
-      dockerfile: ./compose/django/Dockerfile
+      dockerfile: ./compose/django/Dockerfile-dev
     user: django
-    env_file: .env
     depends_on:
      - postgres
      - redis
+    volumes:
+      - .:/app
     command: celery -A rovercode_web.taskapp worker -l INFO
 
   celerybeat:
     build:
       context: .
-      dockerfile: ./compose/django/Dockerfile
-    user: django
-    env_file: .env
+      dockerfile: ./compose/django/Dockerfile-dev
     depends_on:
       - postgres
       - redis
+    volumes:
+      - .:/app
     command: celery -A rovercode_web.taskapp beat -l INFO
 
   mailhog:
