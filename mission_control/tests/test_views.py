@@ -13,7 +13,7 @@ class TestRoverViewSet(TestCase):
             owner='jimbo',
             local_ip='8.8.8.8'
         )
-        response = self.get(reverse('rover-list'))
+        response = self.get(reverse('mission-control:rover-list'))
         self.assertEqual(1, len(response.json()))
         self.assertEqual(response.json()[0]['name'], 'rover')
         self.assertEqual(response.json()[0]['owner'], 'jimbo')
@@ -29,7 +29,7 @@ class TestBlockDiagramViewSet(TestCase):
             name='test',
             content='<xml></xml>'
         )
-        response = self.get(reverse('blockdiagram-list'))
+        response = self.get(reverse('mission-control:blockdiagram-list'))
         self.assertEqual(1, len(response.json()))
         self.assertEqual(response.json()[0]['id'], bd.id)
         self.assertEqual(response.json()[0]['user'], user.id)
