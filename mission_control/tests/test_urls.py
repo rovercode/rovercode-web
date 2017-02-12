@@ -15,6 +15,18 @@ class TestMissionControlURLs(TestCase):
             resolve('/mission-control/').view_name,
             'mission-control:home')
 
+    def test_list_reverse(self):
+        """mission-control:list should reverse to /mission-control/list/."""
+        self.assertEqual(
+            reverse('mission-control:list'),
+            '/mission-control/list/')
+
+    def test_list_resolve(self):
+        """/mission-control/list/ should resolve to mission-control:list."""
+        self.assertEqual(
+            resolve('/mission-control/list/').view_name,
+            'mission-control:list')
+
     def test_rovers_reverse(self):
         """mission-control:rovers should reverse to /mission-control/rovers/."""
         self.assertEqual(

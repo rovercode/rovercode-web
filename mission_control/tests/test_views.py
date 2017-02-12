@@ -1,8 +1,42 @@
 from test_plus.test import TestCase
 
+from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 
 from mission_control.models import Rover, BlockDiagram
+
+
+class TestListView(TestCase):
+    def setUp(self):
+        self.admin = get_user_model().objects.create(username='administrator')
+        self.admin.set_password('password')
+        self.admin.save()
+
+    def test_list(self):
+        self.client.login(username='administrator', password='password')
+        user = self.make_user()
+        bd1 = BlockDiagram.objects.create(
+            user=user,
+            name='user_bd',
+            content='<xml></xml>'
+        )
+        bd2 = BlockDiagram.objects.create(
+            user=self.admin,
+            name='admin_bd',
+            content='<xml></xml>'
+        )
+        response = self.get(reverse('mission-control:list'))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, self.admin.username)
+        self.assertContains(response, bd2.name)
+        self.assertNotContains(response, bd1.name)
+
+    def test_list_not_logged_in(self):
+        response = self.get(reverse('mission-control:list'))
+        self.assertRedirects(
+            response,
+            reverse('account_login') + '?next=' +
+            reverse('mission-control:list'))
 
 
 class TestRoverViewSet(TestCase):

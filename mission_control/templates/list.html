@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block css %}
+  {{ block.super }}
+  <style>
+    .btn {
+      margin: 5px;
+    }
+  </style>
+{% endblock css %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12">
+      <h1>{{ request.user.username }}'s Block Diagrams:</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12 btn-group" id="bds">
+      {% for bd in bd_list %}
+        <button class="btn btn-primary">{{ bd.name }}</button>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock content %}
