@@ -7,6 +7,7 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register(r'rovers', views.RoverViewSet)
+router.register(r'block-diagrams', views.BlockDiagramViewSet)
 
 urlpatterns = [
     url(r'^$', views.home, name='mission-control-home'),
