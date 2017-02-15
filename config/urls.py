@@ -21,7 +21,7 @@ urlpatterns = [
     url(r'^accounts/', include('allauth.urls')),
 
     # Your stuff: custom urls includes go here
-    url(r'^mission-control/', include('mission_control.urls')),
+    url(r'^mission-control/', include('mission_control.urls', namespace='mission-control')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
