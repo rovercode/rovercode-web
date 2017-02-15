@@ -14,7 +14,6 @@ if not settings.configured:
 
 app = Celery('rovercode_web')
 
-
 class CeleryConfig(AppConfig):
     name = 'rovercode_web.taskapp'
     verbose_name = 'Celery Config'
@@ -25,6 +24,8 @@ class CeleryConfig(AppConfig):
         app.config_from_object('django.conf:settings')
         installed_apps = [app_config.name for app_config in apps.get_app_configs()]
         app.autodiscover_tasks(lambda: installed_apps, force=True)
+
+        app.add_periodic_task(5.0, another_debug_task.s(), name='hi every 5')
 
         if hasattr(settings, 'RAVEN_CONFIG'):
             # Celery signal registration
@@ -39,3 +40,7 @@ class CeleryConfig(AppConfig):
 @app.task(bind=True)
 def debug_task(self):
     print('Request: {0!r}'.format(self.request))  # pragma: no cover
+
+@app.task(bind=True)
+def another_debug_task(self):
+    print('Hi there!!!')
