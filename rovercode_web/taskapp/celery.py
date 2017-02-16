@@ -6,7 +6,6 @@ from celery.schedules import crontab
 from django.apps import apps, AppConfig
 from django.conf import settings
 
-
 if not settings.configured:
     # set the default Django settings module for the 'celery' program.
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')  # pragma: no cover
@@ -25,7 +24,8 @@ class CeleryConfig(AppConfig):
         installed_apps = [app_config.name for app_config in apps.get_app_configs()]
         app.autodiscover_tasks(lambda: installed_apps, force=True)
 
-        app.add_periodic_task(5.0, another_debug_task.s(), name='hi every 5')
+        app.add_periodic_task(13.0, another_debug_task.s(), name='hi every 13')
+        app.add_periodic_task(5.0, clear_old_rovers.s(), name='clear old rovers')
 
         if hasattr(settings, 'RAVEN_CONFIG'):
             # Celery signal registration
@@ -44,3 +44,9 @@ def debug_task(self):
 @app.task(bind=True)
 def another_debug_task(self):
     print('Hi there!!!')
+
+@app.task(bind=True)
+def clear_old_rovers(self):
+    from mission_control.models import Rover
+    rovers = Rover.objects.all()
+    print(rovers[0].name)
