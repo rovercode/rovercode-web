@@ -43,6 +43,9 @@
             <ul class="nav navbar-nav pull-xs-right">
               {% if request.user.is_authenticated %}
                 <li class="nav-item">
+                  <a class="nav-link" href="{% url 'mission-control:list' %}">{% trans "My Block Diagrams" %}</a>
+                </li>
+                <li class="nav-item">
                   <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a>
                 </li>
                 <li class="nav-item">
