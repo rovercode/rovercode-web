@@ -69,7 +69,7 @@
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">File</a>
               <div class="dropdown-menu">
-                <a href="#" onclick="return chooseDesign()">Load Previous Design</a>
+                <a href="#" onclick="return chooseDesign({{ request.user.id }})">Load Previous Design</a>
                 <a href="#" onclick="$('#nameModal').modal()">Copy This Design</a>
                 <a href="#" id="downloadLink">Download This Design</a>
               </div>
@@ -165,7 +165,7 @@
             <div class="row text-md-center" style="padding-top: 40px; padding-bottom: 40px">
               <div class="col-md-12">
                 <h2>Or, load a saved design</h2>
-                <a role="button" onclick="return chooseDesign()" style="color: white;" class="btn btn-primary">Go</a>
+                <a role="button" onclick="return chooseDesign({{ request.user.id }})" style="color: white;" class="btn btn-primary">Go</a>
               </div>
             </div>
           </div>
@@ -181,7 +181,7 @@
           <div class="container-fluid">
             <div class="row" style="padding-top: 40px; padding-bottom: 40px">
               <div class="col-md-12">
-                <h2>Here are the designs saved on this rover:</h2>
+                <h2>Here are your saved designs:</h2>
                 <div class="panel" id="savedDesignsArea"></div>
               </div>
             </div>

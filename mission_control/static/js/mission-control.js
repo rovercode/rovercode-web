@@ -176,10 +176,10 @@ function setRoverIp(ip) {
 
 /*----- DESIGN SAVING/LOADING FUNCTIONS -----*/
 
-function chooseDesign() {
+function chooseDesign(userId) {
   $('#nameModal').modal('hide');
   $('#loadModal').modal('show');
-  refreshSavedBds();
+  refreshSavedBds(userId);
 }
 
 $('#uploadForm #fileToUpload').change(function(){
