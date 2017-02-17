@@ -69,3 +69,25 @@ class TestBlockDiagramViewSet(TestCase):
         self.assertEqual(response.json()[0]['user'], user.id)
         self.assertEqual(response.json()[0]['name'], 'test')
         self.assertEqual(response.json()[0]['content'], '<xml></xml>')
+
+    def test_bd_user_filter(self):
+        user1 = self.make_user('user1')
+        user2 = self.make_user('user2')
+        BlockDiagram.objects.create(
+            user=user1,
+            name='test1',
+            content='<xml></xml>'
+        )
+        bd2 = BlockDiagram.objects.create(
+            user=user2,
+            name='test2',
+            content='<xml></xml>'
+        )
+        response = self.get(
+            reverse(
+                'mission-control:blockdiagram-list') + '?user=' + str(user2.id))
+        self.assertEqual(1, len(response.json()))
+        self.assertEqual(response.json()[0]['id'], bd2.id)
+        self.assertEqual(response.json()[0]['user'], user2.id)
+        self.assertEqual(response.json()[0]['name'], 'test2')
+        self.assertEqual(response.json()[0]['content'], '<xml></xml>')

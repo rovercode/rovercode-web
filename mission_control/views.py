@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from .models import Rover, BlockDiagram
-from rest_framework import viewsets
+from rest_framework import filters, viewsets
 from .serializers import RoverSerializer, BlockDiagramSerializer
 
 
@@ -29,3 +29,5 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
     """
     queryset = BlockDiagram.objects.all()
     serializer_class = BlockDiagramSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('user',)
