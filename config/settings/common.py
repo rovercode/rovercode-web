@@ -252,7 +252,6 @@ LOGIN_URL = 'account_login'
 AUTOSLUG_SLUGIFY_FUNCTION = 'slugify.slugify'
 
 ########## CELERY
-INSTALLED_APPS += ('rovercode_web.taskapp.celery.CeleryConfig',)
 BROKER_URL = env('CELERY_BROKER_URL', default='django://')
 if BROKER_URL == 'django://':
     CELERY_RESULT_BACKEND = 'redis://'

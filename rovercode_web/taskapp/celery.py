@@ -1,17 +1,20 @@
-
 from __future__ import absolute_import
 import os
 from celery import Celery
-from celery.schedules import crontab
+
 from django.apps import apps, AppConfig
 from django.conf import settings
 
-if not settings.configured:
-    # set the default Django settings module for the 'celery' program.
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')  # pragma: no cover
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')  # pragma: no cover
+
+import django
+django.setup()
+
+from mission_control.models import Rover
 
 
 app = Celery('rovercode_web')
+app.config_from_object('django.conf:settings', namespace='CELERY')
 
 class CeleryConfig(AppConfig):
     name = 'rovercode_web.taskapp'
@@ -47,6 +50,5 @@ def another_debug_task(self):
 
 @app.task(bind=True)
 def clear_old_rovers(self):
-    from mission_control.models import Rover
     rovers = Rover.objects.all()
     print(rovers[0].name)
