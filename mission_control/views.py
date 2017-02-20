@@ -2,7 +2,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from .models import Rover, BlockDiagram
 from rest_framework import filters, viewsets
+from rest_framework.response import Response
 from .serializers import RoverSerializer, BlockDiagramSerializer
+from mission_control.utils import remove_old_rovers
 
 
 def home(request):
@@ -22,6 +24,11 @@ class RoverViewSet(viewsets.ModelViewSet):
     queryset = Rover.objects.all()
     serializer_class = RoverSerializer
 
+    def list(self, request):
+        remove_old_rovers()
+        queryset = Rover.objects.all()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 class BlockDiagramViewSet(viewsets.ModelViewSet):
     """

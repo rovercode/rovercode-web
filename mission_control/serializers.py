@@ -4,7 +4,7 @@ from rest_framework import serializers
 class RoverSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Rover
-        fields = ('name', 'owner', 'local_ip', 'last_checkin')
+        fields = ('id', 'name', 'owner', 'local_ip', 'last_checkin')
 
 
 class BlockDiagramSerializer(serializers.ModelSerializer):

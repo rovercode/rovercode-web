@@ -5,6 +5,8 @@ from django.core.urlresolvers import reverse
 
 from mission_control.models import Rover, BlockDiagram
 
+import time
+
 
 class TestListView(TestCase):
     def setUp(self):
@@ -52,6 +54,9 @@ class TestRoverViewSet(TestCase):
         self.assertEqual(response.json()[0]['name'], 'rover')
         self.assertEqual(response.json()[0]['owner'], 'jimbo')
         self.assertEqual(response.json()[0]['local_ip'], '8.8.8.8')
+        time.sleep(6)
+        response = self.get(reverse('mission-control:rover-list'))
+        self.assertEqual(0, len(response.json()))
 
 
 class TestBlockDiagramViewSet(TestCase):
