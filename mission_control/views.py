@@ -5,6 +5,7 @@ from rest_framework import filters, viewsets
 from rest_framework.response import Response
 from .serializers import RoverSerializer, BlockDiagramSerializer
 from mission_control.utils import remove_old_rovers
+from datetime import timedelta
 
 
 def home(request):
@@ -25,7 +26,7 @@ class RoverViewSet(viewsets.ModelViewSet):
     serializer_class = RoverSerializer
 
     def list(self, request):
-        remove_old_rovers()
+        remove_old_rovers(timedelta(seconds=-5))
         queryset = Rover.objects.all()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
