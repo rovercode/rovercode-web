@@ -15,9 +15,12 @@ class TestRemoveOldRovers(TestCase):
             owner='jimbo',
             local_ip='8.8.8.8'
         )
-        rovers = Rover.objects.all()
-        self.assertEqual(1, len(rovers))
+        self.assertEqual(1, Rover.objects.count())
         time.sleep(6)
+        Rover.objects.create(
+            name='rover2',
+            owner='jimbo',
+            local_ip='8.8.8.8'
+        )
         remove_old_rovers();
-        rovers = Rover.objects.all()
-        self.assertEqual(0, len(rovers))
+        self.assertEqual(1, Rover.objects.count())

@@ -55,8 +55,13 @@ class TestRoverViewSet(TestCase):
         self.assertEqual(response.json()[0]['owner'], 'jimbo')
         self.assertEqual(response.json()[0]['local_ip'], '8.8.8.8')
         time.sleep(6)
+        Rover.objects.create(
+            name='rover2',
+            owner='jimbo',
+            local_ip='8.8.8.8'
+        )
         response = self.get(reverse('mission-control:rover-list'))
-        self.assertEqual(0, len(response.json()))
+        self.assertEqual(1, len(response.json()))
 
 
 class TestBlockDiagramViewSet(TestCase):
