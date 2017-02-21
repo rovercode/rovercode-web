@@ -48,7 +48,7 @@ LOCAL_APPS = (
     # custom users app
     'rovercode_web.users.apps.UsersConfig',
     # Your stuff: custom apps go here
-    'mission_control'
+    'mission_control.apps.MissionControlConfig'
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
