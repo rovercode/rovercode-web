@@ -8,6 +8,12 @@ from mission_control.models import Rover, BlockDiagram
 import time
 
 
+class TestHomeView(TestCase):
+    def test_home(self):
+        response = self.get(reverse('mission-control:home'))
+        self.assertEqual(200, response.status_code)
+
+
 class TestListView(TestCase):
     def setUp(self):
         self.admin = get_user_model().objects.create(username='administrator')
