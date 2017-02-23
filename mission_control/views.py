@@ -1,7 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from django_filters.rest_framework import DjangoFilterBackend
 from .models import Rover, BlockDiagram
-from rest_framework import filters, viewsets
+from rest_framework import viewsets
 from rest_framework.response import Response
 from .serializers import RoverSerializer, BlockDiagramSerializer
 from mission_control.utils import remove_old_rovers
@@ -31,11 +32,12 @@ class RoverViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+
 class BlockDiagramViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows block diagrams to be viewed or edited.
     """
     queryset = BlockDiagram.objects.all()
     serializer_class = BlockDiagramSerializer
-    filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend,)
     filter_fields = ('user',)
