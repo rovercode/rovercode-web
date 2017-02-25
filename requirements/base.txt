@@ -47,3 +47,4 @@ redis>=2.10.5
 # Your custom requirements go here
 djangorestframework~=3.5.3
 django-filter==1.0.1
+prospector==0.12.4

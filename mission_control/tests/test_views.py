@@ -1,3 +1,4 @@
+"""Mission Control test views."""
 from test_plus.test import TestCase
 
 from django.contrib.auth import get_user_model
@@ -9,18 +10,25 @@ import time
 
 
 class TestHomeView(TestCase):
+    """Tests the home view."""
+
     def test_home(self):
+        """Test the home view."""
         response = self.get(reverse('mission-control:home'))
         self.assertEqual(200, response.status_code)
 
 
 class TestListView(TestCase):
+    """Tests the block diagram list view."""
+
     def setUp(self):
+        """Setup the tests."""
         self.admin = get_user_model().objects.create(username='administrator')
         self.admin.set_password('password')
         self.admin.save()
 
     def test_list(self):
+        """Test the block diagram list view displays the correct items."""
         self.client.login(username='administrator', password='password')
         user = self.make_user()
         bd1 = BlockDiagram.objects.create(
@@ -40,6 +48,7 @@ class TestListView(TestCase):
         self.assertNotContains(response, bd1.name)
 
     def test_list_not_logged_in(self):
+        """Test the block diagram list view redirects if no logged in user."""
         response = self.get(reverse('mission-control:list'))
         self.assertRedirects(
             response,
@@ -48,8 +57,10 @@ class TestListView(TestCase):
 
 
 class TestRoverViewSet(TestCase):
+    """Tests the rover API view."""
 
     def test_rover(self):
+        """Test the rover view displays the correct items."""
         Rover.objects.create(
             name='rover',
             owner='jimbo',
@@ -71,8 +82,10 @@ class TestRoverViewSet(TestCase):
 
 
 class TestBlockDiagramViewSet(TestCase):
+    """Tests the block diagram API view."""
 
     def test_bd(self):
+        """Test the block diagram API view displays the correct items."""
         user = self.make_user()
         bd = BlockDiagram.objects.create(
             user=user,
@@ -87,6 +100,7 @@ class TestBlockDiagramViewSet(TestCase):
         self.assertEqual(response.json()[0]['content'], '<xml></xml>')
 
     def test_bd_user_filter(self):
+        """Test the block diagram API view filters on user correctly."""
         user1 = self.make_user('user1')
         user2 = self.make_user('user2')
         BlockDiagram.objects.create(

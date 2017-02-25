@@ -1,6 +1,5 @@
+"""Mission Control test utils."""
 from test_plus.test import TestCase
-
-from django.core.urlresolvers import reverse
 
 from mission_control.models import Rover
 from mission_control.utils import remove_old_rovers
@@ -8,9 +7,12 @@ from mission_control.utils import remove_old_rovers
 import time
 from datetime import timedelta
 
+
 class TestRemoveOldRovers(TestCase):
+    """Tests removing old rovers."""
 
     def test_rover(self):
+        """Test the remove_old_rovers method."""
         Rover.objects.create(
             name='rover',
             owner='jimbo',
@@ -23,5 +25,5 @@ class TestRemoveOldRovers(TestCase):
             owner='jimbo',
             local_ip='8.8.8.8'
         )
-        remove_old_rovers(timedelta(seconds=-1));
+        remove_old_rovers(timedelta(seconds=-1))
         self.assertEqual(1, Rover.objects.count())
