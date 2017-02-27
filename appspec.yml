@@ -5,6 +5,6 @@ files:
     destination: /home/ubuntu/rovercode-web
 hooks:
   BeforeInstall:
-    - location: /home/ubuntu/Scripts/remove_prev_install.sh
+    - location: deploy-scripts/remove_prev_install.sh
   AfterInstall:
-    - location: /home/ubuntu/Scripts/rename_app.sh
+    - location: deploy-scripts/rename_app.sh
