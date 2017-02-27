@@ -3,3 +3,8 @@ os: linux
 files:
   - source: /
     destination: /home/ubuntu/rovercode-web
+hooks:
+  BeforeInstall:
+    - location: /home/ubuntu/Scripts/remove_prev_install.sh
+  AfterInstall:
+    - location: /home/ubuntu/Scripts/rename_app.sh
