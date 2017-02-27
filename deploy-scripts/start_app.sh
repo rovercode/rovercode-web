@@ -1,5 +1,6 @@
 #!/bin/bash
 pushd /home/ubuntu/rovercode-web > /dev/null
-docker-compose stop
+cp env-example .env
+docker-compose build
+docker-compose up
 popd > /dev/null
-rm -rf /home/ubuntu/rovercode-web

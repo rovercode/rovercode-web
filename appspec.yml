@@ -8,3 +8,5 @@ hooks:
     - location: deploy-scripts/remove_prev_install.sh
   AfterInstall:
     - location: deploy-scripts/rename_app.sh
+  ApplicationStart:
+    - location: deploy-scripts/start_app.sh
