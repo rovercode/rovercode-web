@@ -10,4 +10,3 @@ hooks:
     - location: deploy-scripts/rename_app.sh
   ApplicationStart:
     - location: deploy-scripts/start_app.sh
-      runas: ubuntu
