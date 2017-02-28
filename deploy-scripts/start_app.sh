@@ -1,4 +1,4 @@
 #!/bin/bash
 cd /home/ubuntu/rovercode-web
 docker-compose build
-docker-compose up
+docker-compose up -d
