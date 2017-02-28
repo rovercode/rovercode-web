@@ -1,3 +1,2 @@
 #!/bin/bash
-cd /home/ubuntu/rovercode-web > /dev/null
-cp env.example .env
+cp /home/ubuntu/rovercode-web.env /home/ubuntu/rovercode-web/.env
