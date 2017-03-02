@@ -32,7 +32,7 @@ deploy:
   deployment_group: beta-rovercode-web
   on:
     repo: aninternetof/rovercode-web
-    branch: development
+    branch: feature/codedeploy
 - provider: codedeploy
   access_key_id: AKIAIZTZIW2KWAYZ6MUQ
   secret_access_key:
@@ -42,4 +42,4 @@ deploy:
   deployment_group: rovercode-web
   on:
     repo: aninternetof/rovercode-web
-    branch: master
+    branch: feature/codedeploy
