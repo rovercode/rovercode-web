@@ -30,7 +30,7 @@ Install `docker <https://docs.docker.com/engine/installation/>`_ and `docker-com
 
 .. code-block:: bash
 
-    $ git clone --recursive -j8 https://github.com/aninternetof/rovercode-web.git && cd rovercode-web
+    $ git clone --recursive https://github.com/aninternetof/rovercode-web.git && cd rovercode-web
     $ sudo docker-compose -f dev.yml build
     $ sudo docker-compose -f dev.yml up
     $ google-chrome localhost:8000

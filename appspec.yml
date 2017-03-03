@@ -1,0 +1,14 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu/rovercode-web
+hooks:
+  BeforeInstall:
+    - location: deploy-scripts/remove_prev_install.sh
+  AfterInstall:
+    - location: deploy-scripts/rename_app.sh
+    - location: deploy-scripts/create_env.sh
+    - location: deploy-scripts/change_ownership.sh
+  ApplicationStart:
+    - location: deploy-scripts/start_app.sh
