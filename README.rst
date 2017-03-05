@@ -8,7 +8,7 @@ rovercode-web
 
 :License: GPLv3
 .. image:: https://img.shields.io/badge/chat-on%20Slack-41AB8C.svg?style=flat
-      :target: https://rovercode.herokuapp.com/
+      :target: http://chat.rovercode.com/
 .. image:: https://img.shields.io/badge/join-mailing%20list-yellow.svg?style=flat
       :target: http://rovercode.org/cgi-bin/mailman/listinfo/developers
 .. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg
