@@ -1,9 +1,6 @@
 [submodule "blockly"]
 	path = mission_control/static/blockly
 	url = https://github.com/aninternetof/blockly
-[submodule "closure-library"]
-	path = mission_control/static/closure-library
-	url = https://github.com/google/closure-library
 [submodule "JS-Interpreter"]
 	path = mission_control/static/JS-Interpreter
 	url = https://github.com/NeilFraser/JS-Interpreter
