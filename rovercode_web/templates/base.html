@@ -43,6 +43,9 @@
             <ul class="nav navbar-nav pull-xs-right">
               {% if request.user.is_authenticated %}
                 <li class="nav-item">
+                  <a class="nav-link" href="{% url 'mission-control:list' %}">{% trans "My Block Diagrams" %}</a>
+                </li>
+                <li class="nav-item">
                   <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a>
                 </li>
                 <li class="nav-item">
@@ -97,5 +100,13 @@
 
 
     {% endblock javascript %}
+
+    <div class="text-muted text-xs-center text-sm-center text-md-center text-lg-center nice-underlines" style="margin-top: 60px;">
+      <p>
+        <a href="https://github.com/aninternetof/rovercode-web">About us</a>.
+        rovercode is &copy 2017 Brady L. Hurlburt and rovercode contributors.
+      </p>
+    </div>
+
   </body>
 </html>

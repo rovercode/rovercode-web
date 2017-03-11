@@ -26,20 +26,21 @@ Blockly.HSV_VALUE = 0.9;
 Blockly.Flyout.prototype.CORNER_RADIUS = 0;
 Blockly.BlockSvg.START_HAT = true;
 
-/* Set up a listener for sensor events */
-namespace = '/api/v1';
-socket = io.connect(namespace);
-socket.on('connect', function () {
-  socket.emit('status', {data: 'Connected'});
-});
-socket.on('binary_sensors', function(msg) {
-  writeToConsole(msg.data);
-  updateLocalStateAfterEvent(msg.data);
-  eventQueue.push(msg.data);
-});
-socket.on('status', function(msg) {
-  writeToConsole(msg.data);
-});
+/* Socket for for sensor events */
+function connectToSocket() {
+  socket = io.connect(roverResource(''));
+  socket.on('connect', function () {
+    socket.emit('status', {data: 'Connected'});
+  });
+  socket.on('binary_sensors', function(msg) {
+    writeToConsole(msg.data);
+    updateLocalStateAfterEvent(msg.data);
+    eventQueue.push(msg.data);
+  });
+  socket.on('status', function(msg) {
+    writeToConsole(msg.data);
+  });
+}
 
 /* Inject Blockly */
 var workspace = Blockly.inject(blocklyDiv,
@@ -111,12 +112,12 @@ function keyEvent(e) {
 }
 
 /* Add video stream */
-videoSource = 'http://' + window.location.hostname + ':8080/?action=stream';
-$('#videoBackground').append('<img src=' + videoSource + ' />');
-$('#videoBackground').find('img').on("error", function() {
+/* videoSource = 'http://' + window.location.hostname + ':8080/?action=stream'; */
+/* $('#videoBackground').append('<img src=' + videoSource + ' />'); */
+/* $('#videoBackground').find('img').on("error", function() { */
   $('#videoBackground').empty();
   $('#videoBackground').append("[no Rover webcam detected]");
-});
+/* }); */
 
 $('#nameModal').modal();
 
@@ -147,12 +148,38 @@ function updateLocalStateAfterEvent(event){
   }
 }
 
+/*----- ROVER CONNECTION FUNCTIONS -----*/
+function getRovers() {
+  $('#registeredRoversArea').empty();
+  $('#connectModal').modal('toggle');
+  $.getJSON("/mission-control/rovers", function(result){
+      $.each(result, function(i, field){
+        console.log(field.name);
+        $(document.createElement('a')).addClass('btn btn-primary')
+        .html(field.name + " | " + field.owner)
+        .attr('href', '#')
+        .css('margin', '10px')
+        .appendTo($("#registeredRoversArea"))
+        .click(function() {
+          setRoverIp(field.local_ip);
+          $('#connectModal').modal('hide');
+        });
+      });
+  });
+}
+
+function setRoverIp(ip) {
+  writeToConsole('Talking to rover at ' + ip);
+  roverDomain = ip;
+  connectToSocket();
+}
+
 /*----- DESIGN SAVING/LOADING FUNCTIONS -----*/
 
-function chooseDesign() {
+function chooseDesign(userId) {
   $('#nameModal').modal('hide');
   $('#loadModal').modal('show');
-  refreshSavedBds();
+  refreshSavedBds(userId);
 }
 
 $('#uploadForm #fileToUpload').change(function(){

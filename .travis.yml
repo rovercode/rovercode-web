@@ -1,12 +1,45 @@
 sudo: true
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq build-essential gettext python-dev zlib1g-dev libpq-dev xvfb
-  - sudo apt-get install -qq libtiff4-dev libjpeg8-dev libfreetype6-dev liblcms1-dev libwebp-dev
-  - sudo apt-get install -qq graphviz-dev python-setuptools python3-dev python-virtualenv python-pip
-  - sudo apt-get install -qq firefox automake libtool libreadline6 libreadline6-dev libreadline-dev
-  - sudo apt-get install -qq libsqlite3-dev libxml2 libxml2-dev libssl-dev libbz2-dev wget curl llvm
+- sudo apt-get update -qq
+- sudo apt-get install -qq build-essential gettext python-dev zlib1g-dev libpq-dev
+  xvfb
+- sudo apt-get install -qq libtiff4-dev libjpeg8-dev libfreetype6-dev liblcms1-dev
+  libwebp-dev
+- sudo apt-get install -qq graphviz-dev python-setuptools python3-dev python-virtualenv
+  python-pip
+- sudo apt-get install -qq firefox automake libtool libreadline6 libreadline6-dev
+  libreadline-dev
+- sudo apt-get install -qq libsqlite3-dev libxml2 libxml2-dev libssl-dev libbz2-dev
+  wget curl llvm
+install:
+- pip install -r requirements/local.txt
+- pip install coveralls
+script:
+- py.test --cov-report=
+- prospector
+after_success:
+- coveralls
 language: python
 python:
-- "3.5"
-
+- '3.5'
+deploy:
+- provider: codedeploy
+  access_key_id: AKIAIZTZIW2KWAYZ6MUQ
+  secret_access_key:
+    secure: KTdHFUfomQvGqnulNo+K6IaVdl/WIuKvhvFNkXEfYOdfn4kWL0vf7F1aarhWN+Ptcj5QCiqpsa6KNi4U+f5J2K2xQUa4wZmQa1gLkw5l6Uaw9zbpbB3I4nywjGfNtPRKAwc8caQ80EaaSBHl3GsgJnTFszWkhWmY4k6bfvLLconLtRXFB07YS9mqwq6CvZ40RBiI2rUW1zgYGz6FRJhd0k/QGCqv3k+D3sPYad8/e3yapOhDTIFJESUMQt94rmg4n2gYBJMggk+aZ2yarSV7mr9Samf3HnGZ1VbONqsEH1rKlDsR9uT77udv8scryJDWlVyCAWpwr8y1Od2b6+VbWayWBY/xoPoeQLsQoReI6fzQy4fgk24F+Yxe5dxvSBkeil5Vq1yBKpBhxq53+Mto8mKTFXa0/6uNMD7JN+0kl6kbJVrIULhpd3/QYtF7DH2TYMhWsO0duGwz4k/IpsDMWddsIVrxCiaEKMKpD8ZY5WlV8Qun72/wlRaC557upK+LVJm89WntCEypoPEHNWYvzulVe0weWVlv89053ryP7rHa5PUwh8N0NLwI9dxAJ7WcgXjuiaZCtqLsbIXCpBOECstWFS8Kd/FS6Y3Tp4CRIN0Jt80BciKFV5HTyYWPsXnaFqNmt/PyRHkwgdIj4ULo2xLNAyXUQGS4RoPSdBVh9O4=
+  revision_type: github
+  application: beta-rovercode-web
+  deployment_group: beta-rovercode-web
+  on:
+    repo: aninternetof/rovercode-web
+    branch: development
+- provider: codedeploy
+  access_key_id: AKIAIZTZIW2KWAYZ6MUQ
+  secret_access_key:
+    secure: KTdHFUfomQvGqnulNo+K6IaVdl/WIuKvhvFNkXEfYOdfn4kWL0vf7F1aarhWN+Ptcj5QCiqpsa6KNi4U+f5J2K2xQUa4wZmQa1gLkw5l6Uaw9zbpbB3I4nywjGfNtPRKAwc8caQ80EaaSBHl3GsgJnTFszWkhWmY4k6bfvLLconLtRXFB07YS9mqwq6CvZ40RBiI2rUW1zgYGz6FRJhd0k/QGCqv3k+D3sPYad8/e3yapOhDTIFJESUMQt94rmg4n2gYBJMggk+aZ2yarSV7mr9Samf3HnGZ1VbONqsEH1rKlDsR9uT77udv8scryJDWlVyCAWpwr8y1Od2b6+VbWayWBY/xoPoeQLsQoReI6fzQy4fgk24F+Yxe5dxvSBkeil5Vq1yBKpBhxq53+Mto8mKTFXa0/6uNMD7JN+0kl6kbJVrIULhpd3/QYtF7DH2TYMhWsO0duGwz4k/IpsDMWddsIVrxCiaEKMKpD8ZY5WlV8Qun72/wlRaC557upK+LVJm89WntCEypoPEHNWYvzulVe0weWVlv89053ryP7rHa5PUwh8N0NLwI9dxAJ7WcgXjuiaZCtqLsbIXCpBOECstWFS8Kd/FS6Y3Tp4CRIN0Jt80BciKFV5HTyYWPsXnaFqNmt/PyRHkwgdIj4ULo2xLNAyXUQGS4RoPSdBVh9O4=
+  revision_type: github
+  application: rovercode-web
+  deployment_group: rovercode-web
+  on:
+    repo: aninternetof/rovercode-web
+    branch: master

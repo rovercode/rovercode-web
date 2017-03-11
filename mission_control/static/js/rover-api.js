@@ -28,21 +28,22 @@ function saveDesign() {
   });
 }
 
-function refreshSavedBds() {
-  $.get(roverResource('blockdiagrams'), function(json){
-    if (!json.result.length){
-      $('#savedDesignsArea').text("There are no designs saved on this rover");
+function refreshSavedBds(userId) {
+  $.get("/mission-control/block-diagrams/?user=" + userId, function(json){
+    if (!json.length){
+      $('#savedDesignsArea').text("There are no designs saved.");
     } else {
       $('#savedDesignsArea').empty();
-      json.result.forEach(function(entry) {
-        $(document.createElement('a')).addClass('button')
-        .html(entry)
-        .attr('href', '#')
-        .css('margin', '10px')
-        .appendTo($("#savedDesignsArea"))
-        .click(function() {
-          return loadDesign(entry);
-        });
+      $.each(json, function(index, entry) {
+        $(document.createElement('button'))
+          .addClass('btn btn-primary')
+          .text(entry.name)
+          .attr('href', '#')
+          .css('margin', '10px')
+          .appendTo($("#savedDesignsArea"))
+          .click(function() {
+            return loadDesign(entry);
+          });
       });
     }
   }

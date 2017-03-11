@@ -1,5 +1,14 @@
 /* Project specific Javascript goes here. */
 
+console.log("Project.js loaded.")
+
+$("#learn-more-button").click(function() {
+  console.log("clicked")
+  $('html, body').animate({
+      scrollTop: $("#learn-more").offset().top-50
+  }, 500);
+});
+
 /*
 Formatting hack to get around crispy-forms unfortunate hardcoding
 in helpers.FormHelper:

@@ -1,18 +1,125 @@
 {% extends "base.html" %}
+{% load staticfiles i18n %}
 
 
 {% block jumbotron %}
-  <div class="jumbotron">
-    <div class="row text-xs-center nice-underlines" style="padding-top: 100px;">
-      <div class="col-6">
-        <div class="card" style="background:#bed0cd">
-          <div class="card-block">
-            <div class="welcome-message">
-              <a href="#">Build a <span style="display: inline-block; width:210px" id="js-rotating">Raspberry Pi,Next Thing Co,BeagleBone</span> rover</a>, then <a href="{% url 'mission-control-home'%}">code with blocks</a>.
-            </div>
+    <div class="jumbotron">
+      <div class="container">
+        <div class="row nice-underlines" style="margin-top: 20vh">
+          <div class="col-lg-4 text-lg-left col-md-12 text-md-center vcenter">
+            <h1 class="display-1">rovercode</h1>
+            <p class="lead">an educational robotics system made for exploring</p>
+            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#comingSoonModal">Get a Rover</button>
+            <button id="learn-more-button" type="button" class="btn btn-secondary btn-lg">Learn More</button>
+          </div>
+          <div class="col-lg-7 text-lg-left col-md-12 text-md-center vcenter">
+            <img style="width:100%; padding-top: 50px; padding-bottom: 50px;" src="{% static 'images/rover.png' %}" />
           </div>
         </div>
       </div>
     </div>
-  </div>
-{% endblock jumbotron %}
+{% endblock %}
+{% block content %}
+    <div id="learn-more"></div>
+    <div class="row nice-underlines" style="margin-top: 60px">
+      <div class="col-xs-12 offset-xs-0 col-sm-12 offset-sm-0 col-md-3 offset-md-1 vcenter text-md-center text-lg-center text-sm-center text-xs-center">
+        <img style="width:100%;" src="{% static 'images/blocks.png' %}" />
+      </div>
+      <div class="col-md-6 vcenter">
+        <div class="card">
+          <div class="card-block">
+            <h4 class="card-title">Start With Blocks, Move to Code</h4>
+            <p class="card-text">
+              Your students can start coding immediately using the drag-and-drop
+              programming interface. Then, whenever they're ready, they can
+              graduate to text-based code. <a href="{% url 'mission-control:home' %}">
+                Try out a demo of Mission Control here</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row nice-underlines" style="margin-top: 60px">
+      <div class="col-xs-12 offset-xs-0 col-sm-12 offset-sm-0 col-md-3 offset-md-1 vcenter text-md-center text-lg-center text-sm-center text-xs-center">
+        <img style="width:40%;" src="{% static 'images/cam.png' %}" />
+      </div>
+      <div class="col-md-6 vcenter">
+        <div class="card">
+          <div class="card-block">
+            <h4 class="card-title">See What the Rover Sees</h4>
+            <p class="card-text">
+              rovercode features a live video feed from the robot's point of view.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row nice-underlines" style="margin-top: 60px">
+      <div class="col-xs-12 offset-xs-0 col-sm-12 offset-sm-0 col-md-3 offset-md-1 vcenter text-md-center text-lg-center text-sm-center text-xs-center">
+        <img style="width:100%;" src="{% static 'images/devices.png' %}" />
+      </div>
+      <div class="col-md-6 vcenter">
+        <div class="card">
+          <div class="card-block">
+            <h4 class="card-title">No Software or App to Install</h4>
+            <p class="card-text">
+              Just turn on your rover, then launch <a href="{% url 'mission-control:home' %}">
+              Mission Control</a> on any
+              device with a browser. Whether you students have iPads,
+              Chromebooks, desktops or laptops, they are good to go.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row nice-underlines" style="margin-top: 60px">
+      <div class="col-xs-12 offset-xs-0 col-sm-12 offset-sm-0 col-md-3 offset-md-1 vcenter text-md-center text-lg-center text-sm-center text-xs-center">
+        <img id="heart" style="width:50%;" src="{% static 'images/heart.png' %}" />
+      </div>
+      <div class="col-md-6 vcenter">
+        <div class="card">
+          <div class="card-block">
+            <h4 class="card-title">Created by Community</h4>
+            <p class="card-text">
+              rovercode is developed with care by a team of open-source
+              developers. If you're developer, <a href="https://github.com/aninternetof/rovercode-web"> find out how easy
+              it is to help make rovercode even better</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row nice-underlines" style="margin-top: 60px">
+      <div class="col-md-6 text-xs-center text-s-center text-md-center text-lg-left offset-md-4">
+        <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#comingSoonModal" style="margin-bottom: 60px">Get a Rover</button>
+        <button type="button" onclick="location.href='https://github.com/aninternetof/rovercode-web';" class="btn btn-secondary btn-lg" style="margin-bottom: 60px">More Details</button>
+      </div>
+    </div>
+
+    <div class="modal fade" id="comingSoonModal" tabindex="-1" role="dialog" aria-labelledby="comingSoonModal" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Thanks for your interest!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>
+              We're working hard developing our rover hardware. To be notified
+              when they are available, <a href="mailto:bradyhurlburt@gmail.com">
+              send us an email</a> or say hello on <a href="http://chat.rovercode.com">our Slack
+              channel</a>. We'd love to hear where you'd like to use a rover.
+            </p>
+            <p>
+              Talk to you soon!
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

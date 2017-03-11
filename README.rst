@@ -1,99 +1,49 @@
-Rovercode Web
+.. .. image:: http://localhost:8000/static/images/screenshot.jpg
+.. image:: https://rovercode.com/static/images/screenshot.jpg
+
+rovercode
 =============
-
-Block-based programming for educational robots.
-
-.. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg
-     :target: https://github.com/pydanny/cookiecutter-django/
-     :alt: Built with Cookiecutter Django
-
+rovercode-web
+-------------
 
 :License: GPLv3
+.. image:: https://img.shields.io/badge/chat-on%20Slack-41AB8C.svg?style=flat
+      :target: http://chat.rovercode.com/
+.. image:: https://img.shields.io/badge/join-mailing%20list-yellow.svg?style=flat
+      :target: http://rovercode.org/cgi-bin/mailman/listinfo/developers
+.. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg
+      :target: https://github.com/pydanny/cookiecutter-django/
+      :alt: Built with Cookiecutter Django
+.. image:: https://api.travis-ci.org/aninternetof/rovercode-web.svg
+      :target: https://travis-ci.org/aninternetof/rovercode-web
+.. image:: https://coveralls.io/repos/github/aninternetof/rovercode-web/badge.svg?branch=development
+      :target: https://coveralls.io/github/aninternetof/rovercode-web?branch=deveopment
 
+rovercode is easy-to-use package for controlling robots (rovers) that can sense and react to their environment. The Blockly editor makes it easy to program and run your bot straight from your browser. Just drag and drop your commands to drive motors, read values from a variety of supported sensors, and see what your rover sees with the built in webcam viewer.
+rovercode runs on any single-board-computer supported by the `Adafruit Python GPIO wrapper library <https://github.com/adafruit/Adafruit_Python_GPIO>`_, including the NextThingCo CHIP, Raspberry Pi, and BeagleBone Black. Once installed, just connect to your rover and get started.
 
-Settings
---------
+**rovercode is made up of two parts.** rovercode-web (this repo) is the web app that is hosted on the Internet. rovercode (`a different repo <https://github.com/aninternetof/rovercode>`_) is the service that runs on the rover.
 
-Moved to settings_.
+Setup
+-----
+Install `docker <https://docs.docker.com/engine/installation/>`_ and `docker-compose <https://docs.docker.com/compose/install/>`_, then
 
-.. _settings: http://cookiecutter-django.readthedocs.io/en/latest/settings.html
+.. code-block:: bash
+
+    $ git clone --recursive https://github.com/aninternetof/rovercode-web.git && cd rovercode-web
+    $ sudo docker-compose -f dev.yml build
+    $ sudo docker-compose -f dev.yml up
+    $ google-chrome localhost:8000
 
 Basic Commands
 --------------
+rovercode-web runs is built with Django. During development, you can do regular Django things like this:
 
-Setting Up Your Users
-^^^^^^^^^^^^^^^^^^^^^
+.. code-block:: bash
 
-* To create a **normal user account**, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
+    $ docker-compose -f dev.yml run django python manage.py migrate
+    $ docker-compose -f dev.yml run django python manage.py createsuperuser
 
-* To create an **superuser account**, use this command::
-
-    $ python manage.py createsuperuser
-
-For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
-
-Test coverage
-^^^^^^^^^^^^^
-
-To run the tests, check your test coverage, and generate an HTML coverage report::
-
-    $ coverage run manage.py test
-    $ coverage html
-    $ open htmlcov/index.html
-
-Running tests with py.test
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-::
-
-  $ py.test
-
-Live reloading and Sass CSS compilation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Moved to `Live reloading and SASS compilation`_.
-
-.. _`Live reloading and SASS compilation`: http://cookiecutter-django.readthedocs.io/en/latest/live-reloading-and-sass-compilation.html
-
-
-
-
-Email Server
-^^^^^^^^^^^^
-
-In development, it is often nice to be able to see emails that are being sent from your application. For that reason local SMTP server `MailHog`_ with a web interface is available as docker container.
-
-.. _mailhog: https://github.com/mailhog/MailHog
-
-Container mailhog will start automatically when you will run all docker containers.
-Please check `cookiecutter-django Docker documentation`_ for more details how to start all containers.
-
-With MailHog running, to view messages that are sent by your application, open your browser and go to ``http://127.0.0.1:8025``
-
-
-
-
-Sentry
-^^^^^^
-
-Sentry is an error logging aggregator service. You can sign up for a free account at  https://sentry.io/signup/?code=cookiecutter  or download and host it yourself.
-The system is setup with reasonable defaults, including 404 logging and integration with the WSGI application.
-
-You must set the DSN url in production.
-
-
-Deployment
-----------
-
-The following details how to deploy this application.
-
-
-
-Docker
-^^^^^^
-
-See detailed `cookiecutter-django Docker documentation`_.
+If anything gives you trouble, see the detailed `cookiecutter-django Docker documentation`_.
 
 .. _`cookiecutter-django Docker documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html
-
-

@@ -40,6 +40,7 @@ THIRD_PARTY_APPS = (
     'allauth',  # registration
     'allauth.account',  # registration
     'allauth.socialaccount',  # registration
+    'rest_framework',
 )
 
 # Apps specific for this project go here.
@@ -47,6 +48,7 @@ LOCAL_APPS = (
     # custom users app
     'rovercode_web.users.apps.UsersConfig',
     # Your stuff: custom apps go here
+    'mission_control.apps.MissionControlConfig'
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
