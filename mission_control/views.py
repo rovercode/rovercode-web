@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Rover, BlockDiagram
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from .serializers import RoverSerializer, BlockDiagramSerializer
 from mission_control.utils import remove_old_rovers
@@ -43,5 +43,12 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
 
     queryset = BlockDiagram.objects.all()
     serializer_class = BlockDiagramSerializer
+    permission_classes = (permissions.IsAuthenticated, )
     filter_backends = (DjangoFilterBackend,)
     filter_fields = ('user',)
+
+    def get_queryset(self):
+        """Get the queryset based on the authenticated user."""
+        if self.request.user.is_superuser:
+            return BlockDiagram.objects.all()
+        return BlockDiagram.objects.filter(user=self.request.user.id)
