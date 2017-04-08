@@ -1,6 +1,7 @@
 /*----- MISC GLOBALS -----*/
 var roverDomain = ''; //Later, if the rover is not hosting the webpage, its address will go here
 var roverApiPath = '/api/v1/';
+var bdId = null;
 
 /*----- HELPER FUNCTIONS -----*/
 function roverResource(resource) {
@@ -22,9 +23,49 @@ function sendMotorCommand(command, pin, speed) {
 function saveDesign() {
   xml = Blockly.Xml.workspaceToDom(workspace);
   xmlString = Blockly.Xml.domToText(xml);
-  $.post(roverResource('blockdiagrams'), {bdString: xmlString, designName: designName}, function(response){
-  }).error(function(){
-    writeToConsole("There was an error saving your design to the rover");
+  if (userId === null) {
+    console.log("Not logged in. In demo mode. Not saving");
+  } else {
+    data = {
+      "user": userId,
+      "name": designName,
+      "content": xmlString
+    };
+    if (bdId === null) {
+      saveFirst();
+    } else {
+      saveAgain();
+    }
+  }
+}
+
+function saveFirst() {
+  $.post('/mission-control/block-diagrams/', data, function(response){
+    bdId = response.id;
+    console.log('Created bd ' + bdId + ' on the server server');
+  })
+    .fail(function(){
+      console.log("Failure when creating saved bd on server.");
+      writeToConsole("There was an error saving your design to the rover");
+    });
+}
+
+function saveAgain() {
+  $.ajax({
+    method: 'PUT',
+    url: '/mission-control/block-diagrams/' + bdId + '/',
+    data: data,
+    complete: function(e, xhr, settings) {
+      if (e.status === 200 ) {
+        console.log('Update save sucess');
+      } else if (e.status == 405) {
+        console.log('This bd id does not exist on the server. Creating it.');
+        saveFirst();
+      } else {
+        console.log("Failure when updating saved bd. Code " + e.status);
+        writeToConsole("There was an error saving your design to the rover");
+      }
+    },
   });
 }
 
@@ -57,9 +98,9 @@ function loadDesign(name) {
     xmlDom = Blockly.Xml.textToDom(response.getElementsByTagName('bd')[0].childNodes[0].nodeValue);
     Blockly.Xml.domToWorkspace(workspace, xmlDom);
     if (name == 'event_handler_hidden')
-    designName = "Unnamed_Design_" + (Math.floor(Math.random()*1000)).toString();
+      designName = "Unnamed_Design_" + (Math.floor(Math.random()*1000)).toString();
     else
-    designName = name;
+      designName = name;
     $('a#downloadLink').attr("onclick", "return downloadDesign(\""+designName+".xml\")");
     $('a#designNameArea').text(designName);
 
@@ -85,8 +126,8 @@ function acceptName() {
   if (!designName) {
     $('#nameErrorArea').text('Please enter a name for your design in the box');
   } else {
-    $.get(roverResource('blockdiagrams'), function(json){
-      var duplicate = json.result.indexOf(designName) > -1;
+    $.get("/mission-control/block-diagrams/?user=" + userId, function(json){
+      var duplicate = json.indexOf(designName) > -1;
       if (duplicate) {
         $('#nameErrorArea').text('This name has already been chosen. Please pick another one.');
       } else {
