@@ -149,6 +149,28 @@ function keyEvent(e) {
 
 $('#nameModal').modal();
 
+/*----- BD NAME FUNCTIONS -----*/
+function acceptName() {
+  designName = $('input[name=designName]').val();
+
+  if (!designName) {
+    $('#nameErrorArea').text('Please enter a name for your design in the box');
+  } else {
+    $.get("/mission-control/block-diagrams/?user=" + userId, function(json){
+      var duplicate = json.indexOf(designName) > -1;
+      if (duplicate) {
+        $('#nameErrorArea').text('This name has already been chosen. Please pick another one.');
+      } else {
+        saveDesign();
+        $('#nameErrorArea').empty();
+        $('a#designNameArea').text(designName);
+        $('a#downloadLink').attr("onclick", "return downloadDesign(\""+designName+".xml\")");
+        $('#nameModal').modal('hide');
+      }
+    });
+  }
+
+}
 testString = "more stuff";
 
 /*----- UI EVENT HANDLING -----*/
