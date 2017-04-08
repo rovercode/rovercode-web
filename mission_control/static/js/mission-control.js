@@ -1,5 +1,4 @@
 /*----- MISC GLOBALS -----*/
-
 var sidebarVisible = true;
 var runningEnabled = false;
 var blocksToHide = ["always", "initially","whenRightEyeSeesSomething", "whenLeftEyeSeesSomething"];
@@ -20,6 +19,35 @@ sensorStateCache["SENSORS_leftIr"] = false;
 sensorStateCache["SENSORS_rightIr"] = false;
 
 /*----- INIT CODE -----*/
+/* Set up to use CSRF token */
+function getCookie(name) {
+  var cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = jQuery.trim(cookies[i]);
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+function csrfSafeMethod(method) {
+  // these HTTP methods do not require CSRF protection
+  return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+  beforeSend: function(xhr, settings) {
+    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+      xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    }
+  }
+});
+
 /* Set overall Blockly colors */
 Blockly.HSV_SATURATION = 0.85;
 Blockly.HSV_VALUE = 0.9;
