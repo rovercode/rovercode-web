@@ -16,6 +16,7 @@ def home(request):
     """Home view."""
     return render(request, 'home.html')
 
+
 @login_required
 def list(request):
     """Block diagram list view for the logged in user."""
