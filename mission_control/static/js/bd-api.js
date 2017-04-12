@@ -10,25 +10,25 @@ function saveDesign() {
       "content": xmlString
     };
     if (bdId === null) {
-      saveFirst();
+      createBd();
     } else {
-      saveAgain();
+      updateBd();
     }
   }
 }
 
-function saveFirst() {
+function createBd() {
   $.post('/mission-control/block-diagrams/', data, function(response){
     bdId = response.id;
-    console.log('Created bd ' + bdId + ' on the server server');
+    console.log('Created bd ' + bdId + ' on the server');
   })
-    .fail(function(){
-      console.log("Failure when creating saved bd on server.");
+    .fail(function(xhr, status, error){
+      console.error("Failure when creating saved bd on server: " + xhr.statusText);
       writeToConsole("There was an error saving your design to the rover");
     });
 }
 
-function saveAgain() {
+function updateBd() {
   $.ajax({
     method: 'PUT',
     url: '/mission-control/block-diagrams/' + bdId + '/',
@@ -38,9 +38,9 @@ function saveAgain() {
         console.log('Update save sucess');
       } else if (e.status == 405) {
         console.log('This bd id does not exist on the server. Creating it.');
-        saveFirst();
+        createBd();
       } else {
-        console.log("Failure when updating saved bd. Code " + e.status);
+        console.error("Failure when updating saved bd. Code " + e.status);
         writeToConsole("There was an error saving your design to the rover");
       }
     },
@@ -86,8 +86,9 @@ function loadDesign(name) {
     var hiddenBlock;
     var allBlocksHidden = true;
     for (hiddenBlock of blocksToHide) {
-      if (!hideBlock(hiddenBlock))
-      allBlocksHidden = false;
+      if (!hideBlock(hiddenBlock)) {
+        allBlocksHidden = false;
+      }
     }
     if (allBlocksHidden) {
       showBlock('always');
