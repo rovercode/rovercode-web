@@ -1,5 +1,4 @@
 /*----- MISC GLOBALS -----*/
-
 var sidebarVisible = true;
 var runningEnabled = false;
 var blocksToHide = ["always", "initially","whenRightEyeSeesSomething", "whenLeftEyeSeesSomething"];
@@ -20,6 +19,35 @@ sensorStateCache["SENSORS_leftIr"] = false;
 sensorStateCache["SENSORS_rightIr"] = false;
 
 /*----- INIT CODE -----*/
+/* Set up to use CSRF token */
+function getCookie(name) {
+  var cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = jQuery.trim(cookies[i]);
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+function csrfSafeMethod(method) {
+  // these HTTP methods do not require CSRF protection
+  return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+  beforeSend: function(xhr, settings) {
+    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+      xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    }
+  }
+});
+
 /* Set overall Blockly colors */
 Blockly.HSV_SATURATION = 0.85;
 Blockly.HSV_VALUE = 0.9;
@@ -121,6 +149,28 @@ function keyEvent(e) {
 
 $('#nameModal').modal();
 
+/*----- BD NAME FUNCTIONS -----*/
+function acceptName() {
+  designName = $('input[name=designName]').val();
+
+  if (!designName) {
+    $('#nameErrorArea').text('Please enter a name for your design in the box');
+  } else {
+    $.get("/mission-control/block-diagrams/?user=" + userId, function(json){
+      var duplicate = json.indexOf(designName) > -1;
+      if (duplicate) {
+        $('#nameErrorArea').text('This name has already been chosen. Please pick another one.');
+      } else {
+        saveDesign();
+        $('#nameErrorArea').empty();
+        $('a#designNameArea').text(designName);
+        $('a#downloadLink').attr("onclick", "return downloadDesign(\""+designName+".xml\")");
+        $('#nameModal').modal('hide');
+      }
+    });
+  }
+
+}
 testString = "more stuff";
 
 /*----- UI EVENT HANDLING -----*/

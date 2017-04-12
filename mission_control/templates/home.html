@@ -50,7 +50,16 @@
   <link href='https://fonts.googleapis.com/css?family=Merriweather' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
   <link href="https://fonts.googleapis.com/css?family=Faster+One" rel="stylesheet">
+  <script>
+    if ("{{ request.user.id }}" == "None") {
+      console.log('Not logged in. In demo mode.')
+      userId = null;
+    } else {
+      userId = {{ request.user.id }};
+    }
+  </script>
   <script src="{% static 'js/rover-api.js' %}"></script>
+  <script src="{% static 'js/bd-api.js' %}"></script>
   <script src="{% static 'js/blockly-api.js' %}"></script>
 
 </head>

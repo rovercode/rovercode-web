@@ -8,8 +8,10 @@ from rest_framework.response import Response
 from .serializers import RoverSerializer, BlockDiagramSerializer
 from mission_control.utils import remove_old_rovers
 from datetime import timedelta
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 
+@ensure_csrf_cookie
 def home(request):
     """Home view."""
     return render(request, 'home.html')
