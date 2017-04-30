@@ -191,3 +191,17 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         """Test the block diagram view denies unauthenticated user."""
         response = self.get(reverse('mission-control:blockdiagram-list'))
         self.assertEqual(403, response.status_code)
+
+    def test_bd_create(self):
+        """Test creating block diagram sets user."""
+        self.client.login(username='administrator', password='password')
+        data = {
+            'name': 'test',
+            'content': '<xml></xml>'
+        }
+        response = self.client.post(
+            reverse('mission-control:blockdiagram-list'), data)
+        self.assertEqual(201, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
+        self.assertEqual(BlockDiagram.objects.last().name, data['name'])
+        self.assertEqual(BlockDiagram.objects.last().content, data['content'])

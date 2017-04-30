@@ -52,3 +52,8 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
         if self.request.user.is_superuser:
             return BlockDiagram.objects.all()
         return BlockDiagram.objects.filter(user=self.request.user.id)
+
+    def perform_create(self, serializer):
+        """Perform the create operation."""
+        user = self.request.user
+        serializer.save(user=user)
