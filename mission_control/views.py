@@ -44,4 +44,4 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
     queryset = BlockDiagram.objects.all()
     serializer_class = BlockDiagramSerializer
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('user','name')
+    filter_fields = ('user', 'name')
