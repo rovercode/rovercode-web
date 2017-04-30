@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Rover, BlockDiagram
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, serializers
 from rest_framework.response import Response
 from .serializers import RoverSerializer, BlockDiagramSerializer
 from mission_control.utils import remove_old_rovers
@@ -47,13 +47,14 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filter_fields = ('user',)
 
-    def get_queryset(self):
-        """Get the queryset based on the authenticated user."""
-        if self.request.user.is_superuser:
-            return BlockDiagram.objects.all()
-        return BlockDiagram.objects.filter(user=self.request.user.id)
-
     def perform_create(self, serializer):
         """Perform the create operation."""
         user = self.request.user
         serializer.save(user=user)
+
+    def perform_update(self, serializer):
+        """Perform the update operation."""
+        if self.get_object().user.id is not self.request.user.id:
+            raise serializers.ValidationError(
+                'You may only modify your own block diagrams')
+        serializer.save()
