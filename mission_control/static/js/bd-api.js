@@ -69,33 +69,42 @@ function refreshSavedBds(userId) {
 );
 }
 
-function loadDesign(name) {
-  $.get(roverResource(['blockdiagrams', name]), function(response){
-    workspace.clear();
-
-    xmlDom = Blockly.Xml.textToDom(response.getElementsByTagName('bd')[0].childNodes[0].nodeValue);
-    Blockly.Xml.domToWorkspace(workspace, xmlDom);
-    if (name == 'event_handler_hidden')
-      designName = "Unnamed_Design_" + (Math.floor(Math.random()*1000)).toString();
-    else
-      designName = name;
-    $('a#downloadLink').attr("onclick", "return downloadDesign(\""+designName+".xml\")");
-    $('a#designNameArea').text(designName);
-
-    hideBlockByComment("MAIN EVENT HANDLER LOOP");
-    var hiddenBlock;
-    var allBlocksHidden = true;
-    for (hiddenBlock of blocksToHide) {
-      if (!hideBlock(hiddenBlock)) {
-        allBlocksHidden = false;
-      }
+function loadDesignByName(name) {
+  $.get("/mission-control/block-diagrams/?name=" + name, function(json){
+    if (!json.length){
+      console.warn("Could not find block diagram named " + name);
+      writeToConsole("Could not find block diagram named " + name);
+    } else {
+      /* For now, just load the first with that name */
+      loadDesign(json[0]);
     }
-    if (allBlocksHidden) {
-      showBlock('always');
-    }
-  }).error(function(){
-    alert("There was an error loading your design from the rover");
   });
+}
+
+function loadDesign(design) {
+  workspace.clear();
+  xmlDom = Blockly.Xml.textToDom(design.content);
+  Blockly.Xml.domToWorkspace(workspace, xmlDom);
+  if (design.name == 'event_handler_hidden') {
+    designName = "Unnamed_Design_" + (Math.floor(Math.random()*1000)).toString();
+    /* leave bdId unassigned to that a new bd is created*/
+  } else {
+    designName = design.name;
+    bdId = design.id;
+  }
+  $('a#downloadLink').attr("onclick", "return downloadDesign(\""+designName+".xml\")");
+  $('a#designNameArea').text(designName);
+  hideBlockByComment("MAIN EVENT HANDLER LOOP");
+  var hiddenBlock;
+  var allBlocksHidden = true;
+  for (hiddenBlock of blocksToHide) {
+    if (!hideBlock(hiddenBlock)) {
+      allBlocksHidden = false;
+    }
+  }
+  if (allBlocksHidden) {
+    showBlock('always');
+  }
   updateCode();
 }
 

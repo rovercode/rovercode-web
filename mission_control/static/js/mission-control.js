@@ -70,8 +70,8 @@ var workspace = Blockly.inject(blocklyDiv,
 );
 workspace.addChangeListener(updateCode);
 workspace.addChangeListener(saveDesign);
-//loadDesign('event_handler_hidden');
-writeToConsole("RoverCode console started");
+loadDesignByName('event_handler_hidden');
+writeToConsole("rovercode console started");
 
 /* Handle Blockly resizing */
 var onresize = function(e) {
