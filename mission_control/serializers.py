@@ -20,4 +20,5 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
         """Meta class."""
 
         model = BlockDiagram
-        fields = ('id', 'user', 'name', 'content')
+        fields = '__all__'
+        read_only_fields = ('user',)
