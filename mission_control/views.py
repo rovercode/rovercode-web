@@ -45,7 +45,7 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
     serializer_class = BlockDiagramSerializer
     permission_classes = (permissions.IsAuthenticated, )
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('user',)
+    filter_fields = ('user', 'name')
 
     def perform_create(self, serializer):
         """Perform the create operation."""
