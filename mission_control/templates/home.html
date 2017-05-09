@@ -51,6 +51,14 @@
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
   <link href="https://fonts.googleapis.com/css?family=Faster+One" rel="stylesheet">
   <script>
+    if ("{{ bd }}" == "None") {
+      console.log('No bd to load initially.')
+      bdToLoad = null;
+    } else {
+      {% autoescape off %}
+      bdToLoad = {{ bd }};
+      {% endautoescape %}
+    }
     if ("{{ request.user.id }}" == "None") {
       console.log('Not logged in. In demo mode.')
       userId = null;

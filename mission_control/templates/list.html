@@ -18,7 +18,9 @@
   <div class="row">
     <div class="col-md-12 btn-group" id="bds">
       {% for bd in bd_list %}
-        <button class="btn btn-primary">{{ bd.name }}</button>
+        <button class="btn btn-primary" onclick="location.href='../load/{{ bd.id }}';">
+          {{ bd.name }}
+        </button>
       {% endfor %}
     </div>
   </div>
