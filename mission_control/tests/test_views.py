@@ -54,7 +54,6 @@ class TestHomeViewWithLoad(BaseAuthenticatedTestCase):
             content='<xml></xml>'
         )
         response = self.get(reverse('mission-control:home_with_load', kwargs={'bd':bd.id+1}))
-        print(response)
         self.assertEqual(404, response.status_code)
 
 

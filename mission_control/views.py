@@ -3,7 +3,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Rover, BlockDiagram
-from django.db.models.base import ObjectDoesNotExist
 from rest_framework import viewsets, permissions, serializers
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
@@ -11,20 +10,16 @@ from .serializers import RoverSerializer, BlockDiagramSerializer
 from mission_control.utils import remove_old_rovers
 from datetime import timedelta
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.http import Http404
+from django.shortcuts import get_object_or_404
 
 
 @ensure_csrf_cookie
 def home(request, bd=None):
     """Home view."""
     if bd is not None:
-        try:
-            bd_object = BlockDiagram.objects.get(id=bd)
-        except ObjectDoesNotExist:
-            raise Http404("Block diagram not found")
+        bd_object = get_object_or_404(BlockDiagram, id=bd)
         bd_data = BlockDiagramSerializer(bd_object).data
         bd_serial = JSONRenderer().render(bd_data)
-        print(bd_serial)
     else:
         bd_serial = "None"
     return render(request, 'home.html', {'bd': bd_serial})
