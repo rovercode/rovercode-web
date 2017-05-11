@@ -70,7 +70,13 @@ var workspace = Blockly.inject(blocklyDiv,
 );
 workspace.addChangeListener(updateCode);
 workspace.addChangeListener(saveDesign);
-loadDesignByName('event_handler_hidden');
+if (bdToLoad) {
+  console.log("Loading design " + bdToLoad);
+  loadDesign(bdToLoad);
+} else {
+  loadDesignByName('event_handler_hidden');
+  $('#nameModal').modal();
+}
 writeToConsole("rovercode console started");
 
 /* Handle Blockly resizing */
@@ -130,8 +136,6 @@ function keyEvent(e) {
   $('#videoBackground').empty();
   $('#videoBackground').append("[no Rover webcam detected]");
 /* }); */
-
-$('#nameModal').modal();
 
 /*----- BD NAME FUNCTIONS -----*/
 function acceptName() {

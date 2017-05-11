@@ -31,6 +31,33 @@ class BaseAuthenticatedTestCase(TestCase):
         )
 
 
+class TestHomeViewWithLoad(BaseAuthenticatedTestCase):
+    """Tests the home view loading a block diagram."""
+
+    def test_home_load(self):
+        """Test the home view loading a block diagram."""
+        self.client.login(username='administrator', password='password')
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>'
+        )
+        response = self.get(reverse('mission-control:home_with_load', kwargs={'bd':bd.id}))
+        self.assertEqual(200, response.status_code)
+
+    def test_home_load_nonexistant(self):
+        """Test the home view tring to load a nonexistant block diagram."""
+        self.client.login(username='administrator', password='password')
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>'
+        )
+        response = self.get(reverse('mission-control:home_with_load', kwargs={'bd':bd.id+1}))
+        self.assertEqual(404, response.status_code)
+
+
+
 class TestListView(BaseAuthenticatedTestCase):
     """Tests the block diagram list view."""
 

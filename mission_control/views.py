@@ -5,16 +5,24 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import Rover, BlockDiagram
 from rest_framework import viewsets, permissions, serializers
 from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
 from .serializers import RoverSerializer, BlockDiagramSerializer
 from mission_control.utils import remove_old_rovers
 from datetime import timedelta
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.shortcuts import get_object_or_404
 
 
 @ensure_csrf_cookie
-def home(request):
+def home(request, bd=None):
     """Home view."""
-    return render(request, 'home.html')
+    if bd is not None:
+        bd_object = get_object_or_404(BlockDiagram, id=bd)
+        bd_data = BlockDiagramSerializer(bd_object).data
+        bd_serial = JSONRenderer().render(bd_data)
+    else:
+        bd_serial = "None"
+    return render(request, 'home.html', {'bd': bd_serial})
 
 
 @login_required
