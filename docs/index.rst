@@ -69,7 +69,7 @@ Contents
 
    quickstart
    contribute
-   docs
+   modules
 
 Indices and tables
 ==================
