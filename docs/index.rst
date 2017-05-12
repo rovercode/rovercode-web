@@ -12,9 +12,8 @@ Contents:
    :maxdepth: 2
 
    install
-   deploy
-   docker_ec2
-   tests
+   mission-control
+   rovercode-web
 
 
 
