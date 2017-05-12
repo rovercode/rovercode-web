@@ -45,3 +45,7 @@ rovercode-web runs is built with Django. During development, you can do regular 
 If anything gives you trouble, see the detailed `cookiecutter-django Docker documentation`_.
 
 .. _`cookiecutter-django Docker documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html
+
+Docs
+-----
+Read the complete docs `here <http://rovercode-web.readthedocs.io/en/latest/>`_.
