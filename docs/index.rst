@@ -52,7 +52,7 @@ The rover and the device running the browser must be on the same local network.
 Get Started
 ############
 Check out the `quickstart guide <quickstart.html>`_. Then see `how to
-contribute <contribute.html>_`
+contribute <contribute.html>`_.
 
 Contact
 ########
