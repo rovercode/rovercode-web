@@ -41,6 +41,9 @@
           <!-- Collect the nav links, forms, and other content for toggling -->
           <div class="collapse navbar-toggleable-xs" id="bs-navbar-collapse-1">
             <ul class="nav navbar-nav pull-xs-right">
+              <li class="nav-item">
+                <a class="nav-link" href="http://rovercode-web.readthedocs.io/">{% trans "Docs" %}</a>
+              </li>
               {% if request.user.is_authenticated %}
                 <li class="nav-item">
                   <a class="nav-link" href="{% url 'mission-control:list' %}">{% trans "My Block Diagrams" %}</a>
