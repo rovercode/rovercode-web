@@ -75,6 +75,7 @@ Contents
    :maxdepth: 2
 
    quickstart
+   detailed-usage
    contribute
    modules
 
