@@ -44,6 +44,9 @@
               <li class="nav-item">
                 <a class="nav-link" href="http://rovercode-web.readthedocs.io/">{% trans "Docs" %}</a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" href="http://rovercode-web.readthedocs.io/#Contact">{% trans "Contact" %}</a>
+              </li>
               {% if request.user.is_authenticated %}
                 <li class="nav-item">
                   <a class="nav-link" href="{% url 'mission-control:list' %}">{% trans "My Block Diagrams" %}</a>

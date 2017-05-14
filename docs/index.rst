@@ -10,6 +10,8 @@ rovercode-web
 
 .. image:: https://img.shields.io/badge/chat-on%20Slack-41AB8C.svg?style=flat
       :target: http://chat.rovercode.com/
+.. image:: https://img.shields.io/badge/join-mailing%20list-yellow.svg?style=flat
+      :target: https://1988.onlinegroups.net/groups/rovercode-developers/
 .. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg
       :target: https://github.com/pydanny/cookiecutter-django/
       :alt: Built with Cookiecutter Django
@@ -57,7 +59,11 @@ contribute <contribute.html>`_.
 
 Contact
 ########
-We'd love to chat with you! Join the `the rovercode Slack channel
+Please join the rovercode developer mailing list! `Go here
+<https://1988.onlinegroups.net/groups/rovercode-developers/>`_, then
+click "register".
+
+Also, we'd love to chat with you! Join the `the rovercode Slack channel
 <http://chat.rovercode.com>`_.
 
 You can also email brady@rovercode.com.
