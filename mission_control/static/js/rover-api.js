@@ -5,7 +5,7 @@ var bdId = null;
 
 /*----- HELPER FUNCTIONS -----*/
 function roverResource(resource) {
-  return roverDomain + roverApiPath + (Array.isArray(resource) ? resource.join('/') : resource);
+  return 'http://' + roverDomain + roverApiPath + (Array.isArray(resource) ? resource.join('/') : resource);
 }
 
 /*----- ROVER API FUNCTIONS -----*/
