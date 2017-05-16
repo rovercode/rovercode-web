@@ -23,6 +23,11 @@ sftp-config.json
 *.py[cod]
 __pycache__
 
+# Docs
+docs/_build
+docs/_autosummary
+docs/generated
+
 # Logs
 logs
 *.log
