@@ -58,7 +58,7 @@ class TestHomeViewWithLoad(BaseAuthenticatedTestCase):
 
 
 
-class TestListView(BaseAuthenticatedTestCase):
+class TestBlockDiagramListView(BaseAuthenticatedTestCase):
     """Tests the block diagram list view."""
 
     def test_list(self):
@@ -75,7 +75,7 @@ class TestListView(BaseAuthenticatedTestCase):
             name='admin_bd',
             content='<xml></xml>'
         )
-        response = self.get(reverse('mission-control:list'))
+        response = self.get(reverse('mission-control:bd_list'))
         self.assertEqual(200, response.status_code)
         self.assertContains(response, self.admin.username)
         self.assertContains(response, bd2.name)
@@ -83,11 +83,11 @@ class TestListView(BaseAuthenticatedTestCase):
 
     def test_list_not_logged_in(self):
         """Test the block diagram list view redirects if no logged in user."""
-        response = self.get(reverse('mission-control:list'))
+        response = self.get(reverse('mission-control:bd_list'))
         self.assertRedirects(
             response,
             reverse('account_login') + '?next=' +
-            reverse('mission-control:list'))
+            reverse('mission-control:bd_list'))
 
 
 class TestRoverViewSet(TestCase):

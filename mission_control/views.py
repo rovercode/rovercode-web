@@ -26,10 +26,10 @@ def home(request, bd=None):
 
 
 @login_required
-def list(request):
+def bd_list(request):
     """Block diagram list view for the logged in user."""
     bd_list = BlockDiagram.objects.filter(user=request.user.id)
-    return render(request, 'list.html', {'bd_list': bd_list})
+    return render(request, 'bd_list.html', {'bd_list': bd_list})
 
 
 class RoverViewSet(viewsets.ModelViewSet):

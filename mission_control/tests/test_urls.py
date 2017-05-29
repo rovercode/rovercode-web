@@ -29,17 +29,17 @@ class TestMissionControlURLs(TestCase):
         self.assertEqual(match.view_name, 'mission-control:home_with_load')
         self.assertEqual(match.kwargs['bd'], '1')
 
-    def test_list_reverse(self):
-        """mission-control:list should reverse to /mission-control/list/."""
+    def test_bd_list_reverse(self):
+        """mission-control:bd_list should reverse to /mission-control/bd-list/.""" #noqa
         self.assertEqual(
-            reverse('mission-control:list'),
-            '/mission-control/list/')
+            reverse('mission-control:bd_list'),
+            '/mission-control/bd-list/')
 
-    def test_list_resolve(self):
-        """/mission-control/list/ should resolve to mission-control:list."""
+    def test_bd_list_resolve(self):
+        """/mission-control/bd-list/ should resolve to mission-control:bd_list.""" #noqa
         self.assertEqual(
-            resolve('/mission-control/list/').view_name,
-            'mission-control:list')
+            resolve('/mission-control/bd-list/').view_name,
+            'mission-control:bd_list')
 
     def test_rovers_reverse(self):
         """mission-control:rover-list should reverse to /mission-control/rovers/.""" #noqa
