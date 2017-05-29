@@ -41,6 +41,18 @@ class TestMissionControlURLs(TestCase):
             resolve('/mission-control/bd-list/').view_name,
             'mission-control:bd_list')
 
+    def test_rover_list_reverse(self):
+        """mission-control:rover_list should reverse to /mission-control/rover-list/.""" #noqa
+        self.assertEqual(
+            reverse('mission-control:rover_list'),
+            '/mission-control/rover-list/')
+
+    def test_rover_list_resolve(self):
+        """/mission-control/rover-list/ should resolve to mission-control:rover_list.""" #noqa
+        self.assertEqual(
+            resolve('/mission-control/rover-list/').view_name,
+            'mission-control:rover_list')
+
     def test_rovers_reverse(self):
         """mission-control:rover-list should reverse to /mission-control/rovers/.""" #noqa
         self.assertEqual(

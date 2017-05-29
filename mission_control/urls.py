@@ -18,4 +18,5 @@ urlpatterns = [
     url(r'^api-auth/',
         include('rest_framework.urls', namespace='rest_framework')),
     url(r'^bd-list/$', views.bd_list, name='bd_list'),
+    url(r'^rover-list/$', views.rover_list, name='rover_list'),
 ]

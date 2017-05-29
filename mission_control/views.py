@@ -32,6 +32,14 @@ def bd_list(request):
     return render(request, 'bd_list.html', {'bd_list': bd_list})
 
 
+@login_required
+def rover_list(request):
+    """Rover list view for the logged in user."""
+    # TODO: Only display the user's rovers.
+    rover_list = Rover.objects.all()
+    return render(request, 'rover_list.html', {'rover_list': rover_list})
+
+
 class RoverViewSet(viewsets.ModelViewSet):
     """API endpoint that allows rovers to be viewed or edited."""
 

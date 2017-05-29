@@ -90,6 +90,38 @@ class TestBlockDiagramListView(BaseAuthenticatedTestCase):
             reverse('mission-control:bd_list'))
 
 
+class TestRoverListView(BaseAuthenticatedTestCase):
+    """Tests the rover list view."""
+
+    def test_list(self):
+        """Test the rover list view displays the correct items."""
+        self.client.login(username='administrator', password='password')
+        rover1 = Rover.objects.create(
+            name='rover1',
+            owner='user1',
+            local_ip = '192.168.1.100'
+        )
+        rover2 = Rover.objects.create(
+            name='rover2',
+            owner='user2',
+            local_ip = '192.168.1.200'
+        )
+        response = self.get(reverse('mission-control:rover_list'))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, self.admin.username)
+        # TODO: verify only the user's rovers are displayed
+        self.assertContains(response, rover1.name)
+        self.assertContains(response, rover2.name)
+
+    def test_list_not_logged_in(self):
+        """Test the rover list view redirects if no logged in user."""
+        response = self.get(reverse('mission-control:rover_list'))
+        self.assertRedirects(
+            response,
+            reverse('account_login') + '?next=' +
+            reverse('mission-control:rover_list'))
+
+
 class TestRoverViewSet(TestCase):
     """Tests the rover API view."""
 
