@@ -10,7 +10,11 @@ class RoverSerializer(serializers.HyperlinkedModelSerializer):
         """Meta class."""
 
         model = Rover
-        fields = ('id', 'name', 'owner', 'local_ip', 'last_checkin')
+        fields = (
+            'id', 'name', 'owner', 'local_ip', 'last_checkin',
+            'left_forward_pin', 'left_backward_pin', 'right_forward_pin',
+            'right_backward_pin', 'left_eye_pin', 'right_eye_pin',
+        )
 
 
 class BlockDiagramSerializer(serializers.ModelSerializer):

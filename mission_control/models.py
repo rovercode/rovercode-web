@@ -10,6 +10,12 @@ class Rover(models.Model):
     owner = models.TextField()
     local_ip = models.TextField()
     last_checkin = models.DateTimeField(auto_now=True)
+    left_forward_pin = models.TextField(null=False, default='XIO-P0')
+    left_backward_pin = models.TextField(null=False, default='XIO-P1')
+    right_forward_pin = models.TextField(null=False, default='XIO-P6')
+    right_backward_pin = models.TextField(null=False, default='XIO-P7')
+    left_eye_pin = models.TextField(null=False, default='XIO-P2')
+    right_eye_pin = models.TextField(null=False, default='XIO-P4')
 
     def __str__(self):
         """Convert the model to a human readable string."""
