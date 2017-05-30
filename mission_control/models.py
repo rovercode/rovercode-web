@@ -7,7 +7,7 @@ class Rover(models.Model):
     """Attributes to describe a single rover."""
 
     name = models.TextField()
-    owner = models.TextField()
+    owner = models.ForeignKey(User)
     local_ip = models.TextField()
     last_checkin = models.DateTimeField(auto_now=True)
     left_forward_pin = models.TextField(null=False, default='XIO-P0')

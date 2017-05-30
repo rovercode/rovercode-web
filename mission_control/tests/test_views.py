@@ -96,22 +96,22 @@ class TestRoverListView(BaseAuthenticatedTestCase):
     def test_list(self):
         """Test the rover list view displays the correct items."""
         self.client.login(username='administrator', password='password')
+        user = self.make_user()
         rover1 = Rover.objects.create(
             name='rover1',
-            owner='user1',
-            local_ip = '192.168.1.100'
+            owner=user,
+            local_ip='192.168.1.100'
         )
         rover2 = Rover.objects.create(
             name='rover2',
-            owner='user2',
-            local_ip = '192.168.1.200'
+            owner=self.admin,
+            local_ip='192.168.1.200'
         )
         response = self.get(reverse('mission-control:rover_list'))
         self.assertEqual(200, response.status_code)
         self.assertContains(response, self.admin.username)
-        # TODO: verify only the user's rovers are displayed
-        self.assertContains(response, rover1.name)
         self.assertContains(response, rover2.name)
+        self.assertNotContains(response, rover1.name)
 
     def test_list_not_logged_in(self):
         """Test the rover list view redirects if no logged in user."""
@@ -122,26 +122,26 @@ class TestRoverListView(BaseAuthenticatedTestCase):
             reverse('mission-control:rover_list'))
 
 
-class TestRoverViewSet(TestCase):
+class TestRoverViewSet(BaseAuthenticatedTestCase):
     """Tests the rover API view."""
 
     def test_rover(self):
         """Test the rover view displays the correct items."""
         Rover.objects.create(
             name='rover',
-            owner='jimbo',
+            owner=self.admin,
             local_ip='8.8.8.8'
         )
         response = self.get(reverse('mission-control:rover-list'))
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(response.json()))
         self.assertEqual(response.json()[0]['name'], 'rover')
-        self.assertEqual(response.json()[0]['owner'], 'jimbo')
+        self.assertEqual(response.json()[0]['owner'], self.admin.id)
         self.assertEqual(response.json()[0]['local_ip'], '8.8.8.8')
         time.sleep(6)
         Rover.objects.create(
             name='rover2',
-            owner='jimbo',
+            owner=self.admin,
             local_ip='8.8.8.8'
         )
         response = self.get(reverse('mission-control:rover-list'))

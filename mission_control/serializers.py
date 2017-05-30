@@ -3,7 +3,7 @@ from .models import Rover, BlockDiagram
 from rest_framework import serializers
 
 
-class RoverSerializer(serializers.HyperlinkedModelSerializer):
+class RoverSerializer(serializers.ModelSerializer):
     """Rover model serializer."""
 
     class Meta:

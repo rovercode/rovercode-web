@@ -9,9 +9,10 @@ class TestRover(TestCase):
 
     def test__str__(self):
         """Test the stringify method."""
+        user = self.make_user()
         self.rover = Rover.objects.create(
             name='rover',
-            owner='jimbo',
+            owner=user,
             local_ip='8.8.8.8'
         )
         self.assertEqual(str(self.rover), 'rover')
