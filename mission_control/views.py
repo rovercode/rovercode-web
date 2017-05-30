@@ -35,8 +35,7 @@ def bd_list(request):
 @login_required
 def rover_list(request):
     """Rover list view for the logged in user."""
-    # TODO: Only display the user's rovers.
-    rover_list = Rover.objects.all()
+    rover_list = Rover.objects.filter(owner=request.user.id)
     return render(request, 'rover_list.html', {'rover_list': rover_list})
 
 
