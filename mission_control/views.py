@@ -4,11 +4,8 @@ from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Rover, BlockDiagram
 from rest_framework import viewsets, permissions, serializers
-from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from .serializers import RoverSerializer, BlockDiagramSerializer
-from mission_control.utils import remove_old_rovers
-from datetime import timedelta
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import get_object_or_404
 
@@ -42,15 +39,14 @@ def rover_list(request):
 class RoverViewSet(viewsets.ModelViewSet):
     """API endpoint that allows rovers to be viewed or edited."""
 
-    queryset = Rover.objects.all()
     serializer_class = RoverSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('name',)
 
-    def list(self, request):
-        """Remove old rovers and lists the remaining active rovers."""
-        remove_old_rovers(timedelta(seconds=-5))
-        queryset = Rover.objects.all()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        """The list of rovers for the user."""
+        return Rover.objects.filter(owner=self.request.user.id)
 
 
 class BlockDiagramViewSet(viewsets.ModelViewSet):

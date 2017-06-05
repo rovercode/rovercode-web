@@ -7,7 +7,7 @@ from . import views
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register(r'rovers', views.RoverViewSet)
+router.register(r'rovers', views.RoverViewSet, base_name='rover')
 router.register(r'block-diagrams', views.BlockDiagramViewSet)
 
 

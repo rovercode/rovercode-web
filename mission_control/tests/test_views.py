@@ -7,7 +7,6 @@ from django.core.urlresolvers import reverse
 from mission_control.models import Rover, BlockDiagram
 
 import json
-import time
 
 
 class TestHomeView(TestCase):
@@ -127,9 +126,15 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
 
     def test_rover(self):
         """Test the rover view displays the correct items."""
+        self.client.login(username='administrator', password='password')
         Rover.objects.create(
             name='rover',
             owner=self.admin,
+            local_ip='8.8.8.8'
+        )
+        Rover.objects.create(
+            name='rover2',
+            owner=self.make_user(),
             local_ip='8.8.8.8'
         )
         response = self.get(reverse('mission-control:rover-list'))
@@ -138,15 +143,32 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(response.json()[0]['name'], 'rover')
         self.assertEqual(response.json()[0]['owner'], self.admin.id)
         self.assertEqual(response.json()[0]['local_ip'], '8.8.8.8')
-        time.sleep(6)
+
+    def test_rover_name_filter(self):
+        """Test the rover view filters correctly on name."""
+        self.client.login(username='administrator', password='password')
         Rover.objects.create(
+            name='rover',
+            owner=self.admin,
+            local_ip='8.8.8.8'
+        )
+        rover2 = Rover.objects.create(
             name='rover2',
             owner=self.admin,
             local_ip='8.8.8.8'
         )
-        response = self.get(reverse('mission-control:rover-list'))
+        response = self.get(
+            reverse('mission-control:rover-list') + '?name=' + rover2.name)
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(response.json()))
+        self.assertEqual(response.json()[0]['name'], 'rover2')
+        self.assertEqual(response.json()[0]['owner'], self.admin.id)
+        self.assertEqual(response.json()[0]['local_ip'], '8.8.8.8')
+
+    def test_rover_not_logged_in(self):
+        """Test the rover view denies unauthenticated user."""
+        response = self.get(reverse('mission-control:rover-list'))
+        self.assertEqual(403, response.status_code)
 
 
 class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
