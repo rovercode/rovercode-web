@@ -76,3 +76,15 @@ class TestMissionControlURLs(TestCase):
         self.assertEqual(
             resolve('/mission-control/block-diagrams/').view_name,
             'mission-control:blockdiagram-list')
+
+    def test_rover_settings_reverse(self):
+        """'mission-control:rover_settings' should reverse to /mission-control/rover-settings/.""" #noqa
+        self.assertEqual(
+            reverse('mission-control:rover_settings', kwargs={'pk': 1}),
+            '/mission-control/rover-settings/1/')
+
+    def test_rover_settings_resolve(self):
+        """/mission-control/rover-settings/ should resolve to mission-control:rover_settings.""" #noqa
+        self.assertEqual(
+            resolve('/mission-control/rover-settings/1/').view_name,
+            'mission-control:rover_settings')

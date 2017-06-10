@@ -1,6 +1,7 @@
 """Mission Control views."""
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.core.urlresolvers import reverse
+from django.shortcuts import render, redirect
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Rover, BlockDiagram
 from rest_framework import viewsets, permissions, serializers
@@ -8,6 +9,7 @@ from rest_framework.renderers import JSONRenderer
 from .serializers import RoverSerializer, BlockDiagramSerializer
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import get_object_or_404
+from .forms import RoverForm
 
 
 @ensure_csrf_cookie
@@ -34,6 +36,28 @@ def rover_list(request):
     """Rover list view for the logged in user."""
     rover_list = Rover.objects.filter(owner=request.user.id)
     return render(request, 'rover_list.html', {'rover_list': rover_list})
+
+
+@login_required
+def rover_settings(request, pk):
+    """Rover settings view for the specific rover."""
+    rover = get_object_or_404(Rover, owner=request.user, pk=pk)
+    print(request.POST)
+    if request.method == 'POST':
+        form = RoverForm(instance=rover, data=request.POST)
+
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('mission-control:rover_list'))
+
+        form = RoverForm(instance=rover)
+    else:
+        form = RoverForm(instance=rover)
+
+    return render(request, 'rover_settings.html', {
+        'name': rover.name,
+        'form': form
+    })
 
 
 class RoverViewSet(viewsets.ModelViewSet):

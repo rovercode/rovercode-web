@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block css %}
+  {{ block.super }}
+  <style>
+    .col-form-label {
+      text-align: right;
+    }
+  </style>
+{% endblock css %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12">
+      <h1>{{ name }}'s Settings:</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <h4 for="sbc">{% trans "Single Board Computer:" %}</h4>
+    </div>
+   </div>
+  <div class="row">
+    <div class="col-md-12">
+      <select class="form-control" id="sbc" disabled>
+        <option>Next Thing Co. CHIP</option>
+        <option>Raspberry Pi</option>
+        <option>Beaglebone Black</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <h4>{% trans "Pin assignments:" %}</h4>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group row">
+          {{ form.as_p }}
+        </div>
+        <div class="form-group row">
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block javascript %}
+{{ block.super }}
+  <script>
+  $(document).ready(function() {
+    $("input[id=id_name]").attr("disabled", true)
+  });
+  </script>
+{% endblock javascript %}
