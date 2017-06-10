@@ -18,7 +18,7 @@
   <div class="row">
     <div class="col-md-12 btn-group" id="bds">
       {% for rover in rover_list %}
-        <button class="btn btn-primary">
+        <button class="btn btn-primary" onclick="location.href = '{% url 'mission-control:rover_settings' pk=rover.pk %}';">
           {{ rover.name }}
         </button>
       {% endfor %}

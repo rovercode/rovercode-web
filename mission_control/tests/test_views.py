@@ -283,3 +283,105 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             b'["You may only modify your own block diagrams"]')
         self.assertEqual(BlockDiagram.objects.last().user.id, user.id)
         self.assertEqual(BlockDiagram.objects.last().name, 'test1')
+
+
+class TestRoverSettingsView(BaseAuthenticatedTestCase):
+    """Tests the rover settings view."""
+
+    def test_display_settings(self):
+        """Test the rover settings view displays the correct items."""
+        self.client.login(username='administrator', password='password')
+        user = self.make_user()
+        Rover.objects.create(
+            name='rover1',
+            owner=user,
+            local_ip='192.168.1.100'
+        )
+        rover2 = Rover.objects.create(
+            name='rover2',
+            owner=self.admin,
+            local_ip='192.168.1.200'
+        )
+        response = self.get(
+            reverse('mission-control:rover_settings', kwargs={'pk': rover2.pk}))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, rover2.name)
+
+    def test_display_settings_not_own_rover(self):
+        """Test the rover settings view when not user's rover."""
+        self.client.login(username='administrator', password='password')
+        user = self.make_user()
+        rover1 = Rover.objects.create(
+            name='rover1',
+            owner=user,
+            local_ip='192.168.1.100'
+        )
+        Rover.objects.create(
+            name='rover2',
+            owner=self.admin,
+            local_ip='192.168.1.200'
+        )
+        response = self.get(
+            reverse('mission-control:rover_settings', kwargs={'pk': rover1.pk}))
+        self.assertEqual(404, response.status_code)
+
+    def test_change_settings(self):
+        """Test changing the rover settings."""
+        self.client.login(username='administrator', password='password')
+        rover = Rover.objects.create(
+            name='rover1',
+            owner=self.admin,
+            local_ip='192.168.1.100'
+        )
+        settings = {
+            'name': 'rover1',
+            'left_forward_pin': 'a',
+            'left_backward_pin': 'b',
+            'right_forward_pin': 'c',
+            'right_backward_pin': 'd',
+            'left_eye_pin': 'e',
+            'right_eye_pin': 'f'
+        }
+        response = self.client.post(
+            reverse('mission-control:rover_settings', kwargs={'pk': rover.pk}),
+            settings)
+        self.assertRedirects(
+            response,
+            reverse('mission-control:rover_list'))
+        rover_obj = Rover.objects.get(pk=rover.pk)
+        self.assertEqual(rover_obj.name, settings['name'])
+        self.assertEqual(
+            rover_obj.left_forward_pin, settings['left_forward_pin'])
+        self.assertEqual(
+            rover_obj.right_forward_pin, settings['right_forward_pin'])
+        self.assertEqual(
+            rover_obj.left_backward_pin, settings['left_backward_pin'])
+        self.assertEqual(
+            rover_obj.right_backward_pin, settings['right_backward_pin'])
+        self.assertEqual(
+            rover_obj.left_eye_pin, settings['left_eye_pin'])
+        self.assertEqual(
+            rover_obj.right_eye_pin, settings['right_eye_pin'])
+
+    def test_change_settings_invalid(self):
+        """Test changing the rover settings with invalid settings."""
+        self.client.login(username='administrator', password='password')
+        rover = Rover.objects.create(
+            name='rover1',
+            owner=self.admin,
+            local_ip='192.168.1.100'
+        )
+        settings = {}
+        response = self.client.post(
+            reverse('mission-control:rover_settings', kwargs={'pk': rover.pk}),
+            settings)
+        self.assertEqual(200, response.status_code)
+
+    def test_rover_settings_not_logged_in(self):
+        """Test the rover settings view redirects if no logged in user."""
+        response = self.get(
+            reverse('mission-control:rover_settings', kwargs={'pk': '1'}))
+        self.assertRedirects(
+            response,
+            reverse('account_login') + '?next=' +
+            reverse('mission-control:rover_settings', kwargs={'pk': '1'}))
