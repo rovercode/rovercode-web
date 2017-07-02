@@ -247,8 +247,13 @@ function updateCode() {
 
 function showCode() {
   updateCode();
-  consoleDiv = $('#consoleArea');
-  consoleDiv.append("<p>"+code+"</p>");
+  let editor = ace.edit('editor');
+  editor.setTheme('ace/theme/iplastic');
+  editor.getSession().setMode('ace/mode/javascript');
+  editor.setReadOnly(true);
+  editor.setFontSize(14);
+  editor.setValue(code);
+  $('#codeViewModal').modal();
 }
 
 function beginSleep(sleepTimeInMs) {
