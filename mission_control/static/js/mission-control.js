@@ -247,8 +247,15 @@ function updateCode() {
 
 function showCode() {
   updateCode();
-  consoleDiv = $('#consoleArea');
-  consoleDiv.append("<p>"+code+"</p>");
+  /* Remove 'highlightBlock' code generated from Blockly */
+  strippedCode = code.replace(/highlightBlock\(\'[0-9]+\'\);/g, '');
+  let editor = ace.edit('editor');
+  editor.setTheme('ace/theme/iplastic');
+  editor.getSession().setMode('ace/mode/javascript');
+  editor.setReadOnly(true);
+  editor.setFontSize(14);
+  editor.setValue(strippedCode);
+  $('#codeViewModal').modal();
 }
 
 function beginSleep(sleepTimeInMs) {
