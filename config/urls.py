@@ -22,6 +22,7 @@ urlpatterns = [
 
     # Your stuff: custom urls includes go here
     url(r'^mission-control/', include('mission_control.urls', namespace='mission-control')),
+    url(r'^blog/', include('rovercode_web.blog.urls', namespace='blog')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
