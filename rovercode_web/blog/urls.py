@@ -15,10 +15,10 @@ urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^api-auth/',
         include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^post-edit/(?P<pk>[0-9]+)/$',
+    url(r'^post-edit/(?P<slug>[-\w]+)/$',
         views.post_edit, name='post_edit'),
     url(r'^post-edit/$',
         views.post_edit, name='post_new'),
-    url(r'^post-detail/(?P<pk>[0-9]+)/$',
+    url(r'^post-detail/(?P<slug>[-\w]+)/$',
         views.post_detail, name='post_detail'),
 ]

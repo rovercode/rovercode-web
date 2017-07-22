@@ -18,10 +18,10 @@ def post_list(request, drafts=False):
     return render(request, 'blog_post_list.html', {'post_list': post_list})
 
 @staff_member_required
-def post_edit(request, pk=None):
+def post_edit(request, slug=None):
     """Post edit view for a specific blog post."""
-    if pk is not None:
-        post = get_object_or_404(Post, pk=pk)
+    if slug is not None:
+        post = get_object_or_404(Post, slug=slug)
     else:
         # Create a new post
         post = Post()
@@ -43,9 +43,9 @@ def post_edit(request, pk=None):
         'form': form
     })
 
-def post_detail(request, pk):
+def post_detail(request, slug):
     """Post details view for a specific blog post."""
-    post = get_object_or_404(Post, pk=pk)
+    post = get_object_or_404(Post, slug=slug)
     return render(request, 'blog_post_detail.html', {'post': post})
 
 class PostViewSet(viewsets.ModelViewSet):

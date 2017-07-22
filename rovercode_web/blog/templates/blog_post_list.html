@@ -15,11 +15,11 @@
 <div class="row nice-underlines">
   <div class="col-md-12">
       {% for post in post_list %}
-        <h2><a href="{% url 'blog:post_detail' pk=post.pk %}"> {{ post.title }}</a></h2>
+        <h2><a href="{% url 'blog:post_detail' slug=post.slug %}"> {{ post.title }}</a></h2>
         <p> {{ post.lead | safe }} </p>
         <p class="text-muted"> posted by {{ post.author }} on {{ post.published_date }} </p>
         {% if request.user.is_staff %}
-          <p class="small"><a href="{% url 'blog:post_edit' pk=post.pk %}">edit</a></h2>
+          <p class="small"><a href="{% url 'blog:post_edit' slug=post.slug %}">edit</a></h2>
         {% endif %}
       {% endfor %}
   </div>

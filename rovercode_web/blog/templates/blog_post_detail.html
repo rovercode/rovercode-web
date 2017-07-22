@@ -18,7 +18,7 @@
   <div class="col-md-12">
     <h1>{{ post.title }}</h1>
     {% if request.user.is_staff %}
-      <p class="small"><a href="{% url 'blog:post_edit' pk=post.pk %}">edit</a></h2>
+      <p class="small"><a href="{% url 'blog:post_edit' slug=post.slug %}">edit</a></h2>
     {% endif %}
   </div>
 </div>
