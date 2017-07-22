@@ -2,10 +2,23 @@
 """Blog urls."""
 from __future__ import absolute_import, unicode_literals
 
-from django.conf.urls import url
-
+from django.conf.urls import include, url
+from rest_framework import routers
 from . import views
 
+router = routers.DefaultRouter()
+router.register(r'posts', views.PostViewSet, base_name='post')
+
 urlpatterns = [
-    url(r'^$', views.list, name='list')
+    url(r'^$', views.post_list, name='post_list'),
+    url(r'^/post-drafts-list/$', views.post_list, {'drafts': True}, name='post_drafts_list'),
+    url(r'^', include(router.urls)),
+    url(r'^api-auth/',
+        include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^post-edit/(?P<pk>[0-9]+)/$',
+        views.post_edit, name='post_edit'),
+    url(r'^post-edit/$',
+        views.post_edit, name='post_new'),
+    url(r'^post-detail/(?P<pk>[0-9]+)/$',
+        views.post_detail, name='post_detail'),
 ]

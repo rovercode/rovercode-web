@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row nice-underlines" style="margin-bottom: 4em">
+  <div class="col-md-12">
+    <h1>rovercode blog</h1>
+    {% if request.user.is_staff %}
+      <p class="small">
+        <a href="{% url 'blog:post_new'%}">new post</a>
+        <a href="{% url 'blog:post_drafts_list'%}">drafts</a>
+      </p>
+    {% endif %}
+  </div>
+</div>
+<div class="row nice-underlines">
+  <div class="col-md-12">
+      {% for post in post_list %}
+        <h2><a href="{% url 'blog:post_detail' pk=post.pk %}"> {{ post.title }}</a></h2>
+        <p> {{ post.lead | safe }} </p>
+        <p class="text-muted"> posted by {{ post.author }} on {{ post.published_date }} </p>
+        {% if request.user.is_staff %}
+          <p class="small"><a href="{% url 'blog:post_edit' pk=post.pk %}">edit</a></h2>
+        {% endif %}
+      {% endfor %}
+  </div>
+</div>
+
+{% endblock content %}
