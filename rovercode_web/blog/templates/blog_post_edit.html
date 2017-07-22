@@ -35,7 +35,10 @@
 {{ block.super }}
   <script>
   $(document).ready(function() {
-    $("input[id=id_name]").attr("disabled", true)
+    $('input').addClass('form-control');
+    $('textarea').addClass('form-control');
+    $('select').addClass('form-control');
+    $('#id_published').css('width', '5%');
   });
   </script>
 {% endblock javascript %}
