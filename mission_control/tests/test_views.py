@@ -151,7 +151,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
 
         checkin_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(checkin_time > creation_time)
+        self.assertGreater(checkin_time, creation_time)
 
     def test_rover(self):
         """Test the rover view displays the correct items."""
