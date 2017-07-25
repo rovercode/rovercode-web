@@ -72,6 +72,11 @@ class RoverViewSet(viewsets.ModelViewSet):
         """The list of rovers for the user."""
         return Rover.objects.filter(owner=self.request.user.id)
 
+    def perform_create(self, serializer):
+        """Perform the create operation."""
+        user = self.request.user
+        serializer.save(owner=user)
+
 
 class BlockDiagramViewSet(viewsets.ModelViewSet):
     """API endpoint that allows block diagrams to be viewed or edited."""

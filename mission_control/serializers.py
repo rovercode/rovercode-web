@@ -15,6 +15,7 @@ class RoverSerializer(serializers.ModelSerializer):
             'left_forward_pin', 'left_backward_pin', 'right_forward_pin',
             'right_backward_pin', 'left_eye_pin', 'right_eye_pin',
         )
+        read_only_fields = ('owner',)
 
 
 class BlockDiagramSerializer(serializers.ModelSerializer):
