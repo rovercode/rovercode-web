@@ -4,8 +4,8 @@ from test_plus.test import TestCase
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 from django.db.utils import IntegrityError
-from rest_framework.test import APIClient
 import dateutil.parser
+from urllib.parse import urlencode
 
 from mission_control.models import Rover, BlockDiagram
 
@@ -129,26 +129,25 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
 
     def test_rover_create(self):
         """Test the rover registration interface."""
-        drf_client = APIClient()
-        drf_client.login(username='administrator', password='password')
+        self.client.login(username='administrator', password='password')
         rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10'}
 
         # Create the rover
-        response = drf_client.post(reverse('mission-control:rover-list'), rover_info)
+        response = self.client.post(reverse('mission-control:rover-list'), rover_info)
         id = response.data['id']
         creation_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 201)
 
         # Try and fail to create the same rover again
         with self.assertRaises(IntegrityError):
-            drf_client.post(reverse('mission-control:rover-list'), rover_info)
+            self.client.post(reverse('mission-control:rover-list'), rover_info)
 
         # Update the rover
-        response = drf_client.put(
+        response = self.client.put(
             reverse('mission-control:rover-list')+str(id)+'/',
-            rover_info
+            urlencode(rover_info),
+            content_type="application/x-www-form-urlencoded"
         )
-
         checkin_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 200)
         self.assertGreater(checkin_time, creation_time)
