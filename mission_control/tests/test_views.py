@@ -144,7 +144,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
 
         # Update the rover
         response = self.client.put(
-            reverse('mission-control:rover-list')+str(id)+'/',
+            reverse('mission-control:rover-detail', kwargs={'pk': id}),
             urlencode(rover_info),
             content_type="application/x-www-form-urlencoded"
         )
