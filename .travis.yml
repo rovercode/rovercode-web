@@ -31,7 +31,7 @@ deploy:
   application: beta-rovercode-web
   deployment_group: beta-rovercode-web
   on:
-    repo: aninternetof/rovercode-web
+    repo: rovercode/rovercode-web
     branch: development
 - provider: codedeploy
   access_key_id: AKIAIZTZIW2KWAYZ6MUQ
@@ -41,7 +41,7 @@ deploy:
   application: rovercode-web
   deployment_group: rovercode-web
   on:
-    repo: aninternetof/rovercode-web
+    repo: rovercode/rovercode-web
     branch: master
 notifications:
   slack:
