@@ -41,7 +41,8 @@ class TestHomeViewWithLoad(BaseAuthenticatedTestCase):
             name='test',
             content='<xml></xml>'
         )
-        response = self.get(reverse('mission-control:home_with_load', kwargs={'bd':bd.id}))
+        response = self.get(reverse(
+            'mission-control:home_with_load', kwargs={'bd': bd.id}))
         self.assertEqual(200, response.status_code)
 
     def test_home_load_nonexistant(self):
@@ -52,9 +53,9 @@ class TestHomeViewWithLoad(BaseAuthenticatedTestCase):
             name='test',
             content='<xml></xml>'
         )
-        response = self.get(reverse('mission-control:home_with_load', kwargs={'bd':bd.id+1}))
+        response = self.get(reverse(
+            'mission-control:home_with_load', kwargs={'bd': bd.id + 1}))
         self.assertEqual(404, response.status_code)
-
 
 
 class TestBlockDiagramListView(BaseAuthenticatedTestCase):
@@ -303,7 +304,9 @@ class TestRoverSettingsView(BaseAuthenticatedTestCase):
             local_ip='192.168.1.200'
         )
         response = self.get(
-            reverse('mission-control:rover_settings', kwargs={'pk': rover2.pk}))
+            reverse('mission-control:rover_settings',
+                    kwargs={'pk': rover2.pk})
+        )
         self.assertEqual(200, response.status_code)
         self.assertContains(response, rover2.name)
 
@@ -322,7 +325,9 @@ class TestRoverSettingsView(BaseAuthenticatedTestCase):
             local_ip='192.168.1.200'
         )
         response = self.get(
-            reverse('mission-control:rover_settings', kwargs={'pk': rover1.pk}))
+            reverse('mission-control:rover_settings',
+                    kwargs={'pk': rover1.pk})
+        )
         self.assertEqual(404, response.status_code)
 
     def test_change_settings(self):
