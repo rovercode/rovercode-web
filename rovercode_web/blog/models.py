@@ -2,8 +2,9 @@
 from django.db import models
 from rovercode_web.users.models import User
 
+
 class Post(models.Model):
-    """Attributes to describe a single blog post"""
+    """Attributes to describe a single blog post."""
 
     title = models.CharField(null=False, max_length=200)
     slug = models.SlugField(null=False, max_length=100, unique=True)

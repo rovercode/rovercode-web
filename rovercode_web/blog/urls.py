@@ -11,7 +11,9 @@ router.register(r'posts', views.PostViewSet, base_name='post')
 
 urlpatterns = [
     url(r'^$', views.post_list, name='post_list'),
-    url(r'^/post-drafts-list/$', views.post_list, {'drafts': True}, name='post_drafts_list'),
+    url(r'^post-drafts-list/$',
+        views.post_list, {'drafts': True},
+        name='post_drafts_list'),
     url(r'^', include(router.urls)),
     url(r'^api-auth/',
         include('rest_framework.urls', namespace='rest_framework')),
