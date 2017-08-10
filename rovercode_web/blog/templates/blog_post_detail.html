@@ -24,7 +24,7 @@
 </div>
 <div class="row nice-underlines" id="attribution">
   <div class="col-md-12">
-    <p class="text-muted">posted by {{ user.get_full_name | default:user.username }} on {{ post.published_date | date}} </p>
+    <p class="text-muted">posted by {{ post.author.get_full_name | default:post.author.username }} on {{ post.published_date | date}} </p>
   </div>
 </div>
 <div class="row nice-underlines">
