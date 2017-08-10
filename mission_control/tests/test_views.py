@@ -134,7 +134,8 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10'}
 
         # Create the rover
-        response = self.client.post(reverse('mission-control:rover-list'), rover_info)
+        response = self.client.post(
+            reverse('mission-control:rover-list'), rover_info)
         id = response.data['id']
         creation_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 201)
