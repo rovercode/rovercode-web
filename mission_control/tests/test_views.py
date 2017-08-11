@@ -3,11 +3,13 @@ from test_plus.test import TestCase
 
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
+from django.db.utils import IntegrityError
+import dateutil.parser
+from urllib.parse import urlencode
 
 from mission_control.models import Rover, BlockDiagram
 
 import json
-import time
 
 
 class TestHomeView(TestCase):
@@ -42,7 +44,8 @@ class TestHomeViewWithLoad(BaseAuthenticatedTestCase):
             name='test',
             content='<xml></xml>'
         )
-        response = self.get(reverse('mission-control:home_with_load', kwargs={'bd':bd.id}))
+        response = self.get(reverse(
+            'mission-control:home_with_load', kwargs={'bd': bd.id}))
         self.assertEqual(200, response.status_code)
 
     def test_home_load_nonexistant(self):
@@ -53,12 +56,12 @@ class TestHomeViewWithLoad(BaseAuthenticatedTestCase):
             name='test',
             content='<xml></xml>'
         )
-        response = self.get(reverse('mission-control:home_with_load', kwargs={'bd':bd.id+1}))
+        response = self.get(reverse(
+            'mission-control:home_with_load', kwargs={'bd': bd.id + 1}))
         self.assertEqual(404, response.status_code)
 
 
-
-class TestListView(BaseAuthenticatedTestCase):
+class TestBlockDiagramListView(BaseAuthenticatedTestCase):
     """Tests the block diagram list view."""
 
     def test_list(self):
@@ -75,7 +78,7 @@ class TestListView(BaseAuthenticatedTestCase):
             name='admin_bd',
             content='<xml></xml>'
         )
-        response = self.get(reverse('mission-control:list'))
+        response = self.get(reverse('mission-control:bd_list'))
         self.assertEqual(200, response.status_code)
         self.assertContains(response, self.admin.username)
         self.assertContains(response, bd2.name)
@@ -83,38 +86,119 @@ class TestListView(BaseAuthenticatedTestCase):
 
     def test_list_not_logged_in(self):
         """Test the block diagram list view redirects if no logged in user."""
-        response = self.get(reverse('mission-control:list'))
+        response = self.get(reverse('mission-control:bd_list'))
         self.assertRedirects(
             response,
             reverse('account_login') + '?next=' +
-            reverse('mission-control:list'))
+            reverse('mission-control:bd_list'))
 
 
-class TestRoverViewSet(TestCase):
+class TestRoverListView(BaseAuthenticatedTestCase):
+    """Tests the rover list view."""
+
+    def test_list(self):
+        """Test the rover list view displays the correct items."""
+        self.client.login(username='administrator', password='password')
+        user = self.make_user()
+        rover1 = Rover.objects.create(
+            name='rover1',
+            owner=user,
+            local_ip='192.168.1.100'
+        )
+        rover2 = Rover.objects.create(
+            name='rover2',
+            owner=self.admin,
+            local_ip='192.168.1.200'
+        )
+        response = self.get(reverse('mission-control:rover_list'))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, self.admin.username)
+        self.assertContains(response, rover2.name)
+        self.assertNotContains(response, rover1.name)
+
+    def test_list_not_logged_in(self):
+        """Test the rover list view redirects if no logged in user."""
+        response = self.get(reverse('mission-control:rover_list'))
+        self.assertRedirects(
+            response,
+            reverse('account_login') + '?next=' +
+            reverse('mission-control:rover_list'))
+
+
+class TestRoverViewSet(BaseAuthenticatedTestCase):
     """Tests the rover API view."""
+
+    def test_rover_create(self):
+        """Test the rover registration interface."""
+        self.client.login(username='administrator', password='password')
+        rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10'}
+
+        # Create the rover
+        response = self.client.post(
+            reverse('mission-control:rover-list'), rover_info)
+        id = response.data['id']
+        creation_time = dateutil.parser.parse(response.data['last_checkin'])
+        self.assertEqual(response.status_code, 201)
+
+        # Try and fail to create the same rover again
+        with self.assertRaises(IntegrityError):
+            self.client.post(reverse('mission-control:rover-list'), rover_info)
+
+        # Update the rover
+        response = self.client.put(
+            reverse('mission-control:rover-detail', kwargs={'pk': id}),
+            urlencode(rover_info),
+            content_type="application/x-www-form-urlencoded"
+        )
+        checkin_time = dateutil.parser.parse(response.data['last_checkin'])
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(checkin_time, creation_time)
 
     def test_rover(self):
         """Test the rover view displays the correct items."""
+        self.client.login(username='administrator', password='password')
         Rover.objects.create(
             name='rover',
-            owner='jimbo',
+            owner=self.admin,
+            local_ip='8.8.8.8'
+        )
+        Rover.objects.create(
+            name='rover2',
+            owner=self.make_user(),
             local_ip='8.8.8.8'
         )
         response = self.get(reverse('mission-control:rover-list'))
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(response.json()))
         self.assertEqual(response.json()[0]['name'], 'rover')
-        self.assertEqual(response.json()[0]['owner'], 'jimbo')
+        self.assertEqual(response.json()[0]['owner'], self.admin.id)
         self.assertEqual(response.json()[0]['local_ip'], '8.8.8.8')
-        time.sleep(6)
+
+    def test_rover_name_filter(self):
+        """Test the rover view filters correctly on name."""
+        self.client.login(username='administrator', password='password')
         Rover.objects.create(
-            name='rover2',
-            owner='jimbo',
+            name='rover',
+            owner=self.admin,
             local_ip='8.8.8.8'
         )
-        response = self.get(reverse('mission-control:rover-list'))
+        rover2 = Rover.objects.create(
+            name='rover2',
+            owner=self.admin,
+            local_ip='8.8.8.8'
+        )
+        response = self.get(
+            reverse('mission-control:rover-list') + '?name=' + rover2.name)
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(response.json()))
+        self.assertEqual(response.json()[0]['name'], 'rover2')
+        self.assertEqual(response.json()[0]['owner'], self.admin.id)
+        self.assertEqual(response.json()[0]['local_ip'], '8.8.8.8')
+
+    def test_rover_not_logged_in(self):
+        """Test the rover view denies unauthenticated user."""
+        response = self.get(reverse('mission-control:rover-list'))
+        self.assertEqual(403, response.status_code)
 
 
 class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
@@ -229,3 +313,109 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             b'["You may only modify your own block diagrams"]')
         self.assertEqual(BlockDiagram.objects.last().user.id, user.id)
         self.assertEqual(BlockDiagram.objects.last().name, 'test1')
+
+
+class TestRoverSettingsView(BaseAuthenticatedTestCase):
+    """Tests the rover settings view."""
+
+    def test_display_settings(self):
+        """Test the rover settings view displays the correct items."""
+        self.client.login(username='administrator', password='password')
+        user = self.make_user()
+        Rover.objects.create(
+            name='rover1',
+            owner=user,
+            local_ip='192.168.1.100'
+        )
+        rover2 = Rover.objects.create(
+            name='rover2',
+            owner=self.admin,
+            local_ip='192.168.1.200'
+        )
+        response = self.get(
+            reverse('mission-control:rover_settings',
+                    kwargs={'pk': rover2.pk})
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, rover2.name)
+
+    def test_display_settings_not_own_rover(self):
+        """Test the rover settings view when not user's rover."""
+        self.client.login(username='administrator', password='password')
+        user = self.make_user()
+        rover1 = Rover.objects.create(
+            name='rover1',
+            owner=user,
+            local_ip='192.168.1.100'
+        )
+        Rover.objects.create(
+            name='rover2',
+            owner=self.admin,
+            local_ip='192.168.1.200'
+        )
+        response = self.get(
+            reverse('mission-control:rover_settings',
+                    kwargs={'pk': rover1.pk})
+        )
+        self.assertEqual(404, response.status_code)
+
+    def test_change_settings(self):
+        """Test changing the rover settings."""
+        self.client.login(username='administrator', password='password')
+        rover = Rover.objects.create(
+            name='rover1',
+            owner=self.admin,
+            local_ip='192.168.1.100'
+        )
+        settings = {
+            'name': 'rover1',
+            'left_forward_pin': 'a',
+            'left_backward_pin': 'b',
+            'right_forward_pin': 'c',
+            'right_backward_pin': 'd',
+            'left_eye_pin': 'e',
+            'right_eye_pin': 'f'
+        }
+        response = self.client.post(
+            reverse('mission-control:rover_settings', kwargs={'pk': rover.pk}),
+            settings)
+        self.assertRedirects(
+            response,
+            reverse('mission-control:rover_list'))
+        rover_obj = Rover.objects.get(pk=rover.pk)
+        self.assertEqual(rover_obj.name, settings['name'])
+        self.assertEqual(
+            rover_obj.left_forward_pin, settings['left_forward_pin'])
+        self.assertEqual(
+            rover_obj.right_forward_pin, settings['right_forward_pin'])
+        self.assertEqual(
+            rover_obj.left_backward_pin, settings['left_backward_pin'])
+        self.assertEqual(
+            rover_obj.right_backward_pin, settings['right_backward_pin'])
+        self.assertEqual(
+            rover_obj.left_eye_pin, settings['left_eye_pin'])
+        self.assertEqual(
+            rover_obj.right_eye_pin, settings['right_eye_pin'])
+
+    def test_change_settings_invalid(self):
+        """Test changing the rover settings with invalid settings."""
+        self.client.login(username='administrator', password='password')
+        rover = Rover.objects.create(
+            name='rover1',
+            owner=self.admin,
+            local_ip='192.168.1.100'
+        )
+        settings = {}
+        response = self.client.post(
+            reverse('mission-control:rover_settings', kwargs={'pk': rover.pk}),
+            settings)
+        self.assertEqual(200, response.status_code)
+
+    def test_rover_settings_not_logged_in(self):
+        """Test the rover settings view redirects if no logged in user."""
+        response = self.get(
+            reverse('mission-control:rover_settings', kwargs={'pk': '1'}))
+        self.assertRedirects(
+            response,
+            reverse('account_login') + '?next=' +
+            reverse('mission-control:rover_settings', kwargs={'pk': '1'}))

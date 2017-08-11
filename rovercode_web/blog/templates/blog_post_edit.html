@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block css %}
+  {{ block.super }}
+  <style>
+    .col-form-label {
+      text-align: right;
+    }
+  </style>
+{% endblock css %}
+
+{% block content %}
+  {% if form.errors %}
+    {% for field in form %}
+      {% for error in field.errors %}
+        <div class="alert alert-danger">
+          <strong>{{ error|escape }}</strong>
+        </div>
+      {% endfor %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+      <div class="alert alert-danger">
+        <strong>{{ error|escape }}</strong>
+      </div>
+    {% endfor %}
+  {% endif %}
+  <div class="row">
+    <div class="col-md-12">
+      <h1>{{ title }}</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group row">
+          {{ form.as_p }}
+        </div>
+        <div class="form-group row">
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block javascript %}
+{{ block.super }}
+  <script>
+  $(document).ready(function() {
+    $('input').addClass('form-control');
+    $('textarea').addClass('form-control');
+    $('select').addClass('form-control');
+    $('#id_published').css('width', '5%');
+  });
+  </script>
+{% endblock javascript %}

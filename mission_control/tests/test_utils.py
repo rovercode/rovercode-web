@@ -15,14 +15,14 @@ class TestRemoveOldRovers(TestCase):
         """Test the remove_old_rovers method."""
         Rover.objects.create(
             name='rover',
-            owner='jimbo',
+            owner=self.make_user(username='user1'),
             local_ip='8.8.8.8'
         )
         self.assertEqual(1, Rover.objects.count())
         time.sleep(1)
         Rover.objects.create(
             name='rover2',
-            owner='jimbo',
+            owner=self.make_user(username='user2'),
             local_ip='8.8.8.8'
         )
         remove_old_rovers(timedelta(seconds=-1))

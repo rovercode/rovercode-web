@@ -48,7 +48,8 @@ LOCAL_APPS = (
     # custom users app
     'rovercode_web.users.apps.UsersConfig',
     # Your stuff: custom apps go here
-    'mission_control.apps.MissionControlConfig'
+    'mission_control.apps.MissionControlConfig',
+    'rovercode_web.blog.apps.BlogConfig',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -141,6 +142,7 @@ TEMPLATES = [
         # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
         'DIRS': [
             str(APPS_DIR.path('rovercode_web/templates')),
+            str(APPS_DIR.path('rovercode_web/blog/templates')),
             str(APPS_DIR.path('mission_control/templates')),
         ],
         'OPTIONS': {

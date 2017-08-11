@@ -16,6 +16,7 @@
 
   <script src="https://use.fontawesome.com/60eff1bf54.js"></script>
   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/ace/1.2.8/ace.js"></script>
 
   <script src="{% static 'blockly/blockly_compressed.js' %}"></script>
   <script src="{% static 'blockly/generators/javascript.js' %}"></script>
@@ -121,6 +122,7 @@
           </ul>
 
           <ul class="nav navbar-nav pull-xs-right">
+            <li class="nav-item"><a class="nav-link" href="#" id="showCodeButton" onclick="showCode()">Show Me The Code!</a></li>
             <li class="nav-item" style="margin-right:20px"><a class="nav-link" href="#" onclick="return getRovers()">Connect To A Rover</a></li>
             <li class="nav-item code-control-button-container"><a id="runButton" style="background-color:#F04124; font-size:400%; line-height: 5.8rem; box-shadow: 1px 1px 1px #333333;
                     position:relative; z-index:999" href="#" onclick="return goToRunningState()">
@@ -235,6 +237,23 @@
                 <h2>Here are the online rovers:</h2>
                 <div class="panel" id="registeredRoversArea"></div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" role="dialog" id="codeViewModal" aria-labelledby="codeViewModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div clas="modal-body">
+          <div class="container-fluid">
+            <div class="row">
+              <h2>Here is the code in <a href="https://en.wikipedia.org/wiki/JavaScript">Javascript</a>:</h2>
+            </div>
+            <div class="row">
+              <div id="editor" style="height: 300px; width: 100%"></div>
             </div>
           </div>
         </div>

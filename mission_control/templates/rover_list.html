@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block css %}
+  {{ block.super }}
+  <style>
+    .btn {
+      margin: 5px;
+    }
+  </style>
+{% endblock css %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12">
+      <h1>{{ request.user.username }}'s Rovers:</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12 btn-group" id="bds">
+      {% for rover in rover_list %}
+        <button class="btn btn-primary" onclick="location.href = '{% url 'mission-control:rover_settings' pk=rover.pk %}';">
+          {{ rover.name }}
+        </button>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock content %}
