@@ -98,6 +98,8 @@ class TestPostEditView(BaseStaffAuthenticatedTestCase):
             reverse('blog:post_edit', kwargs={'slug': post.slug}),
             content)
         self.assertEqual(200, response.status_code)
+        self.assertContains(response, "alert alert-danger")
+        self.assertContains(response, "This field is required.")
 
     def test_post_new(self):
         """Test the post edit view for creating a new post."""
@@ -106,7 +108,7 @@ class TestPostEditView(BaseStaffAuthenticatedTestCase):
         self.assertEqual(200, response.status_code)
 
     def test_home_load_nonexistant(self):
-        """Test the post edit view tring to load a nonexistant post."""
+        """Test the post edit view trying to load a nonexistent post."""
         self.client.login(username='staff', password='password')
         Post.objects.create(
             author=self.staff,
@@ -118,7 +120,7 @@ class TestPostEditView(BaseStaffAuthenticatedTestCase):
         self.assertEqual(404, response.status_code)
 
     def test_home_load_nonstaff(self):
-        """Test the post edit view tring to load a nonexistant post."""
+        """Test the post edit view trying to load a nonexistent post."""
         self.client.login(username='nonstaffuser', password='password')
         Post.objects.create(
             author=self.staff,

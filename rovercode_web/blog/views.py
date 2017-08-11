@@ -10,7 +10,7 @@ from .forms import PostForm
 
 
 def post_list(request, drafts=False):
-    """Test view."""
+    """Post list view."""
     published = not drafts
     post_list = Post.objects.filter(published=published)
     return render(request, 'blog_post_list.html', {'post_list': post_list})
@@ -35,8 +35,6 @@ def post_edit(request, slug=None):
                 reverse('blog:post_detail',
                         kwargs={'slug': post.slug})
             )
-
-        form = PostForm(instance=post)
     else:
         form = PostForm(instance=post)
 
