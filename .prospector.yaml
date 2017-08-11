@@ -7,6 +7,7 @@ ignore-paths:
   - mission_control/migrations/
   - rovercode_web/users/
   - rovercode_web/contrib/
+  - rovercode_web/blog/migrations/
   - config/
   - docs/
   - manage.py
