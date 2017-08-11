@@ -107,7 +107,7 @@ class TestPostEditView(BaseStaffAuthenticatedTestCase):
         response = self.get(reverse('blog:post_new'))
         self.assertEqual(200, response.status_code)
 
-    def test_home_load_nonexistant(self):
+    def test_home_load_nonexistent(self):
         """Test the post edit view trying to load a nonexistent post."""
         self.client.login(username='staff', password='password')
         Post.objects.create(
@@ -147,8 +147,8 @@ class TestPostDetailView(TestCase):
             kwargs={'slug': post.slug}))
         self.assertEqual(200, response.status_code)
 
-    def test_home_load_nonexistant(self):
-        """Test the post detail view tring to load a nonexistant post."""
+    def test_home_load_nonexistent(self):
+        """Test the post detail view tring to load a nonexistent post."""
         user = self.make_user()
         Post.objects.create(
             author=user,
