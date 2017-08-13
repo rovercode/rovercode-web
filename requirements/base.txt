@@ -49,3 +49,6 @@ djangorestframework~=3.5.3
 django-filter==1.0.1
 pylint==1.6.5
 prospector==0.12.4
+
+# Using signals added after the 1.0.0 release
+git+https://github.com/evonove/django-oauth-toolkit.git@18bbdc177f5f68f7db173bd3b883787418816a81#egg=django-oauth-toolkit
