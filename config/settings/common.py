@@ -50,6 +50,7 @@ LOCAL_APPS = (
     # Your stuff: custom apps go here
     'mission_control.apps.MissionControlConfig',
     'rovercode_web.blog.apps.BlogConfig',
+    'api.apps.ApiConfig',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
