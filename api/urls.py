@@ -13,6 +13,4 @@ router.register(r'block-diagrams', views.BlockDiagramViewSet)
 
 urlpatterns = [
     url(r'^v1/', include(router.urls, namespace='v1')),
-    url(r'^api-auth/',
-        include('rest_framework.urls', namespace='rest_framework')),
 ]
