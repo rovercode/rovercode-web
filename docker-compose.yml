@@ -43,8 +43,8 @@ services:
       - /var/lib/letsencrypt:/var/lib/letsencrypt
 
   certbot:
-    image: quay.io/letsencrypt/letsencrypt
-    command: bash -c "sleep 6 && certbot certonly -n --standalone -d rovercode.com --text --agree-tos --email bradyhurlburt@gmail.com --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --keep-until-expiring --standalone-supported-challenges http-01"
+    image: certbot/certbot 
+    command: sh -c "sleep 6 && certbot certonly -n --standalone -d rovercode.com --text --agree-tos --email bradyhurlburt@gmail.com --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --keep-until-expiring --standalone-supported-challenges http-01"
     entrypoint: ""
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
