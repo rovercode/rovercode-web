@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^api/', include('api.urls', namespace='api')),
     url(r'^api-auth/',
         include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^oauth2/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
