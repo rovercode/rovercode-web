@@ -17,6 +17,9 @@
   </div>
   <div class="row">
     <div class="col-md-12 btn-group" id="bds">
+      <button class="btn btn-large btn-info" onclick="location.href = '{% url 'mission-control:rover_new' %}';">
+        Register a New Rover
+      </button>
       {% for rover in rover_list %}
         <button class="btn btn-primary" onclick="location.href = '{% url 'mission-control:rover_settings' pk=rover.pk %}';">
           {{ rover.name }}

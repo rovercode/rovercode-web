@@ -64,3 +64,15 @@ class TestMissionControlURLs(TestCase):
         self.assertEqual(
             resolve('/mission-control/rover-settings/1/').view_name,
             'mission-control:rover_settings')
+
+    def test_rover_new_reverse(self):
+        """'mission-control:rover_new' should reverse to /mission-control/rover-settings/.""" # noqa
+        self.assertEqual(
+            reverse('mission-control:rover_new'),
+            '/mission-control/rover-settings/')
+
+    def test_rover_new_resolve(self):
+        """/mission-control/rover-settings/ should resolve to mission-control:rover_new."""  # noqa
+        self.assertEqual(
+            resolve('/mission-control/rover-settings/').view_name,
+            'mission-control:rover_new')

@@ -37,10 +37,12 @@ def rover_list(request):
 
 
 @login_required
-def rover_settings(request, pk):
+def rover_settings(request, pk=None):
     """Rover settings view for the specific rover."""
-    rover = get_object_or_404(Rover, owner=request.user, pk=pk)
-    print(request.POST)
+    if pk:
+        rover = get_object_or_404(Rover, owner=request.user, pk=pk)
+    else:
+        rover = Rover(owner=request.user, pk=pk)
     if request.method == 'POST':
         form = RoverForm(instance=rover, data=request.POST)
 
@@ -48,9 +50,7 @@ def rover_settings(request, pk):
             form.save()
             return redirect(reverse('mission-control:rover_list'))
 
-        form = RoverForm(instance=rover)
-    else:
-        form = RoverForm(instance=rover)
+    form = RoverForm(instance=rover)
 
     return render(request, 'rover_settings.html', {
         'name': rover.name,
