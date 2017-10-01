@@ -123,6 +123,48 @@ class TestRoverListView(BaseAuthenticatedTestCase):
 class TestRoverSettingsView(BaseAuthenticatedTestCase):
     """Tests the rover settings view."""
 
+    def test_new_rover_form(self):
+        """Test getting a form for a new rover."""
+        self.client.login(username='administrator', password='password')
+        response = self.get(reverse('mission-control:rover_new'))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, 'New Rover')
+
+    def test_new_rover_save(self):
+        """Test creating a new rover."""
+        self.client.login(username='administrator', password='password')
+        settings = {
+            'name': 'rover123',
+            'left_forward_pin': 'a',
+            'left_backward_pin': 'b',
+            'right_forward_pin': 'c',
+            'right_backward_pin': 'd',
+            'left_eye_pin': 'e',
+            'right_eye_pin': 'f',
+            'local_ip': '192.169.1.200',
+        }
+        response = self.client.post(
+            reverse('mission-control:rover_new'),
+            settings)
+        self.assertRedirects(
+            response,
+            reverse('mission-control:rover_list'))
+        rover_obj = Rover.objects.get(name='rover123')
+        self.assertEqual(rover_obj.owner, self.admin)
+        self.assertEqual(rover_obj.name, settings['name'])
+        self.assertEqual(
+            rover_obj.left_forward_pin, settings['left_forward_pin'])
+        self.assertEqual(
+            rover_obj.right_forward_pin, settings['right_forward_pin'])
+        self.assertEqual(
+            rover_obj.left_backward_pin, settings['left_backward_pin'])
+        self.assertEqual(
+            rover_obj.right_backward_pin, settings['right_backward_pin'])
+        self.assertEqual(
+            rover_obj.left_eye_pin, settings['left_eye_pin'])
+        self.assertEqual(
+            rover_obj.right_eye_pin, settings['right_eye_pin'])
+
     def test_display_settings(self):
         """Test the rover settings view displays the correct items."""
         self.client.login(username='administrator', password='password')
