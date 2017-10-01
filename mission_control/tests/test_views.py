@@ -131,7 +131,7 @@ class TestRoverSettingsView(BaseAuthenticatedTestCase):
         self.assertContains(response, 'New Rover')
 
     def test_new_rover_save(self):
-        """Test getting a form for a new rover."""
+        """Test creating a new rover."""
         self.client.login(username='administrator', password='password')
         settings = {
             'name': 'rover123',

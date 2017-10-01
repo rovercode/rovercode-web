@@ -42,7 +42,7 @@ def rover_settings(request, pk=None):
     if pk:
         rover = get_object_or_404(Rover, owner=request.user, pk=pk)
     else:
-        rover = Rover(owner=request.user, pk=pk)
+        rover = Rover(owner=request.user)
     if request.method == 'POST':
         form = RoverForm(instance=rover, data=request.POST)
 
