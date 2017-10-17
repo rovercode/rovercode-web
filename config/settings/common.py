@@ -272,6 +272,7 @@ OAUTH2_PROVIDER = {
         'write': 'Write scope',
     }
 }
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 
 # REST FRAMEWORK CONFIGURATION
 # ------------------------------------------------------------------------------

@@ -8,6 +8,7 @@ from .serializers import BlockDiagramSerializer
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import get_object_or_404
 from .forms import RoverForm
+from oauth2_provider.models import Application
 
 
 @ensure_csrf_cookie
@@ -48,11 +49,20 @@ def rover_settings(request, pk=None):
 
         if form.is_valid():
             form.save()
-            return redirect(reverse('mission-control:rover_list'))
+            if not rover.oauth_application:
+                rover.oauth_application = Application.objects.create(
+                    user=request.user,
+                    authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+                    client_type=Application.CLIENT_CONFIDENTIAL,
+                    name=rover.name
+                )
+            rover.save()
 
     form = RoverForm(instance=rover)
 
     return render(request, 'rover_settings.html', {
         'name': rover.name,
+        'client_id' : rover.oauth_application.client_id if rover.oauth_application else "",
+        'client_secret' : rover.oauth_application.client_secret if rover.oauth_application else "",
         'form': form
     })

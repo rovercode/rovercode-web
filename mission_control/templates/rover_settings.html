@@ -48,6 +48,15 @@
       </form>
     </div>
   </div>
+  {% if client_id %}
+    <div class="row">
+      <div class="col-md-12">
+        <h4>{% trans "Keys:" %}</h4>
+        <p> {{ client_id }} </p>
+        <p> {{ client_secret }} </p>
+      </div>
+    </div>
+  {% endif %}
 {% endblock content %}
 
 {% block javascript %}
