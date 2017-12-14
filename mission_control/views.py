@@ -1,7 +1,6 @@
 """Mission Control views."""
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from .models import Rover, BlockDiagram
 from rest_framework.renderers import JSONRenderer
 from .serializers import BlockDiagramSerializer
@@ -50,19 +49,27 @@ def rover_settings(request, pk=None):
         if form.is_valid():
             form.save()
             if not rover.oauth_application:
-                rover.oauth_application = Application.objects.create(
-                    user=request.user,
-                    authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS,
-                    client_type=Application.CLIENT_CONFIDENTIAL,
-                    name=rover.name
+                rover.oauth_application = _create_app(
+                    request.user,
+                    rover.name
                 )
             rover.save()
 
     form = RoverForm(instance=rover)
 
+    oa = rover.oauth_application
     return render(request, 'rover_settings.html', {
         'name': rover.name,
-        'client_id' : rover.oauth_application.client_id if rover.oauth_application else "",
-        'client_secret' : rover.oauth_application.client_secret if rover.oauth_application else "",
+        'client_id': rover.oauth_application.client_id if oa else "",
+        'client_secret': rover.oauth_application.client_secret if oa else "",
         'form': form
     })
+
+
+def _create_app(user, name):
+    return Application.objects.create(
+        user=user,
+        authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+        client_type=Application.CLIENT_CONFIDENTIAL,
+        name=name
+    )
