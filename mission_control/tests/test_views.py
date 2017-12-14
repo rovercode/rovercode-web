@@ -146,9 +146,7 @@ class TestRoverSettingsView(BaseAuthenticatedTestCase):
         response = self.client.post(
             reverse('mission-control:rover_new'),
             settings)
-        self.assertRedirects(
-            response,
-            reverse('mission-control:rover_list'))
+        self.assertEqual(200, response.status_code)
         rover_obj = Rover.objects.get(name='rover123')
         self.assertEqual(rover_obj.owner, self.admin)
         self.assertEqual(rover_obj.name, settings['name'])
@@ -164,6 +162,15 @@ class TestRoverSettingsView(BaseAuthenticatedTestCase):
             rover_obj.left_eye_pin, settings['left_eye_pin'])
         self.assertEqual(
             rover_obj.right_eye_pin, settings['right_eye_pin'])
+        self.assertEqual(
+            rover_obj.oauth_application.user, self.admin
+        )
+        self.assertTrue(
+            rover_obj.oauth_application.client_id
+        )
+        self.assertTrue(
+            rover_obj.oauth_application.client_secret
+        )
 
     def test_display_settings(self):
         """Test the rover settings view displays the correct items."""
@@ -226,9 +233,7 @@ class TestRoverSettingsView(BaseAuthenticatedTestCase):
         response = self.client.post(
             reverse('mission-control:rover_settings', kwargs={'pk': rover.pk}),
             settings)
-        self.assertRedirects(
-            response,
-            reverse('mission-control:rover_list'))
+        self.assertEqual(200, response.status_code)
         rover_obj = Rover.objects.get(pk=rover.pk)
         self.assertEqual(rover_obj.name, settings['name'])
         self.assertEqual(
@@ -243,6 +248,15 @@ class TestRoverSettingsView(BaseAuthenticatedTestCase):
             rover_obj.left_eye_pin, settings['left_eye_pin'])
         self.assertEqual(
             rover_obj.right_eye_pin, settings['right_eye_pin'])
+        self.assertEqual(
+            rover_obj.oauth_application.user, self.admin
+        )
+        self.assertTrue(
+            rover_obj.oauth_application.client_id
+        )
+        self.assertTrue(
+            rover_obj.oauth_application.client_secret
+        )
 
     def test_change_settings_invalid(self):
         """Test changing the rover settings with invalid settings."""
