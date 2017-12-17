@@ -1,8 +1,6 @@
-console.log("Got cred download.")
-
 $("#download-env").click(function() {
     if ('Blob' in window) {
-        var textToSave = "client_id:"+clientId+"\nclientSecret:"+clientSecret+"\n"
+        var textToSave = "client_id:"+clientId+"\nclientSecret:"+clientSecret+"\n";
         var textToSaveAsBlob = new Blob([textToSave], {type:"text/plain"});
         var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
         var fileNameToSaveAs = "rovercode_"+name+".env";
@@ -14,7 +12,7 @@ $("#download-env").click(function() {
         document.body.appendChild(downloadLink);
         downloadLink.click();
     } else {
-        console.error("No blob support")
+        console.error("No blob support");
         alert('Sorry, your browser does not support HTML5 Blobs. Please try using a newer browser.');
     }
 })

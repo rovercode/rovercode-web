@@ -60,9 +60,9 @@
 {% block javascript %}
   {{ block.super }}
   <script>
-    name = "{{ name }}"
-    clientId = "{{ client_id }}"
-    clientSecret = "{{ client_secret }}"
+    var name = "{{ name }}";
+    var clientId = "{{ client_id }}";
+    var clientSecret = "{{ client_secret }}";
   </script>
 
   <script src="{% static 'js/cred-download.js' %}"></script>
