@@ -60,8 +60,8 @@ def rover_settings(request, pk=None):
     oa = rover.oauth_application
     return render(request, 'rover_settings.html', {
         'name': rover.name,
-        'client_id': rover.oauth_application.client_id if oa else "",
-        'client_secret': rover.oauth_application.client_secret if oa else "",
+        'client_id': oa.client_id if oa else "",
+        'client_secret': oa.client_secret if oa else "",
         'form': form
     })
 
