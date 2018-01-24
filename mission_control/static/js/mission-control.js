@@ -308,6 +308,10 @@ function goToRunningState() {
 }
 
 function goToStopState() {
+  sendMotorCommand('START_MOTOR', motorPins.LEFT.FORWARD, 0);
+  sendMotorCommand('START_MOTOR', motorPins.LEFT.BACKWARD, 0);
+  sendMotorCommand('START_MOTOR', motorPins.RIGHT.FORWARD, 0);
+  sendMotorCommand('START_MOTOR', motorPins.RIGHT.BACKWARD, 0);
   runningEnabled = false;
   $('#runButton > i').css('color', '#FFFFFF');
 }
