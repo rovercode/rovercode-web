@@ -144,7 +144,7 @@ function acceptName() {
   if (!designName) {
     $('#nameErrorArea').text('Please enter a name for your design in the box');
   } else {
-    $.get("/mission-control/block-diagrams/?user=" + userId, function(json){
+    $.get("/api/v1/block-diagrams/?user=" + userId, function(json){
       var duplicate = json.indexOf(designName) > -1;
       if (duplicate) {
         $('#nameErrorArea').text('This name has already been chosen. Please pick another one.');
@@ -190,7 +190,7 @@ function updateLocalStateAfterEvent(event){
 function getRovers() {
   $('#registeredRoversArea').empty();
   $('#connectModal').modal('toggle');
-  $.getJSON("/mission-control/rovers", function(result){
+  $.getJSON("/api/v1/rovers", function(result){
       $.each(result, function(i, field){
         console.log(field.name);
         $(document.createElement('a')).addClass('btn btn-primary')
