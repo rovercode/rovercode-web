@@ -301,7 +301,7 @@ function resetCode() {
 }
 
 function goToRunningState() {
-  $('#runButton').css('color', '#FFCC33');
+  $('#runButton > i').css('color', '#FFCC33');
   updateCode();
   runningEnabled = true;
   runCode();
@@ -309,7 +309,7 @@ function goToRunningState() {
 
 function goToStopState() {
   runningEnabled = false;
-  $('#runButton').css('color', '#FFFFFF');
+  $('#runButton > i').css('color', '#FFFFFF');
 }
 
 /*----- BLOCK VISIBILITY FUNCTIONS -----*/
