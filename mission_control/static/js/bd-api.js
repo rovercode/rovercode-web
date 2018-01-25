@@ -117,7 +117,7 @@ function downloadDesign(name) {
     .attr( {'download': name, 'href': downloadUrl} )
     .get(0)
     .click();
-  }).error(function() {
+  }).fail(function() {
     alert("There was an error accessing your design");
   });
 }
