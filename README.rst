@@ -14,8 +14,8 @@ rovercode-web
 .. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg
       :target: https://github.com/pydanny/cookiecutter-django/
       :alt: Built with Cookiecutter Django
-.. image:: https://api.travis-ci.org/aninternetof/rovercode-web.svg
-      :target: https://travis-ci.org/aninternetof/rovercode-web
+.. image:: https://api.travis-ci.org/rovercode/rovercode-web.svg
+      :target: https://travis-ci.org/rovercode/rovercode-web
 .. image:: https://coveralls.io/repos/github/rovercode/rovercode-web/badge.svg?branch=development
        :target: https://coveralls.io/github/rovercode/rovercode-web?branch=development
 
