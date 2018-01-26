@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 class RoverSerializer(serializers.ModelSerializer):
     """Rover model serializer."""
-
+    client_id = serializers.CharField(source='oauth_application.client_id', read_only=True)
     class Meta:
         """Meta class."""
 
@@ -14,6 +14,7 @@ class RoverSerializer(serializers.ModelSerializer):
             'id', 'name', 'owner', 'local_ip', 'last_checkin',
             'left_forward_pin', 'left_backward_pin', 'right_forward_pin',
             'right_backward_pin', 'left_eye_pin', 'right_eye_pin',
+            'client_id',
         )
         read_only_fields = ('owner',)
 
