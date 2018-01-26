@@ -63,7 +63,7 @@ its name using the command `sudo docker network ls`.)
 
 rovercode is now running, and you can see that it has registered itself with
 your local rovercodeweb container by going to
-http://localhost:8000/mission-control/rovers. You can now select this rover
+http://localhost:8000/mission-control/rover-list. You can now select this rover
 in the mission-control interface, and rover commands will be sent to your
 rovercode container.
 
