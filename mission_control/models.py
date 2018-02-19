@@ -1,6 +1,7 @@
 """Mission Control models."""
 from django.db import models
 from rovercode_web.users.models import User
+from oauth2_provider.models import Application
 
 
 class Rover(models.Model):
@@ -8,6 +9,7 @@ class Rover(models.Model):
 
     name = models.CharField(null=False, max_length=25)
     owner = models.ForeignKey(User)
+    oauth_application = models.ForeignKey(Application, blank=True, null=True)
     local_ip = models.CharField(max_length=15)
     last_checkin = models.DateTimeField(auto_now=True)
     left_forward_pin = models.CharField(
