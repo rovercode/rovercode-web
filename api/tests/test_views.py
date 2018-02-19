@@ -97,7 +97,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
     def test_rover_not_logged_in(self):
         """Test the rover view denies unauthenticated user."""
         response = self.get(reverse('api:v1:rover-list'))
-        self.assertEqual(403, response.status_code)
+        self.assertEqual(401, response.status_code)
 
 
 class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
@@ -156,7 +156,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
     def test_bd_not_logged_in(self):
         """Test the block diagram view denies unauthenticated user."""
         response = self.get(reverse('api:v1:blockdiagram-list'))
-        self.assertEqual(403, response.status_code)
+        self.assertEqual(401, response.status_code)
 
     def test_bd_create(self):
         """Test creating block diagram sets user."""

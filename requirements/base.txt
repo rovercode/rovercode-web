@@ -28,7 +28,7 @@ django-allauth==0.30.0
 
 
 # Python-PostgreSQL Database Adapter
-psycopg2==2.6.2
+psycopg2==2.7.3
 
 # Unicode slugification
 awesome-slugify==1.6.5
@@ -48,6 +48,7 @@ redis>=2.10.5
 djangorestframework~=3.5.3
 django-filter==1.0.1
 pylint==1.6.5
+pylint-django==0.8.0
 prospector==0.12.4
 
 # Using signals added after the 1.0.0 release

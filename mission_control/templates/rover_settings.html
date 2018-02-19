@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load staticfiles i18n %}
 
 {% block css %}
   {{ block.super }}
@@ -48,7 +48,22 @@
       </form>
     </div>
   </div>
+  {% if client_id %}
+    <div class="row">
+      <div class="col-md-12" style="margin-top:2em">
+        <button class="btn btn-secondary" id="download-env">{% trans "Download Credentials" %}</button>
+      </div>
+    </div>
+  {% endif %}
 {% endblock content %}
 
 {% block javascript %}
+  {{ block.super }}
+  <script>
+    var name = "{{ name }}";
+    var clientId = "{{ client_id }}";
+    var clientSecret = "{{ client_secret }}";
+  </script>
+
+  <script src="{% static 'js/cred-download.js' %}"></script>
 {% endblock javascript %}
