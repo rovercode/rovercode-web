@@ -1,5 +1,5 @@
 #!/bin/bash
-if [ ! -d /home/ubuntu/rovercode-web ]; then
+if [ -d /home/ubuntu/rovercode-web ]; then
     pushd /home/ubuntu/rovercode-web > /dev/null
     docker-compose down
     popd > /dev/null
