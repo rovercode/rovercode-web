@@ -16,7 +16,7 @@ if [ -z "$POSTGRES_HOST" ]; then
     export POSTGRES_HOST=postgres
 fi
 if [ -z "$POSTGRES_DB" ]; then
-    export POSTGRES_DB=postgres
+    export POSTGRES_DB=$POSTGRES_USER
 fi
 
 apt-get install -y ca-certificates wget
