@@ -111,6 +111,9 @@ DATABASES = {
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
+if env.bool('POSTGRES_USE_AWS_SSL', False):
+    DATABASES['default']['OPTIONS'] = {'sslrootcert': 'rds-ca-2015-root.pem', 'sslmode': 'require'}
+
 
 # GENERAL CONFIGURATION
 # ------------------------------------------------------------------------------
