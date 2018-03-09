@@ -19,20 +19,14 @@ if [ -z "$POSTGRES_DB" ]; then
     export POSTGRES_DB=$POSTGRES_USER
 fi
 
-apt-get install -y ca-certificates wget
-wget https://s3.amazonaws.com/rds-downloads/rds-ca-2015-root.pem -P /usr/local/share/ca-certificates/
-update-ca-certificates
-
-
 export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB
-
 
 function postgres_ready(){
 python << END
 import sys
 import psycopg2
 if "$POSTGRES_USE_AWS_SSL".lower() == 'true':
-    kwargs = {"sslrootcert": "rds-ca-2015-root.pem", "sslmode": "require"}
+    kwargs = {"sslrootcert": "rds-ca-2015-root.crt", "sslmode": "require"}
 else:
     kwargs = {}
 try:
