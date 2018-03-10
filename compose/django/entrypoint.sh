@@ -12,16 +12,25 @@ export REDIS_URL=redis://redis:6379
 if [ -z "$POSTGRES_USER" ]; then
     export POSTGRES_USER=postgres
 fi
+if [ -z "$POSTGRES_HOST" ]; then
+    export POSTGRES_HOST=postgres
+fi
+if [ -z "$POSTGRES_DB" ]; then
+    export POSTGRES_DB=$POSTGRES_USER
+fi
 
-export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_USER
-
+export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB
 
 function postgres_ready(){
 python << END
 import sys
 import psycopg2
+if "$POSTGRES_USE_AWS_SSL".lower() == 'true':
+    kwargs = {"sslrootcert": "rds-ca-2015-root.crt", "sslmode": "require"}
+else:
+    kwargs = {}
 try:
-    conn = psycopg2.connect(dbname="$POSTGRES_USER", user="$POSTGRES_USER", password="$POSTGRES_PASSWORD", host="postgres")
+    conn = psycopg2.connect(dbname="$POSTGRES_DB", user="$POSTGRES_USER", password="$POSTGRES_PASSWORD", host="$POSTGRES_HOST", **kwargs)
 except psycopg2.OperationalError:
     sys.exit(-1)
 sys.exit(0)
