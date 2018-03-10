@@ -23,6 +23,7 @@ language: python
 python:
 - '3.5'
 deploy:
+  matrix:
   - provider: codedeploy
     access_key_id: AKIAIGTJF2ZRMY5BAAKQ
     secret_access_key:
