@@ -54,6 +54,17 @@ deploy:
     on:
       repo: rovercode/rovercode-web
       branch: development
+  - provider: codedeploy
+    access_key_id: AKIAIGTJF2ZRMY5BAAKQ
+    secret_access_key:
+      secure: uD0Z3WxSFyHp32ivolxlM3QZ8jcp5E7unQvwFNuFSOoQ1KlHyXIEtnat3HZvwUhTw5cdQcO6KYd6/cSUBfy/yRpchXE4Mv6TBXcrvbArSQHAGP/s2lbV4DjJp0xx2n65vvzD0JaxcnMUuQbIBO/4aUwRmJj/Aarri0OWnT4UPAO/B/oi5b/IjzKKz4MUDh6cgXxGsI5sgQnkRQPszPmvos5kIQ1Eoun9Vg88JPJNl/04OhEJlh2aDKBHk5yfrQN+d48OZsVMiSBw6ioIRHa2F6EeaB+6Zomro6AFY3Zgwkx64m93C6B6lw6j6h2szCGMP4rSnUmcgiAleXiOw2iptXbGSx2+hAhk0ohIntwuYtxUtAZEewTfqzMAJMDOy2jMWkT7xxGQ1ihypMtLWfqJqD3d8RHt2cKizOjICSG/w5plxybbHI38ONuj9Qo29Zrw0Jss0ufmCu1zqr2LgqN3yFVIxd1etsB8CDaYfHOTNyGBWzRfiupJ6xe9KvNht4p71Xt2chAbSNjhv7Ow2Pg1IYerowlzo2j7CXfNZ2s0iTOmsGPteKkHn1yMXa47ISQSGkVPWacgm3ZJ2RCWJuP4juioUz8wpKXcqXfrA4QRCeQoE8Bpu4tg9otJEab5Z3CkQ+laFfiKnhfJ9n2GBuDafs+Yz7DzCIoLorTnWTgnUcA=
+    revision_type: github
+    region: us-east-2
+    application: rovercode-web
+    deployment_group: rovercode-web
+    on:
+      repo: rovercode/rovercode-web
+      branch: master
 notifications:
   slack:
     secure: lGfSdmE+gADEOsBsS1tu1jFkhrGqpAZlIUMMXFYjCPODfwrkTC9onyimKzUYOzDcEvOVP4uNQo5XFIZD5/dOg/Grjav9THvwADLuAumkMk9iH4tetWQ1KBRMawTxmMHUQa7ujoOERuEttrq4FhDo84RNaK8d+eLO8iuhHDGeqTd4MSgAak1aukCiohRKfvgNBNAlPPaiBKbeuSea+j46pRqhC/FM55cpIV9iiH0AhFIC9HKa3UkhHfNXh7fybTQuVVD0r+SOCbnJxQvIOzwjWQco+HjZXgXn62GSFLX4bW2WmqfFKuTiLhzXuLKXr5ZI6ggBlqaANvqCsv4Ki8yQ9/qsQOVUipZAnFzvMCAL1XGIBJdRO9mzBegzDk/QO538jOcPzK2P24abEvESqgC3Ld4JOcv1H6ZJ8dFVxnbCPcZIhgE6HoGD+8YHyFoZ5MvR6xq0cQfd7lmXPDgiYXnoQXwsx1Zd95hH07P+BQlsCFfhyG/T0QuXg6XIE7c5NdbZoZutxAbjPjOCJMWNRQlp20PWD+ms9QUNTvtcwtOsubobtoDi0mDSLK/RB6gvUEJkYSh6zmKoIYGLooXSeE8VnZ82V3RgzGnvNPSI8qpd+44czgpRcFtnATdmTw+zrxSywCCXhl9OODB2M4cxvZ7Vfgz2EQfb4taOxH8LibYEyQQ=
