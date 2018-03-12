@@ -53,30 +53,6 @@ class TestMissionControlURLs(TestCase):
             resolve('/mission-control/rover-list/').view_name,
             'mission-control:rover_list')
 
-    def test_rovers_reverse(self):
-        """mission-control:rover-list should reverse to /mission-control/rovers/.""" # noqa
-        self.assertEqual(
-            reverse('mission-control:rover-list'),
-            '/mission-control/rovers/')
-
-    def test_rovers_resolve(self):
-        """/mission-control/rovers/ should resolve to mission-control:rover-list.""" # noqa
-        self.assertEqual(
-            resolve('/mission-control/rovers/').view_name,
-            'mission-control:rover-list')
-
-    def test_block_diagrams_reverse(self):
-        """mission-control:blockdiagram-list should reverse to /mission-control/block-diagrams/.""" # noqa
-        self.assertEqual(
-            reverse('mission-control:blockdiagram-list'),
-            '/mission-control/block-diagrams/')
-
-    def test_block_diagrams_resolve(self):
-        """/mission-control/block-diagrams/ should resolve to mission-control:blockdiagram-list.""" # noqa
-        self.assertEqual(
-            resolve('/mission-control/block-diagrams/').view_name,
-            'mission-control:blockdiagram-list')
-
     def test_rover_settings_reverse(self):
         """'mission-control:rover_settings' should reverse to /mission-control/rover-settings/.""" # noqa
         self.assertEqual(
@@ -88,3 +64,15 @@ class TestMissionControlURLs(TestCase):
         self.assertEqual(
             resolve('/mission-control/rover-settings/1/').view_name,
             'mission-control:rover_settings')
+
+    def test_rover_new_reverse(self):
+        """'mission-control:rover_new' should reverse to /mission-control/rover-settings/.""" # noqa
+        self.assertEqual(
+            reverse('mission-control:rover_new'),
+            '/mission-control/rover-settings/')
+
+    def test_rover_new_resolve(self):
+        """/mission-control/rover-settings/ should resolve to mission-control:rover_new."""  # noqa
+        self.assertEqual(
+            resolve('/mission-control/rover-settings/').view_name,
+            'mission-control:rover_new')

@@ -7,7 +7,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views import defaults as default_views
-import mission_control.urls
+
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
@@ -23,6 +23,10 @@ urlpatterns = [
     # Your stuff: custom urls includes go here
     url(r'^mission-control/', include('mission_control.urls', namespace='mission-control')),
     url(r'^blog/', include('rovercode_web.blog.urls', namespace='blog')),
+    url(r'^api/', include('api.urls', namespace='api')),
+    url(r'^api-auth/',
+        include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^oauth2/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

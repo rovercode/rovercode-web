@@ -5,11 +5,12 @@ files:
     destination: /home/ubuntu/rovercode-web
 hooks:
   BeforeInstall:
+    - location: deploy-scripts/install_docker.sh
     - location: deploy-scripts/remove_prev_install.sh
   AfterInstall:
     - location: deploy-scripts/clone_subrepos.sh
-    - location: deploy-scripts/rename_app.sh
     - location: deploy-scripts/create_env.sh
+    - location: deploy-scripts/rename_app.sh
     - location: deploy-scripts/change_ownership.sh
   ApplicationStart:
     - location: deploy-scripts/start_app.sh

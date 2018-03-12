@@ -41,6 +41,7 @@ THIRD_PARTY_APPS = (
     'allauth.account',  # registration
     'allauth.socialaccount',  # registration
     'rest_framework',
+    'oauth2_provider',
 )
 
 # Apps specific for this project go here.
@@ -50,6 +51,7 @@ LOCAL_APPS = (
     # Your stuff: custom apps go here
     'mission_control.apps.MissionControlConfig',
     'rovercode_web.blog.apps.BlogConfig',
+    'api.apps.ApiConfig',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -65,6 +67,7 @@ MIDDLEWARE = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'oauth2_provider.middleware.OAuth2TokenMiddleware',
 )
 
 # MIGRATIONS CONFIGURATION
@@ -107,6 +110,9 @@ DATABASES = {
     'default': env.db('DATABASE_URL', default='postgres:///rovercode_web'),
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
+
+if env.bool('POSTGRES_USE_AWS_SSL', False):
+    DATABASES['default']['OPTIONS'] = {'sslrootcert': 'rds-ca-2015-root.crt', 'sslmode': 'require'}
 
 
 # GENERAL CONFIGURATION
@@ -233,6 +239,7 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
+    'oauth2_provider.backends.OAuth2Backend',
 )
 
 # Some really nice defaults
@@ -259,3 +266,23 @@ ADMIN_URL = r'^admin/'
 
 # Your common stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------
+
+# OAUTH2 PROVIDER CONFIGURATION
+# ------------------------------------------------------------------------------
+OAUTH2_PROVIDER = {
+    'SCOPES': {
+        'read': 'Read scope',
+        'write': 'Write scope',
+    }
+}
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
+
+# REST FRAMEWORK CONFIGURATION
+# ------------------------------------------------------------------------------
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}

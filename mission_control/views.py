@@ -1,15 +1,13 @@
 """Mission Control views."""
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
-from django.shortcuts import render, redirect
-from django_filters.rest_framework import DjangoFilterBackend
+from django.shortcuts import render
 from .models import Rover, BlockDiagram
-from rest_framework import viewsets, permissions, serializers
 from rest_framework.renderers import JSONRenderer
-from .serializers import RoverSerializer, BlockDiagramSerializer
+from .serializers import BlockDiagramSerializer
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import get_object_or_404
 from .forms import RoverForm
+from oauth2_provider.models import Application
 
 
 @ensure_csrf_cookie
@@ -39,62 +37,39 @@ def rover_list(request):
 
 
 @login_required
-def rover_settings(request, pk):
+def rover_settings(request, pk=None):
     """Rover settings view for the specific rover."""
-    rover = get_object_or_404(Rover, owner=request.user, pk=pk)
-    print(request.POST)
+    if pk:
+        rover = get_object_or_404(Rover, owner=request.user, pk=pk)
+    else:
+        rover = Rover(owner=request.user)
     if request.method == 'POST':
         form = RoverForm(instance=rover, data=request.POST)
 
         if form.is_valid():
             form.save()
-            return redirect(reverse('mission-control:rover_list'))
+            if not rover.oauth_application:
+                rover.oauth_application = _create_app(
+                    request.user,
+                    rover.name
+                )
+            rover.save()
 
-        form = RoverForm(instance=rover)
-    else:
-        form = RoverForm(instance=rover)
+    form = RoverForm(instance=rover)
 
+    oa = rover.oauth_application
     return render(request, 'rover_settings.html', {
         'name': rover.name,
+        'client_id': oa.client_id if oa else "",
+        'client_secret': oa.client_secret if oa else "",
         'form': form
     })
 
 
-class RoverViewSet(viewsets.ModelViewSet):
-    """API endpoint that allows rovers to be viewed or edited."""
-
-    serializer_class = RoverSerializer
-    permission_classes = (permissions.IsAuthenticated, )
-    filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('name',)
-
-    def get_queryset(self):
-        """The list of rovers for the user."""
-        return Rover.objects.filter(owner=self.request.user.id)
-
-    def perform_create(self, serializer):
-        """Perform the create operation."""
-        user = self.request.user
-        serializer.save(owner=user)
-
-
-class BlockDiagramViewSet(viewsets.ModelViewSet):
-    """API endpoint that allows block diagrams to be viewed or edited."""
-
-    queryset = BlockDiagram.objects.all()
-    serializer_class = BlockDiagramSerializer
-    permission_classes = (permissions.IsAuthenticated, )
-    filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('user', 'name')
-
-    def perform_create(self, serializer):
-        """Perform the create operation."""
-        user = self.request.user
-        serializer.save(user=user)
-
-    def perform_update(self, serializer):
-        """Perform the update operation."""
-        if self.get_object().user.id is not self.request.user.id:
-            raise serializers.ValidationError(
-                'You may only modify your own block diagrams')
-        serializer.save()
+def _create_app(user, name):
+    return Application.objects.create(
+        user=user,
+        authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+        client_type=Application.CLIENT_CONFIDENTIAL,
+        name=name
+    )

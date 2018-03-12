@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load staticfiles i18n %}
 
 {% block css %}
   {{ block.super }}
@@ -13,15 +13,19 @@
 {% block content %}
   <div class="row">
     <div class="col-md-12">
-      <h1>{{ name }}'s Settings:</h1>
+      {% if name and name.strip %}
+        <h1>{{ name }}'s Settings:</h1>
+      {% else %}
+        <h1>New Rover:</h1>
+      {% endif %}
     </div>
   </div>
   <div class="row">
     <div class="col-md-12">
       <h4 for="sbc">{% trans "Single Board Computer:" %}</h4>
     </div>
-   </div>
-  <div class="row">
+  </div>
+  <div class="row" style="padding-bottom: 1em;">
     <div class="col-md-12">
       <select class="form-control" id="sbc" disabled>
         <option>Next Thing Co. CHIP</option>
@@ -39,22 +43,27 @@
     <div class="col-md-12">
       <form method="post">
         {% csrf_token %}
-        <div class="form-group row">
-          {{ form.as_p }}
-        </div>
-        <div class="form-group row">
-          <button type="submit" class="btn btn-primary">Save</button>
-        </div>
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Save</button>
       </form>
     </div>
   </div>
+  {% if client_id %}
+    <div class="row">
+      <div class="col-md-12" style="margin-top:2em">
+        <button class="btn btn-secondary" id="download-env">{% trans "Download Credentials" %}</button>
+      </div>
+    </div>
+  {% endif %}
 {% endblock content %}
 
 {% block javascript %}
-{{ block.super }}
+  {{ block.super }}
   <script>
-  $(document).ready(function() {
-    $("input[id=id_name]").attr("disabled", true)
-  });
+    var name = "{{ name }}";
+    var clientId = "{{ client_id }}";
+    var clientSecret = "{{ client_secret }}";
   </script>
+
+  <script src="{% static 'js/cred-download.js' %}"></script>
 {% endblock javascript %}

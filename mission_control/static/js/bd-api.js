@@ -18,7 +18,7 @@ function saveDesign() {
 }
 
 function createBd() {
-  $.post('/mission-control/block-diagrams/', data, function(response){
+  $.post('/api/v1/block-diagrams/', data, function(response){
     bdId = response.id;
     console.log('Created bd ' + bdId + ' on the server');
   })
@@ -31,7 +31,7 @@ function createBd() {
 function updateBd() {
   $.ajax({
     method: 'PUT',
-    url: '/mission-control/block-diagrams/' + bdId + '/',
+    url: '/api/v1/block-diagrams/' + bdId + '/',
     data: data,
     complete: function(e, xhr, settings) {
       if (e.status === 200 ) {
@@ -48,7 +48,7 @@ function updateBd() {
 }
 
 function refreshSavedBds(userId) {
-  $.get("/mission-control/block-diagrams/?user=" + userId, function(json){
+  $.get("/api/v1/block-diagrams/?user=" + userId, function(json){
     if (!json.length){
       $('#savedDesignsArea').text("There are no designs saved.");
     } else {
@@ -70,7 +70,7 @@ function refreshSavedBds(userId) {
 }
 
 function loadDesignByName(name) {
-  $.get("/mission-control/block-diagrams/?name=" + name, function(json){
+  $.get("/api/v1/block-diagrams/?name=" + name, function(json){
     if (!json.length){
       console.warn("Could not find block diagram named " + name);
       writeToConsole("Could not find block diagram named " + name);
@@ -117,7 +117,7 @@ function downloadDesign(name) {
     .attr( {'download': name, 'href': downloadUrl} )
     .get(0)
     .click();
-  }).error(function() {
+  }).fail(function() {
     alert("There was an error accessing your design");
   });
 }
