@@ -9,10 +9,12 @@ from mission_control.serializers import RoverSerializer, BlockDiagramSerializer
 class RoverViewSet(viewsets.ModelViewSet):
     """API endpoint that allows rovers to be viewed or edited."""
 
+    client_id = serializers.CharField(source='oauth_application.client_id',
+                                      read_only=True)
     serializer_class = RoverSerializer
     permission_classes = (permissions.IsAuthenticated, )
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('name',)
+    filter_fields = ('name', 'oauth_application__client_id')
 
     def get_queryset(self):
         """The list of rovers for the user."""
