@@ -2,6 +2,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions, serializers
 
+from mission_control.filters import RoverFilter
 from mission_control.models import Rover, BlockDiagram
 from mission_control.serializers import RoverSerializer, BlockDiagramSerializer
 
@@ -12,7 +13,7 @@ class RoverViewSet(viewsets.ModelViewSet):
     serializer_class = RoverSerializer
     permission_classes = (permissions.IsAuthenticated, )
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('name',)
+    filter_class = RoverFilter
 
     def get_queryset(self):
         """The list of rovers for the user."""
