@@ -121,7 +121,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
             )
         )
         response = self.get(
-            reverse('api:v1:rover-list') + '?oauth_application__client_id=' + rover2.oauth_application.client_id)
+            reverse('api:v1:rover-list') + '?client_id=' + rover2.oauth_application.client_id)
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(response.json()))
         self.assertEqual(response.json()[0]['name'], 'rover2')
