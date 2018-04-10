@@ -21,9 +21,17 @@ class Rover(models.Model):
     right_backward_pin = models.CharField(
         null=False, default='XIO-P7', max_length=25)
     left_eye_pin = models.CharField(
-        null=False, default='XIO-P2', max_length=25)
+        null=False, blank=True, default='XIO-P2', max_length=25)
     right_eye_pin = models.CharField(
-        null=False, default='XIO-P4', max_length=25)
+        null=False, blank=True, default='XIO-P4', max_length=25)
+    right_eye_i2c_port = models.IntegerField(
+        null=False, blank=True, default=1)
+    right_eye_i2c_addr = models.IntegerField(
+        null=False, blank=True, default=19)
+    left_eye_i2c_port = models.IntegerField(
+        null=False, blank=True, default=2)
+    left_eye_i2c_addr = models.IntegerField(
+        null=False, blank=True, default=19)
 
     class Meta:
         """Meta class."""

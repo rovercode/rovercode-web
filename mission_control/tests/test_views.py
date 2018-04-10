@@ -141,6 +141,10 @@ class TestRoverSettingsView(BaseAuthenticatedTestCase):
             'right_backward_pin': 'd',
             'left_eye_pin': 'e',
             'right_eye_pin': 'f',
+            'left_eye_i2c_port': 0,
+            'left_eye_i2c_addr': 1,
+            'right_eye_i2c_port': 2,
+            'right_eye_i2c_addr': 3,
             'local_ip': '192.169.1.200',
         }
         response = self.client.post(
@@ -162,6 +166,14 @@ class TestRoverSettingsView(BaseAuthenticatedTestCase):
             rover_obj.left_eye_pin, settings['left_eye_pin'])
         self.assertEqual(
             rover_obj.right_eye_pin, settings['right_eye_pin'])
+        self.assertEqual(
+            rover_obj.right_eye_i2c_port, settings['right_eye_i2c_port'])
+        self.assertEqual(
+            rover_obj.right_eye_i2c_addr, settings['right_eye_i2c_addr'])
+        self.assertEqual(
+            rover_obj.left_eye_i2c_port, settings['left_eye_i2c_port'])
+        self.assertEqual(
+            rover_obj.left_eye_i2c_addr, settings['left_eye_i2c_addr'])
         self.assertEqual(
             rover_obj.oauth_application.user, self.admin
         )
@@ -228,7 +240,11 @@ class TestRoverSettingsView(BaseAuthenticatedTestCase):
             'right_forward_pin': 'c',
             'right_backward_pin': 'd',
             'left_eye_pin': 'e',
-            'right_eye_pin': 'f'
+            'right_eye_pin': 'f',
+            'left_eye_i2c_port': 0,
+            'left_eye_i2c_addr': 1,
+            'right_eye_i2c_port': 2,
+            'right_eye_i2c_addr': 3
         }
         response = self.client.post(
             reverse('mission-control:rover_settings', kwargs={'pk': rover.pk}),
@@ -248,6 +264,14 @@ class TestRoverSettingsView(BaseAuthenticatedTestCase):
             rover_obj.left_eye_pin, settings['left_eye_pin'])
         self.assertEqual(
             rover_obj.right_eye_pin, settings['right_eye_pin'])
+        self.assertEqual(
+            rover_obj.right_eye_i2c_port, settings['right_eye_i2c_port'])
+        self.assertEqual(
+            rover_obj.right_eye_i2c_addr, settings['right_eye_i2c_addr'])
+        self.assertEqual(
+            rover_obj.left_eye_i2c_port, settings['left_eye_i2c_port'])
+        self.assertEqual(
+            rover_obj.left_eye_i2c_addr, settings['left_eye_i2c_addr'])
         self.assertEqual(
             rover_obj.oauth_application.user, self.admin
         )
