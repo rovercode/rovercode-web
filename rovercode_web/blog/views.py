@@ -4,9 +4,20 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.urlresolvers import reverse
 from datetime import datetime
 from rest_framework import viewsets
+from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import SAFE_METHODS
 from .models import Post
 from .serializers import PostSerializer
 from .forms import PostForm
+
+
+class IsAdminUserOrReadOnly(IsAdminUser):
+    """Custom permission class for r/w for admin, read only for others."""
+
+    def has_permission(self, request, view):
+        """Return the correct permission for the user."""
+        is_admin = super().has_permission(request, view)
+        return request.method in SAFE_METHODS or is_admin
 
 
 def post_list(request, drafts=False):
@@ -74,3 +85,4 @@ class PostViewSet(viewsets.ModelViewSet):
 
     serializer_class = PostSerializer
     queryset = Post.objects.all()
+    permission_classes = (IsAdminUserOrReadOnly,)

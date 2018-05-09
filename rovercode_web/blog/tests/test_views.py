@@ -210,3 +210,20 @@ class TestPostViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(response.json()[1]['title'], 'Bar')
         self.assertEqual(response.json()[1]['slug'], 'bar')
         self.assertEqual(response.json()[1]['author'], user.id)
+
+    def test_post_fails_non_admin(self):
+        """Test the post view doesn't allow new post from non-admin."""
+        self.client.login(username='nonstaffuser', password='password')
+        user = self.make_user()
+
+        content = {
+            'title': 'F1rst P0st',
+            'slug': 'f1rst-p0st',
+            'author': user.id,
+            'content': 'foo',
+            'lead': 'bar',
+            'published_date': datetime.utcnow(),
+            'published': True
+        }
+        response = self.client.post(reverse('blog:post-list'), content)
+        self.assertEqual(403, response.status_code)
