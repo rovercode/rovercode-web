@@ -62,7 +62,26 @@ def post_detail(request, slug):
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    """API endpoint that allows posts to be viewed or edited."""
+    """API endpoint that allows posts to be viewed or edited.
+
+    retrieve:
+        Return a blog post instance.
+
+    list:
+        Return all blog posts.
+
+    create:
+        Create a new blog post.
+
+    delete:
+        Remove an existing blog post.
+
+    partial_update:
+        Update one or more fields on an existing blog post.
+
+    update:
+        Update a blog post.
+    """
 
     serializer_class = PostSerializer
     queryset = Post.objects.all()
