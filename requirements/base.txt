@@ -4,8 +4,8 @@
 # Verified bug on Python 3.5.1
 wheel==0.29.0
 
-# Bleeding edge Django
-django==1.10.5
+# LTS Django
+django==1.11.13
 
 # Configuration
 django-environ==0.4.1
@@ -47,10 +47,8 @@ redis>=2.10.5
 # Your custom requirements go here
 djangorestframework~=3.5.3
 django-rest-swagger==2.2.0
-django-filter==1.0.1
+django-filter==1.0.2
+django-oauth-toolkit==1.1.1
 pylint==1.6.5
 pylint-django==0.8.0
 prospector==0.12.4
-
-# Using signals added after the 1.0.0 release
-git+https://github.com/evonove/django-oauth-toolkit.git@18bbdc177f5f68f7db173bd3b883787418816a81#egg=django-oauth-toolkit
