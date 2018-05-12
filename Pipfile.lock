@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4335d37b205c53ccc0331ef46dac0a42506e477005e17953858883dca37318ab"
+            "sha256": "8a51227b9c3ee648c1ea94ee7f8425e2e45d2af2271725d896ba6f83b3202a08"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -90,17 +90,18 @@
         },
         "django-allauth": {
             "hashes": [
-                "sha256:231f1e980dee8ee56be4f64e6a4b77cb32b41d977e6ea6bd310b2c8c0bc354bb"
+                "sha256:7d9646e3560279d6294ebb4c361fef829708d106da697658cf158bf2ca57b474"
             ],
             "index": "pypi",
-            "version": "==0.30.0"
+            "version": "==0.36.0"
         },
         "django-anymail": {
             "hashes": [
-                "sha256:08414e86b8d76beb190aca7e6af448360cf28fdacf96166d4d2538ab11b4d125"
+                "sha256:9058c1009adbd926213fb2f18d20a8592e23c63f845a4aaa63c51b6476a4638a",
+                "sha256:969ea878da44b54ef2229241da9f0e9a72886c9dea14186ba6733939b63320f4"
             ],
             "index": "pypi",
-            "version": "==0.7"
+            "version": "==2.2"
         },
         "django-braces": {
             "hashes": [
@@ -822,10 +823,10 @@
         },
         "django-allauth": {
             "hashes": [
-                "sha256:231f1e980dee8ee56be4f64e6a4b77cb32b41d977e6ea6bd310b2c8c0bc354bb"
+                "sha256:7d9646e3560279d6294ebb4c361fef829708d106da697658cf158bf2ca57b474"
             ],
             "index": "pypi",
-            "version": "==0.30.0"
+            "version": "==0.36.0"
         },
         "django-braces": {
             "hashes": [
