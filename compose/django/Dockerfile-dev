@@ -9,8 +9,10 @@ RUN apt-get install -y ca-certificates wget \
     && update-ca-certificates
 
 # Requirements have to be pulled and installed here, otherwise caching won't work
-COPY ./requirements /requirements
-RUN pip install -r /requirements/local.txt
+COPY ./Pipfile* /
+
+RUN pip install pipenv && \
+    pipenv install --dev --system
 
 COPY ./compose/django/entrypoint.sh /entrypoint.sh
 RUN sed -i 's/\r//' /entrypoint.sh
