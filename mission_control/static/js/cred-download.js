@@ -1,6 +1,6 @@
 $("#download-env").click(function() {
     if ('Blob' in window) {
-        var textToSave = "client_id:"+clientId+"\nclientSecret:"+clientSecret+"\n";
+        var textToSave = "CLIENT_ID="+clientId+"\nCLIENT_SECRET="+clientSecret+"\n";
         var textToSaveAsBlob = new Blob([textToSave], {type:"text/plain"});
         var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
         var fileNameToSaveAs = "rovercode_"+name+".env";

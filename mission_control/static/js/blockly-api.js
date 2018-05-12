@@ -41,8 +41,8 @@ function initApi(interpreter, scope) {
 
 	// Add set motor API function
 	wrapper = function (motor, direction, speed) {
-		pin = motorPins[motor.data][direction.data];
-		sendMotorCommand('START_MOTOR', pin, speed.data);
+		pin = motorPins[motor][direction];
+		sendMotorCommand('START_MOTOR', pin, speed);
 		return false;
 	};
 	interpreter.setProperty(scope, 'setMotor',
@@ -51,8 +51,8 @@ function initApi(interpreter, scope) {
 	// Add stop motor API function
 	wrapper = function (motor) {
 		/* Stop both forward and backward pins, just to be safe */
-		sendMotorCommand('START_MOTOR', motorPins[motor.data].FORWARD, 0);
-		sendMotorCommand('START_MOTOR', motorPins[motor.data].BACKWARD, 0);
+		sendMotorCommand('START_MOTOR', motorPins[motor].FORWARD, 0);
+		sendMotorCommand('START_MOTOR', motorPins[motor].BACKWARD, 0);
 		return false;
 	};
 	interpreter.setProperty(scope, 'stopMotor',

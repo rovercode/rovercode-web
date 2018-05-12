@@ -42,6 +42,7 @@ THIRD_PARTY_APPS = (
     'allauth.socialaccount',  # registration
     'rest_framework',
     'oauth2_provider',
+    'rest_framework_swagger',
 )
 
 # Apps specific for this project go here.
@@ -256,6 +257,7 @@ SOCIALACCOUNT_ADAPTER = 'rovercode_web.users.adapters.SocialAccountAdapter'
 AUTH_USER_MODEL = 'users.User'
 LOGIN_REDIRECT_URL = 'users:redirect'
 LOGIN_URL = 'account_login'
+LOGOUT_URL = 'account_logout'
 
 # SLUGLIFIER
 AUTOSLUG_SLUGIFY_FUNCTION = 'slugify.slugify'
@@ -280,6 +282,9 @@ OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 # REST FRAMEWORK CONFIGURATION
 # ------------------------------------------------------------------------------
 REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework.authentication.SessionAuthentication',

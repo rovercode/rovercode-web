@@ -8,9 +8,10 @@ RUN apt-get install -y ca-certificates wget \
     && update-ca-certificates
 
 # Requirements have to be pulled and installed here, otherwise caching won't work
-COPY ./requirements /requirements
+COPY ./Pipfile* /
 
-RUN pip install -r /requirements/production.txt \
+RUN pip install pipenv && \
+    pipenv install --system \
     && groupadd -r django \
     && useradd -r -g django django
 

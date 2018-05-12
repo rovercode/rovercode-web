@@ -2,17 +2,37 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions, serializers
 
+from mission_control.filters import RoverFilter
 from mission_control.models import Rover, BlockDiagram
 from mission_control.serializers import RoverSerializer, BlockDiagramSerializer
 
 
 class RoverViewSet(viewsets.ModelViewSet):
-    """API endpoint that allows rovers to be viewed or edited."""
+    """API endpoint that allows rovers to be viewed or edited.
+
+    retrieve:
+        Return a rover instance.
+
+    list:
+        Return all rovers.
+
+    create:
+        Register a new rover.
+
+    delete:
+        Remove an existing rover.
+
+    partial_update:
+        Update one or more fields on an existing rover.
+
+    update:
+        Update a rover.
+    """
 
     serializer_class = RoverSerializer
     permission_classes = (permissions.IsAuthenticated, )
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('name',)
+    filter_class = RoverFilter
 
     def get_queryset(self):
         """The list of rovers for the user."""
@@ -25,7 +45,26 @@ class RoverViewSet(viewsets.ModelViewSet):
 
 
 class BlockDiagramViewSet(viewsets.ModelViewSet):
-    """API endpoint that allows block diagrams to be viewed or edited."""
+    """API endpoint that allows block diagrams to be viewed or edited.
+
+    retrieve:
+        Return a block diagram instance.
+
+    list:
+        Return all block diagrams.
+
+    create:
+        Create a new block diagram.
+
+    delete:
+        Remove an existing block diagram.
+
+    partial_update:
+        Update one or more fields on an existing block diagram.
+
+    update:
+        Update a block diagram.
+    """
 
     queryset = BlockDiagram.objects.all()
     serializer_class = BlockDiagramSerializer
