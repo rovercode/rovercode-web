@@ -152,7 +152,6 @@ function acceptName() {
         saveDesign();
         $('#nameErrorArea').empty();
         $('a#designNameArea').text(designName);
-        $('a#downloadLink').attr("onclick", "return downloadDesign(\""+designName+".xml\")");
         $('#nameModal').modal('hide');
       }
     });
@@ -219,17 +218,6 @@ function chooseDesign(userId) {
   $('#loadModal').modal('show');
   refreshSavedBds(userId);
 }
-
-$('#uploadForm #fileToUpload').change(function(){
-  var file = this.files[0];
-  var type = file.type;
-  if(type == "text/xml")
-  $('#loadErrorArea').empty();
-  else
-  $('#loadErrorArea').text("Please select a .xml file");
-});
-
-$('#uploadForm input[name=button]').click(uploadDesign);
 
 /*----- RUNNING SANDBOXED CODE FUNCTIONS -----*/
 

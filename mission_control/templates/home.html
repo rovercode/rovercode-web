@@ -89,7 +89,6 @@
               <div class="dropdown-menu">
                 <a href="#" onclick="return chooseDesign({{ request.user.id }})">Load Previous Design</a>
                 <a href="#" onclick="$('#nameModal').modal()">Copy This Design</a>
-                <a href="#" id="downloadLink">Download This Design</a>
               </div>
             </li>
 
@@ -202,23 +201,6 @@
               <div class="col-md-12">
                 <h2>Here are your saved designs:</h2>
                 <div class="panel" id="savedDesignsArea"></div>
-              </div>
-            </div>
-            <div class="row" style="padding-top: 40px; padding-bottom: 40px">
-              <div class="col-md-12">
-                <p>Or, upload a design from your computer.</p>
-                <div class="content">
-                  <div class="panel">
-                    <div id="loadErrorArea"></div>
-                    <form enctype="multipart/form-data" id="uploadForm">
-                      <div style="position: relative">
-                        <input id="fileToUpload" name="fileToUpload" type="file" accept="text/xml"/>
-                      </div>
-                      <input class="btn btn-primary" name="button" type="button" value="Upload" style="margin-top:10px;"/>
-                    </form>
-                    <div id="loadStatusArea"></div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>

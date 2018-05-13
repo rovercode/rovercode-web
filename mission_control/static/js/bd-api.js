@@ -92,7 +92,6 @@ function loadDesign(design) {
     designName = design.name;
     bdId = design.id;
   }
-  $('a#downloadLink').attr("onclick", "return downloadDesign(\""+designName+".xml\")");
   $('a#designNameArea').text(designName);
   hideBlockByComment("MAIN EVENT HANDLER LOOP");
   var hiddenBlock;
@@ -106,44 +105,4 @@ function loadDesign(design) {
     showBlock('always');
   }
   updateCode();
-}
-
-
-function downloadDesign(name) {
-  $.get(roverResource(['download', name]), function(response) {
-    var blob = new Blob([new XMLSerializer().serializeToString(response)]);
-    var downloadUrl = URL.createObjectURL(blob);
-    $(document.createElement('a'))
-    .attr( {'download': name, 'href': downloadUrl} )
-    .get(0)
-    .click();
-  }).fail(function() {
-    alert("There was an error accessing your design");
-  });
-}
-
-function uploadDesign() {
-  var formData = new FormData();
-  formData.append("fileToUpload", $('#fileToUpload').get(0).files[0]);
-
-  $.ajax({
-    url: roverResource(['upload']),
-    type: 'POST',
-    xhr: function() {  // Custom XMLHttpRequest
-      var myXhr = $.ajaxSettings.xhr();
-      return myXhr;
-    },
-    success: function (data) {
-      refreshSavedBds();
-      $("#loadStatusArea").text(data + " Look for it above.");
-
-    },
-    error: function (xhr, ajaxOptions, thrownError) {
-      $("#loadStatusArea").text("There was an error uploading your design. " + thrownError);
-    },
-    data: formData,
-    cache: false,
-    contentType: false,
-    processData: false
-  });
 }
