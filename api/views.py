@@ -8,7 +8,8 @@ from mission_control.serializers import RoverSerializer, BlockDiagramSerializer
 
 
 class RoverViewSet(viewsets.ModelViewSet):
-    """API endpoint that allows rovers to be viewed or edited.
+    """
+    API endpoint that allows rovers to be viewed or edited.
 
     retrieve:
         Return a rover instance.
@@ -35,7 +36,7 @@ class RoverViewSet(viewsets.ModelViewSet):
     filter_class = RoverFilter
 
     def get_queryset(self):
-        """The list of rovers for the user."""
+        """List of rovers for the user."""
         return Rover.objects.filter(owner=self.request.user.id)
 
     def perform_create(self, serializer):
@@ -45,7 +46,8 @@ class RoverViewSet(viewsets.ModelViewSet):
 
 
 class BlockDiagramViewSet(viewsets.ModelViewSet):
-    """API endpoint that allows block diagrams to be viewed or edited.
+    """
+    API endpoint that allows block diagrams to be viewed or edited.
 
     retrieve:
         Return a block diagram instance.
