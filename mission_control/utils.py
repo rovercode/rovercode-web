@@ -1,10 +1,12 @@
 """Mission Control utils."""
-from .models import Rover
 from datetime import datetime, timezone
+
+from .models import Rover
 
 
 def remove_old_rovers(age):
-    """Remove inactive rovers from the database.
+    """
+    Remove inactive rovers from the database.
 
     Rovers are determined to be inactive when they haven't checked in a certain
     amount of time.

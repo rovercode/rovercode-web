@@ -1,13 +1,14 @@
 """Mission Control views."""
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from .models import Rover, BlockDiagram
-from rest_framework.renderers import JSONRenderer
-from .serializers import BlockDiagramSerializer
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import get_object_or_404
-from .forms import RoverForm
+from django.shortcuts import render
+from django.views.decorators.csrf import ensure_csrf_cookie
 from oauth2_provider.models import Application
+from rest_framework.renderers import JSONRenderer
+
+from .forms import RoverForm
+from .models import Rover, BlockDiagram
+from .serializers import BlockDiagramSerializer
 
 
 @ensure_csrf_cookie
@@ -25,15 +26,15 @@ def home(request, bd=None):
 @login_required
 def bd_list(request):
     """Block diagram list view for the logged in user."""
-    bd_list = BlockDiagram.objects.filter(user=request.user.id)
-    return render(request, 'bd_list.html', {'bd_list': bd_list})
+    bds = BlockDiagram.objects.filter(user=request.user.id)
+    return render(request, 'bd_list.html', {'bd_list': bds})
 
 
 @login_required
 def rover_list(request):
     """Rover list view for the logged in user."""
-    rover_list = Rover.objects.filter(owner=request.user.id)
-    return render(request, 'rover_list.html', {'rover_list': rover_list})
+    rovers = Rover.objects.filter(owner=request.user.id)
+    return render(request, 'rover_list.html', {'rover_list': rovers})
 
 
 @login_required

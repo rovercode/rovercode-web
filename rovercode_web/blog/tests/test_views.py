@@ -1,4 +1,5 @@
 """Blog test views."""
+from datetime import datetime
 from test_plus.test import TestCase
 
 from django.contrib.auth import get_user_model
@@ -6,14 +7,12 @@ from django.core.urlresolvers import reverse
 
 from rovercode_web.blog.models import Post
 
-from datetime import datetime
-
 
 class BaseAuthenticatedTestCase(TestCase):
     """Base class for all authenticated test cases."""
 
     def setUp(self):
-        """Setup the tests."""
+        """Initialize the tests."""
         self.nonstaffuser = get_user_model().objects.create_user(
             username='nonstaffuser',
             email='admin@example.com',
@@ -25,7 +24,7 @@ class BaseStaffAuthenticatedTestCase(TestCase):
     """Base class for all authenticated test cases."""
 
     def setUp(self):
-        """Setup the tests."""
+        """Initialize the tests."""
         self.staff = get_user_model().objects.create_user(
             username='staff',
             email='staff@example.com',

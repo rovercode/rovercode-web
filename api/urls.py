@@ -3,9 +3,10 @@
 from __future__ import unicode_literals
 
 from django.conf.urls import include, url
-from . import views
 from rest_framework import routers
 from rest_framework_swagger.views import get_swagger_view
+
+from . import views
 
 router = routers.DefaultRouter()
 router.register(r'rovers', views.RoverViewSet, base_name='rover')

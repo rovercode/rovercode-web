@@ -17,7 +17,7 @@ class BaseAuthenticatedTestCase(TestCase):
     """Base class for all authenticated test cases."""
 
     def setUp(self):
-        """Setup the tests."""
+        """Initialize the tests."""
         self.admin = get_user_model().objects.create_user(
             username='administrator',
             email='admin@example.com',
