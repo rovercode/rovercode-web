@@ -1,0 +1,6 @@
+# pyup.io config file
+
+update: insecure
+requirements:
+  - Pipfile
+  - Pipfile.lock
