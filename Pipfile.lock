@@ -1407,11 +1407,10 @@
         },
         "sphinx": {
             "hashes": [
-                "sha256:8e6a77a20b2df950de322fc32f3b508697d9d654fe984e3cc88f446a5b4c17c5",
-                "sha256:f13a1e175d8a780966df4c0611e310a85073e1b2ac2199bc3c3f3055677b3bf0"
+                "sha256:2e7ad92e96eff1b2006cf9f0cdb2743dacbae63755458594e9e8238b0c3dc60b",
+                "sha256:e9b1a75a3eae05dded19c80eb17325be675e0698975baae976df603b6ed1eb10"
             ],
-            "index": "pypi",
-            "version": "==1.5.1"
+            "version": "==1.7.4"
         },
         "sqlparse": {
             "hashes": [
