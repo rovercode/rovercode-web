@@ -1232,11 +1232,10 @@
         },
         "pytest-cov": {
             "hashes": [
-                "sha256:10e37e876f49ddec80d6c83a54b657157f1387ebc0f7755285f8c156130014a1",
-                "sha256:53d4179086e1eec1c688705977387432c01031b0a7bd91b8ff6c912c08c3820d"
+                "sha256:890fe5565400902b0c78b5357004aab1c814115894f4f21370e2433256a3eeec",
+                "sha256:03aa752cf11db41d281ea1d807d954c4eda35cfa1b21d6971966cc041bbf6e2d"
             ],
-            "index": "pypi",
-            "version": "==2.4.0"
+            "version": "==2.5.1"
         },
         "pytest-django": {
             "hashes": [
