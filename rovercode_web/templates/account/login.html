@@ -20,7 +20,7 @@
 {% get_providers as socialaccount_providers %}
 
 {% if socialaccount_providers %}
-<p>Please sign in with one of your existing third party accounts.</p>
+<p>You can sign up / sign in with one of your existing third-party accounts.</p>
 
 <div class="socialaccount_ballot">
 
@@ -52,15 +52,14 @@
 </div>
 
 {% include "socialaccount/snippets/login_extra.html" %}
-
-<p>{% blocktrans with site.name as site_name %}Or, <a href="{{ signup_url }}">sign up</a>
-for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
+<p>{% blocktrans %}Don't have any of those accounts? <a href="{{ signup_url }}">Create a rovercode account.</a>{% endblocktrans %}</p>
 
 {% else %}
 <p>{% blocktrans %}If you have not created an account yet, then please
 <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
 {% endif %}
 
+<p>{% blocktrans %}Already have a rovercode account? Sign in here:{% endblocktrans %}</p>
 <form class="login" method="POST" action="{% url 'account_login' %}">
   {% csrf_token %}
   {{ form|crispy }}
