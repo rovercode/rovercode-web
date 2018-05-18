@@ -865,10 +865,9 @@
         },
         "django-test-plus": {
             "hashes": [
-                "sha256:3a27340c1ff219004eec4e042037f4c05df0aa7a78909197831d4d84c66a67e6"
+                "sha256:cdfa439642c660a1c65af5add140a2dcf360e71daa65740d87e9e53cb8509d6b"
             ],
-            "index": "pypi",
-            "version": "==1.0.16"
+            "version": "==1.0.22"
         },
         "djangorestframework": {
             "hashes": [
