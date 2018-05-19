@@ -506,11 +506,10 @@
         },
         "raven": {
             "hashes": [
-                "sha256:13e68bbf21d4d6f0cae4458da5be2d0d538733beabc5f93cb185048b28a77457",
-                "sha256:a06517e9b7858ac41963f9741cc8358005d37511475aaa4c8b692d29ae0a7d94"
+                "sha256:1c641e5ebc2d4185560608e253970ca0d4b98475f4edf67735015a415f9e1d48",
+                "sha256:95aecf76c414facaddbb056f3e98c7936318123e467728f2e50b3a66b65a6ef7"
             ],
-            "index": "pypi",
-            "version": "==5.32.0"
+            "version": "==6.8.0"
         },
         "redis": {
             "hashes": [
