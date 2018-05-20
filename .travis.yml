@@ -19,8 +19,9 @@ script:
 - py.test --cov-report=
 - prospector
 script:
-- cd docs
+- pushd docs
 - make html
+- popd
 after_success:
 - coveralls
 language: python
@@ -77,6 +78,7 @@ deploy:
     bucket: "docs"
     local_dir: docs/_build/html
     upload-dir: testing
+    acl: public_read
     skip_cleanup: true
     on:
       repo: rovercode/rovercode-web
