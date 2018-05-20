@@ -790,10 +790,9 @@
         },
         "django-coverage-plugin": {
             "hashes": [
-                "sha256:76d946a4069af65ed21b76f98de2deeddac9e066a4b3a78968a96c3af707b727"
+                "sha256:84b247a39885e59fa018b6b9ba07b034d2cb7df68c6ef372b2df90fe29272d69"
             ],
-            "index": "pypi",
-            "version": "==1.3.1"
+            "version": "==1.5.0"
         },
         "django-crispy-forms": {
             "hashes": [
