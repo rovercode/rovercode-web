@@ -79,7 +79,7 @@ deploy:
     upload-dir: testing
     acl: public_read
     skip_cleanup: true
-    region: us-east-2
+    region: us-east-1
     on:
       repo: rovercode/rovercode-web
       branch: docs-deploy
