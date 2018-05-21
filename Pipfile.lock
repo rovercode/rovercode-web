@@ -804,11 +804,10 @@
         },
         "django-debug-toolbar": {
             "hashes": [
-                "sha256:4eddb6fa791c4bfc6aa49e4c073663cd3719fe1c8609501aedf25b8586563e7a",
-                "sha256:62f95c09c0faa4b2deac7edba69a84d0d8ad794e79ce24d86c7cd004c91053d8"
+                "sha256:4af2a4e1e932dadbda197b18585962d4fc20172b4e5a479490bc659fe998864d",
+                "sha256:d9ea75659f76d8f1e3eb8f390b47fc5bad0908d949c34a8a3c4c87978eb40a0f"
             ],
-            "index": "pypi",
-            "version": "==1.6"
+            "version": "==1.9.1"
         },
         "django-environ": {
             "hashes": [
