@@ -892,11 +892,10 @@
         },
         "factory-boy": {
             "hashes": [
-                "sha256:246f7da9caf9bf855aaa73b4963353ccb147fdd3adcbc419fa29422c5b69dd4c",
-                "sha256:a6644e391a371be603aca8624f3dedbc5a2aa4622878c20494ba17abb4b171bb"
+                "sha256:d552cb872b310ae78bd7429bf318e42e1e903b1a109e899a523293dfa762ea4f",
+                "sha256:6f25cc4761ac109efd503f096e2ad99421b1159f01a29dbb917359dcd68e08ca"
             ],
-            "index": "pypi",
-            "version": "==2.8.1"
+            "version": "==2.11.1"
         },
         "faker": {
             "hashes": [
