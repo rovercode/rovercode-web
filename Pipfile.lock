@@ -892,18 +892,17 @@
         },
         "factory-boy": {
             "hashes": [
-                "sha256:246f7da9caf9bf855aaa73b4963353ccb147fdd3adcbc419fa29422c5b69dd4c",
-                "sha256:a6644e391a371be603aca8624f3dedbc5a2aa4622878c20494ba17abb4b171bb"
+                "sha256:d552cb872b310ae78bd7429bf318e42e1e903b1a109e899a523293dfa762ea4f",
+                "sha256:6f25cc4761ac109efd503f096e2ad99421b1159f01a29dbb917359dcd68e08ca"
             ],
-            "index": "pypi",
-            "version": "==2.8.1"
+            "version": "==2.11.1"
         },
         "faker": {
             "hashes": [
-                "sha256:5cfd9dfbca8757e483bc4a72e4d931115d99be8516c2dc450b663c3ccd5d750b",
-                "sha256:84572061e79f5fbe355cce739e48156e5495f0dd9129d14a6ef6b33ae0f56c30"
+                "sha256:782a58cec0e083df8e3536b0a890fce9bdc1633782c140b64183dcc626fea53e",
+                "sha256:a77a1a2223a8e0d32618878350bbd2171040f32b526ba2cddfab8864704bb370"
             ],
-            "version": "==0.8.14"
+            "version": "==0.8.15"
         },
         "flake8": {
             "hashes": [
@@ -1051,10 +1050,10 @@
         },
         "parso": {
             "hashes": [
-                "sha256:62bd6bf7f04ab5c817704ff513ef175328676471bdef3629d4bdd46626f75551",
-                "sha256:a75a304d7090d2c67bd298091c14ef9d3d560e3c53de1c239617889f61d1d307"
+                "sha256:cdef26e8adc10d589f3ec4eb444bd0a29f3f1eb6d72a4292ab8afcb9d68976a6",
+                "sha256:f0604a40b96e062b0fd99cf134cc2d5cdf66939d0902f8267d938b0d5b26707f"
             ],
-            "version": "==0.2.0"
+            "version": "==0.2.1"
         },
         "pep8-naming": {
             "hashes": [
