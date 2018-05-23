@@ -215,3 +215,7 @@ ADMIN_URL = env('DJANGO_ADMIN_URL')
 
 # Your production stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------
+
+# SOCIAL ACCOUNT CONFIGURATION
+# ------------------------------------------------------------------------------
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
