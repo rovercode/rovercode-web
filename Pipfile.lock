@@ -795,10 +795,10 @@
         },
         "prospector": {
             "hashes": [
-                "sha256:79b658fd86150054cbbefed6533efbf4d94c08f6a91da051604176f6da828a14"
+                "sha256:2903528327b74d79329b60407cf63b9463fe482c4a2f8aa07c324be719a516ad",
+                "sha256:b49dacc6043f258e6a5ecc182ea1ac1da2b77b144bf0e940959d62da09906edb"
             ],
-            "index": "pypi",
-            "version": "==0.12.7"
+            "version": "==0.12.10"
         },
         "ptyprocess": {
             "hashes": [
