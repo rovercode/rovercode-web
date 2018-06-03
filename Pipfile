@@ -1,17 +1,12 @@
 [[source]]
-
 verify_ssl = true
 name = "pypi"
 url = "https://pypi.org/simple"
 
-
 [requires]
-
 python_version = "3.6"
 
-
 [dev-packages]
-
 pylint = "==1.7.6"
 pylint-django = "==0.7.2"
 prospector = "==0.12.10"
@@ -28,9 +23,7 @@ Sphinx = "==1.7.5"
 Werkzeug = "==0.14.1"
 factory_boy = "==2.11.1"
 
-
 [packages]
-
 django-environ = "==0.4.4"
 whitenoise = "==3.3.1"
 django-braces = "==1.13.0"
@@ -42,7 +35,7 @@ awesome-slugify = "==1.6.5"
 pytz = "==2018.4"
 django-redis = "==4.9.0"
 redis = "==2.10.6"
-djangorestframework = "==3.8.2"
+djangorestframework = "==3.5.4"
 django-rest-swagger = "==2.2.0"
 django-filter = "==1.1.0"
 django-oauth-toolkit = "==1.1.2"
