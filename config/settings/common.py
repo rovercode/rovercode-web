@@ -254,6 +254,9 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_ALLOW_REGISTRATION = env.bool('DJANGO_ACCOUNT_ALLOW_REGISTRATION', True)
 ACCOUNT_ADAPTER = 'rovercode_web.users.adapters.AccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'rovercode_web.users.adapters.SocialAccountAdapter'
+ACCOUNT_FORMS = {
+    'reset_password': 'rovercode_web.users.forms.SilentResetPasswordForm',
+}
 
 # Custom user app defaults
 # Select the correct user model
