@@ -1,4 +1,4 @@
-quickstart
+Setup
 ===========
 
 Install `docker <https://docs.docker.com/engine/installation/>`_ and `docker-compose <https://docs.docker.com/compose/install/>`_, then
@@ -11,14 +11,31 @@ Install `docker <https://docs.docker.com/engine/installation/>`_ and `docker-com
     $ google-chrome localhost:8000
 
 Basic Commands
---------------
-rovercode-web runs is built with Django. During development, you can do regular Django things like this:
+----------------
+rovercode-web is built with Django. During development, you can do regular Django things like this:
 
 .. code-block:: bash
 
     $ docker-compose -f dev.yml run django python manage.py migrate
     $ docker-compose -f dev.yml run django python manage.py createsuperuser
 
-If anything gives you trouble, see the detailed `cookiecutter-django Docker documentation`_.
+Running the Tests and Coverage
+---------------------------------
 
-.. _`cookiecutter-django Docker documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html
+.. code-block:: bash
+
+    $ docker-compose -f dev.yml run django pytest
+
+Running the Linter
+---------------------------------
+
+.. code-block:: bash
+
+    $ docker-compose -f dev.yml run django prospector
+
+Building the Docs
+-------------------
+
+.. code-block:: bash
+
+    $ docker-compose -f dev.yml run django make -C docs html
