@@ -22,6 +22,8 @@ pytest-cov = "==2.5.1"
 Sphinx = "==1.7.5"
 Werkzeug = "==0.14.1"
 factory_boy = "==2.11.1"
+sphinx-autobuild = "==0.7.1"
+sphinx-rtd-theme = "==0.4.0"
 
 [packages]
 django-environ = "==0.4.4"
