@@ -46,7 +46,7 @@ rovercode-web runs is built with Django. During development, you can do regular 
     $ docker-compose -f dev.yml run django python manage.py migrate
     $ docker-compose -f dev.yml run django python manage.py createsuperuser
 
-More detailed usage instructions can be found `here in the docs <https://contributor-docs.rovercode.com/rovercode/development/setup.html>`_
+More detailed usage instructions can be found `here in the docs <https://contributor-docs.rovercode.com/rovercode-web/master/setup.html>`_
 
 Docs
 -----
@@ -54,7 +54,7 @@ Read the complete docs `here <https://contributor-docs.rovercode.com>`_
 
 Contributing
 -------------
-Check out the `contributing guide <https://contributor-docs.rovercode.com/contributing.html>`_. 
+Help make rovercode better! Check out the `contributing guide <https://contributor-docs.rovercode.com/contributing.html>`_. 
 
 We'd love to chat with you! Say hello in `our Gitter room
 <https://gitter.im/rovercode/Lobby>`_.
