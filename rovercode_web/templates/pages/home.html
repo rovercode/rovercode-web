@@ -1,18 +1,23 @@
 {% extends "base.html" %}
 {% load staticfiles i18n %}
 
+{% block javascript %}
+  {{ block.super }}
+  <!-- MailChimp popup -->
+  <script type="text/javascript" src="//downloads.mailchimp.com/js/signup-forms/popup/embed.js" data-dojo-config="usePlainJson: true, isDebug: false"></script><script type="text/javascript">require(["mojo/signup-forms/Loader"], function(L) { L.start({"baseUrl":"mc.us18.list-manage.com","uuid":"c3dedcd2a8c16794b576d7a24","lid":"e8a77ee1e6"}) })</script>
+{% endblock javascript %}
 
 {% block jumbotron %}
     <div class="jumbotron">
       <div class="container">
         <div class="row nice-underlines" style="margin-top: 20vh">
-          <div class="col-lg-4 text-lg-left col-md-12 text-md-center vcenter">
-            <h1 class="display-1">rovercode</h1>
-            <p class="lead">an educational robotics system made for exploring</p>
-            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#comingSoonModal">Get a Rover</button>
-            <button id="learn-more-button" type="button" class="btn btn-secondary btn-lg">Learn More</button>
+          <div class="col-lg-5 text-lg-left col-md-12 text-lg-center vcenter" style="text-align: center">
+            <img style="width:100%; padding-right:7%; display:block; margin-left:auto; margin-right:auto" src="{% static 'images/rovercode_logo.png' %}" />
+            <p class="lead text-center">the open-source educational robotics platform</p>
+            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#comingSoonModal">get a rover</button>
+            <button id="learn-more-button" type="button" class="btn btn-secondary btn-lg">learn more</button>
           </div>
-          <div class="col-lg-7 text-lg-left col-md-12 text-md-center vcenter">
+          <div class="col-lg-6 text-lg-left col-md-12 text-md-center vcenter">
             <img style="width:100%; padding-top: 50px; padding-bottom: 50px;" src="{% static 'images/rover.png' %}" />
           </div>
         </div>
@@ -46,7 +51,7 @@
       <div class="col-md-6 vcenter">
         <div class="card">
           <div class="card-block">
-            <h4 class="card-title">See What the Rover Sees</h4>
+            <h4 class="card-title">See What the rover Sees</h4>
             <p class="card-text">
               rovercode features a live video feed from the robot's point of view.
             </p>
@@ -91,32 +96,23 @@
     </div>
     <div class="row nice-underlines" style="margin-top: 60px">
       <div class="col-md-6 text-xs-center text-s-center text-md-center text-lg-left offset-md-4">
-        <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#comingSoonModal" style="margin-bottom: 60px">Get a Rover</button>
-        <button type="button" onclick="location.href='https://github.com/aninternetof/rovercode-web';" class="btn btn-secondary btn-lg" style="margin-bottom: 60px">More Details</button>
+        <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#comingSoonModal" style="margin-bottom: 60px">get a rover</button>
       </div>
     </div>
 
     <div class="modal fade" id="comingSoonModal" tabindex="-1" role="dialog" aria-labelledby="comingSoonModal" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Thanks for your interest!</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
           <div class="modal-body">
+            <h4>
+              Good news: rovers will be available soon!
+            </h4>
             <p>
-              We're working hard developing our rover hardware. To be notified
-              when they are available, <a href="mailto:bradyhurlburt@gmail.com">
-              send us an email</a> or say hello on <a href="http://chat.rovercode.com">our Slack
-              channel</a>. We'd love to hear where you'd like to use a rover.
-            </p>
-            <p>
-              Talk to you soon!
+              Sign up to be the first to know when you can get one.
             </p>
           </div>
           <div class="modal-footer">
+              <a href="http://eepurl.com/dyzIhr" class="btn btn-primary">Sign Up to Recieve Updates</a>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div>

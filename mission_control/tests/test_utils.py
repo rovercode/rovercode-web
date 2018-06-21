@@ -1,11 +1,11 @@
 """Mission Control test utils."""
+import time
+from datetime import timedelta
+
 from test_plus.test import TestCase
 
 from mission_control.models import Rover
 from mission_control.utils import remove_old_rovers
-
-import time
-from datetime import timedelta
 
 
 class TestRemoveOldRovers(TestCase):

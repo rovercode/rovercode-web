@@ -4,9 +4,11 @@ from django.dispatch import receiver
 from oauth2_provider.signals import app_authorized
 
 
+# pylint: disable=unused-argument
 @receiver(app_authorized)
 def handle_app_authorized(sender, request, token, **kwargs):
-    """Attach the application's user to the token.
+    """
+    Attach the application's user to the token.
 
     When using `client_credentials`, there isn't a user attached to an access
     token. This causes Django Rest Framework to fail to authorize when using

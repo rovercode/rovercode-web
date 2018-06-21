@@ -1,7 +1,7 @@
-detailed usage
+Detailed Usage
 ===============
 
-using rovercode with a rovercode-web hosted somewhere other than rovercode.com
+Using rovercode with a rovercode-web hosted somewhere other than rovercode.com
 -------------------------------------------------------------------------------
 By default, when rovercode runs, it registers itself with
 `https://rovercode.com`. But what if you want to try your changes to rovercode
@@ -16,9 +16,8 @@ url by creating a .env file in your rovercode directory.
 
 When you start rovercode, it will register itself with `beta.rovercode.com`.
 
-develop rovercode and rovercode-web on the same machine at the same time
+Developing rovercode and rovercode-web on the same machine at the same time
 --------------------------------------------------------------------------
-
 
 Get, build, and bring up rovercode-web as usual:
 

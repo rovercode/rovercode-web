@@ -57,5 +57,5 @@ services:
 
 
   redis:
-    image: redis:latest
+    image: redis:alpine
 

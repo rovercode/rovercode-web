@@ -1,8 +1,8 @@
 """Blog views."""
+from datetime import datetime
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.urlresolvers import reverse
-from datetime import datetime
 from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser
 from rest_framework.permissions import SAFE_METHODS
@@ -23,8 +23,8 @@ class IsAdminUserOrReadOnly(IsAdminUser):
 def post_list(request, drafts=False):
     """Post list view."""
     published = not drafts
-    post_list = Post.objects.filter(published=published)
-    return render(request, 'blog_post_list.html', {'post_list': post_list})
+    posts = Post.objects.filter(published=published)
+    return render(request, 'blog_post_list.html', {'post_list': posts})
 
 
 @staff_member_required
@@ -62,7 +62,8 @@ def post_detail(request, slug):
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    """API endpoint that allows posts to be viewed or edited.
+    """
+    API endpoint that allows posts to be viewed or edited.
 
     retrieve:
         Return a blog post instance.

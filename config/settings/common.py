@@ -40,6 +40,8 @@ THIRD_PARTY_APPS = (
     'allauth',  # registration
     'allauth.account',  # registration
     'allauth.socialaccount',  # registration
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.google',
     'rest_framework',
     'oauth2_provider',
     'rest_framework_swagger',
@@ -172,6 +174,7 @@ TEMPLATES = [
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
                 # Your stuff: custom template context processors go here
+                'django.template.context_processors.request',
             ],
         },
     },
@@ -251,6 +254,9 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_ALLOW_REGISTRATION = env.bool('DJANGO_ACCOUNT_ALLOW_REGISTRATION', True)
 ACCOUNT_ADAPTER = 'rovercode_web.users.adapters.AccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'rovercode_web.users.adapters.SocialAccountAdapter'
+ACCOUNT_FORMS = {
+    'reset_password': 'rovercode_web.users.forms.SilentResetPasswordForm',
+}
 
 # Custom user app defaults
 # Select the correct user model
@@ -290,4 +296,19 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
+}
+
+# SOCIAL ACCOUNT CONFIGURATION
+# ------------------------------------------------------------------------------
+SOCIALACCOUNT_QUERY_EMAIL = True
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
 }

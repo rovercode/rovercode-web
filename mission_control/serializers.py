@@ -1,6 +1,7 @@
 """Mission Control serializers."""
-from .models import Rover, BlockDiagram
 from rest_framework import serializers
+
+from .models import Rover, BlockDiagram
 
 
 class RoverSerializer(serializers.ModelSerializer):

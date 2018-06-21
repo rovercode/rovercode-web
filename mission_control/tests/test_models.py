@@ -10,19 +10,19 @@ class TestRover(TestCase):
     def test__str__(self):
         """Test the stringify method."""
         user = self.make_user()
-        self.rover = Rover.objects.create(
+        rover = Rover.objects.create(
             name='rover',
             owner=user,
             local_ip='8.8.8.8'
         )
-        self.assertEqual(str(self.rover), 'rover')
+        self.assertEqual(str(rover), 'rover')
 
 
 class TestBlockDiagram(TestCase):
     """Tests the block diagram model."""
 
     def setUp(self):
-        """Setup the tests."""
+        """Initialize the tests."""
         self.user = self.make_user()
         self.bd = BlockDiagram.objects.create(
             user=self.user,
