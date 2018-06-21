@@ -1,10 +1,8 @@
 .. .. image:: http://localhost:8000/static/images/screenshot.jpg
 .. image:: https://rovercode.com/static/images/screenshot.jpg
 
-rovercode
-=============
 rovercode-web
--------------
+=============
 
 :License: GPLv3
 .. image:: https://badges.gitter.im/rovercode.png
