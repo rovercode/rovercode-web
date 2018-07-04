@@ -9,6 +9,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/dev/ref/settings/
 """
 from __future__ import absolute_import, unicode_literals
+import datetime
 
 import environ
 
@@ -55,6 +56,7 @@ LOCAL_APPS = (
     'mission_control.apps.MissionControlConfig',
     'rovercode_web.blog.apps.BlogConfig',
     'api.apps.ApiConfig',
+    'authorize.apps.AuthorizeConfig',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -292,6 +294,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
@@ -312,3 +315,22 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
+# JWT CONFIGURATION
+# ------------------------------------------------------------------------------
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_SECRET_KEY': env(
+        'JWT_SECRET_KEY',
+        default='ac9fb5054311bfeeefe79fbe31740850'
+    ),
+}
+
+# Enables django-rest-auth to use JWT tokens instead of regular tokens.
+REST_USE_JWT = True
+
+SOCIAL_CALLBACK_URL = env(
+    'SOCIAL_CALLBACK_URL',
+    default='http://localhost:8080/login/{service}/callback/'
+)
