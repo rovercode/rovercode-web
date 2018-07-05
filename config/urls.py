@@ -8,6 +8,8 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views import defaults as default_views
 
+from rest_framework.documentation import include_docs_urls
+
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
@@ -27,6 +29,10 @@ urlpatterns = [
     url(r'^api-auth/',
         include('rest_framework.urls', namespace='rest_framework')),
     url(r'^jwt/', include('authorize.urls', namespace='jwt')),
+    url(r'^docs/', include_docs_urls(
+        title='rovercode API',
+        description='API for the rovercode web service.',
+        public=False)),
     url(r'^oauth2/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

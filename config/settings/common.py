@@ -45,7 +45,7 @@ THIRD_PARTY_APPS = (
     'allauth.socialaccount.providers.google',
     'rest_framework',
     'oauth2_provider',
-    'rest_framework_swagger',
+    'django_filters',
 )
 
 # Apps specific for this project go here.
@@ -290,9 +290,6 @@ OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 # REST FRAMEWORK CONFIGURATION
 # ------------------------------------------------------------------------------
 REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
