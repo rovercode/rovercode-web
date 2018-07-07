@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 from django.conf.urls import include, url
 from django.views.generic.base import RedirectView
 from rest_framework import routers
+from rest_framework_jwt.views import obtain_jwt_token
 from rest_framework_jwt.views import verify_jwt_token
 
 from . import views
@@ -15,6 +16,7 @@ router.register(r'block-diagrams', views.BlockDiagramViewSet)
 
 
 urlpatterns = [
+    url(r'^api-token-auth/', obtain_jwt_token),
     url(r'^api-token-verify/', verify_jwt_token),
     url(r'^v1/', include(router.urls, namespace='v1')),
     url(r'^$', RedirectView.as_view(
