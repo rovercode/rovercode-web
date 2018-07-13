@@ -1,11 +1,13 @@
 """Authorize urls."""
 from django.conf.urls import include
 from django.conf.urls import url
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
-from rest_auth.registration.views import (
-    SocialAccountListView, SocialAccountDisconnectView
-)
+from rest_auth.registration.views import RegisterView
+from rest_auth.registration.views import SocialAccountDisconnectView
+from rest_auth.registration.views import SocialAccountListView
+from rest_auth.registration.views import VerifyEmailView
 
 from authorize import views
 
@@ -49,7 +51,13 @@ google_urlpatterns = [
 
 urlpatterns = [
     url(r'^auth/', include('rest_auth.urls')),
-    url(r'^auth/registration/', include('rest_auth.registration.urls')),
+    url(r'^auth/registration/$',
+        csrf_exempt(RegisterView.as_view()), name='rest_register'),
+    url(r'^auth/registration/verify-email/$',
+        csrf_exempt(VerifyEmailView.as_view()), name='rest_verify_email'),
+    url(r'^auth/registration/account-confirm-email/(?P<key>[-:\w]+)/$',
+        csrf_exempt(TemplateView.as_view()),
+        name='account_confirm_email'),
     url(r'^auth/social/github/', include(github_urlpatterns)),
     url(r'^auth/social/google/', include(google_urlpatterns)),
     url(
