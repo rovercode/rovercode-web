@@ -29,6 +29,9 @@ urlpatterns = [
     url(r'^api-auth/',
         include('rest_framework.urls', namespace='rest_framework')),
     url(r'^jwt/', include('authorize.urls', namespace='jwt')),
+    url(r'^jwt/auth/password-reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',  # noqa
+        TemplateView.as_view(template_name="password_reset_confirm.html"),
+        name='password_reset_confirm'),
     url(r'^docs/', include_docs_urls(
         title='rovercode API',
         description='API for the rovercode web service.',
