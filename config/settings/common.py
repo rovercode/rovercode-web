@@ -329,5 +329,5 @@ REST_USE_JWT = True
 
 SOCIAL_CALLBACK_URL = env(
     'SOCIAL_CALLBACK_URL',
-    default='http://localhost:8080/login/{service}/callback/'
+    default='http://localhost:8080/accounts/login/callback/{service}'
 )
