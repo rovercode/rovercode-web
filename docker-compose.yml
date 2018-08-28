@@ -1,61 +1,19 @@
-version: '2'
-
-volumes:
-  postgres_data: {}
-  postgres_backup: {}
+version: '3'
 
 services:
-  postgres:
-    build: ./compose/postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - postgres_backup:/backups
-    env_file: .env
 
   django:
     build:
       context: .
       dockerfile: ./compose/django/Dockerfile
     user: django
+    ports:
+      - 5000:5000
     depends_on:
       - postgres
       - redis
     command: /gunicorn.sh
     env_file: .env
 
-  nginx:
-    build: ./compose/nginx
-    depends_on:
-      - django
-
-      - certbot
-
-    ports:
-      - "0.0.0.0:80:80"
-
-    environment:
-      - MY_DOMAIN_NAME=rovercode.com
-    ports:
-      - "0.0.0.0:80:80"
-      - "0.0.0.0:443:443"
-    volumes:
-      - /etc/letsencrypt:/etc/letsencrypt
-      - /var/lib/letsencrypt:/var/lib/letsencrypt
-
-  certbot:
-    image: certbot/certbot 
-    command: sh -c "sleep 6 && certbot certonly -n --standalone -d rovercode.com --text --agree-tos --email bradyhurlburt@gmail.com --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --keep-until-expiring --standalone-supported-challenges http-01"
-    entrypoint: ""
-    volumes:
-      - /etc/letsencrypt:/etc/letsencrypt
-      - /var/lib/letsencrypt:/var/lib/letsencrypt
-    ports:
-      - "80"
-      - "443"
-    environment:
-      - TERM=xterm
-
-
   redis:
     image: redis:alpine
-
