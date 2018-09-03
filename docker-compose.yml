@@ -20,7 +20,7 @@ services:
     depends_on:
       - postgres
       - redis
-    command: /gunicorn.sh
+    command: /daphne.sh
     env_file: .env
 
   nginx:

@@ -32,6 +32,9 @@ services:
 
       - mailhog
 
+  redis:
+    image: redis:alpine
+
 
 
 
