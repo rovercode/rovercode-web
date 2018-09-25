@@ -1,7 +1,8 @@
 """Rover websocket consumer test"""
-
 from channels.testing import WebsocketCommunicator
-communicator = WebsocketCommunicator(SimpleWebsocketApp, "/testws/")
+from realtime.consumers import ChatConsumer
+
+communicator = WebsocketCommunicator(ChatConsumer, "/testws/")
 connected, subprotocol = await communicator.connect()
 assert connected
 # Test sending text
