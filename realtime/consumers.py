@@ -3,8 +3,11 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 import json
 
+
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
+        print(self.scope)
+        # import pdb; pdb.set_trace()
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
 

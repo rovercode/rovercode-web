@@ -7,9 +7,9 @@ url = "https://pypi.org/simple"
 python_version = "3.6"
 
 [dev-packages]
-pylint = "==1.7.6"
-pylint-django = "==0.7.2"
-prospector = "==0.12.10"
+pylint = "==2.1.1"
+pylint-django = "==2.0.2"
+prospector = "==1.1.2"
 coverage = "==4.5.1"
 django-coverage-plugin = "==1.5.0"
 django-extensions = "==2.0.7"
