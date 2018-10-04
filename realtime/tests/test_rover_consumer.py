@@ -1,5 +1,6 @@
 """Rover websocket consumer test"""
 import pytest
+import json
 from django.test import override_settings
 from django.conf.urls import url
 from channels.testing import WebsocketCommunicator
@@ -14,9 +15,10 @@ async def test_rover_consumer():
     communicator = WebsocketCommunicator(application, "/ws/realtime/foobar/")
     connected, subprotocol = await communicator.connect()
     assert connected
-    # # Test sending text
-    # await communicator.send_to(text_data="hello")
-    # response = await communicator.receive_from()
-    # assert response == "hello"
-    # # Close
+    message = json.dumps({"message": "hello"})
+    # Test sending text
+    await communicator.send_to(text_data=message)
+    response = await communicator.receive_from()
+    assert response == message
+    # Close
     await communicator.disconnect()
