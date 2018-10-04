@@ -219,3 +219,14 @@ ADMIN_URL = env('DJANGO_ADMIN_URL')
 # SOCIAL ACCOUNT CONFIGURATION
 # ------------------------------------------------------------------------------
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+
+# CHANNEL LAYERS CONFIGURATION
+# ------------------------------------------------------------------------------
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
+        },
+    },
+}

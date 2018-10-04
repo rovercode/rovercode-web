@@ -1,5 +1,6 @@
 """Rover websocket consumer test"""
 import pytest
+from django.test import override_settings
 from django.conf.urls import url
 from channels.testing import WebsocketCommunicator
 from channels.routing import URLRouter

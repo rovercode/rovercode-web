@@ -229,15 +229,6 @@ ASGI_APPLICATION = 'config.asgi.application'
 redis_url = urlparse(env('REDIS_URL', default='redis://127.0.0.1:6379'))
 REDIS_HOST = redis_url.hostname
 REDIS_PORT = redis_url.port
-print("^ ^ ^ ^  ##### Redis host is {} and port is {}".format(REDIS_HOST, REDIS_PORT))
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [(REDIS_HOST, REDIS_PORT)],
-        },
-    },
-}
 
 # PASSWORD VALIDATION
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
