@@ -1,19 +1,19 @@
-"""Rover websocket consumer test"""
-import pytest
+"""Rover websocket consumer test."""
 import json
-from django.test import override_settings
+import pytest
 from django.conf.urls import url
 from channels.testing import WebsocketCommunicator
 from channels.routing import URLRouter
-from realtime.consumers import ChatConsumer
+from realtime.consumers import RoverConsumer
 
 @pytest.mark.asyncio
 async def test_rover_consumer():
+    """Test sending a message to the room and having it echo it back."""
     application = URLRouter([
-        url(r'^ws/realtime/(?P<room_name>[^/]+)/$', ChatConsumer),
+        url(r'^ws/realtime/(?P<room_name>[^/]+)/$', RoverConsumer),
     ])
     communicator = WebsocketCommunicator(application, "/ws/realtime/foobar/")
-    connected, subprotocol = await communicator.connect()
+    connected, _ = await communicator.connect()
     assert connected
     message = json.dumps({"message": "hello"})
     # Test sending text

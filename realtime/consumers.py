@@ -1,13 +1,17 @@
-# realtime/consumers.py
+"""Consumers for Realtime app."""
+import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-import json
 
 
-class ChatConsumer(WebsocketConsumer):
+class RoverConsumer(WebsocketConsumer):
+    """Handles bidir communication between rover and browser clients."""
+
+    room_name = None
+    room_group_name = None
+
     def connect(self):
-        print(self.scope)
-        # import pdb; pdb.set_trace()
+        """Handle connections."""
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
 
@@ -19,29 +23,30 @@ class ChatConsumer(WebsocketConsumer):
 
         self.accept()
 
-    def disconnect(self, close_code):
+    def disconnect(self, _):
+        """Handle disconnections."""
         # Leave room group
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name,
             self.channel_name
         )
 
-    # Receive message from WebSocket
-    def receive(self, text_data):
+    def receive(self, text_data=None, bytes_data=None):
+        """Handle messages received via WebSocket connection."""
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
+        message_raw = text_data_json['message']
 
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
                 'type': 'group_message',
-                'message': message
+                'message': message_raw
             }
         )
 
-    # Receive message from room group
     def group_message(self, event):
+        """Handle messages received via the room group channel layer."""
         message = event['message']
 
         # Send message to WebSocket
