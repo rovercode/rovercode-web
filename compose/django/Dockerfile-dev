@@ -11,7 +11,6 @@ RUN apk add --no-cache bash ca-certificates wget build-base python3-dev postgres
     && pip install pipenv \
     && pipenv install --dev --system \
     && apk del --purge python3-dev \
-    && pip freeze
 
 COPY ./compose/django/entrypoint.sh /entrypoint.sh
 RUN sed -i 's/\r//' /entrypoint.sh
