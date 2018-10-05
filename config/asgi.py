@@ -6,8 +6,6 @@ defined in the ASGI_APPLICATION setting.
 import os
 import django
 
-os.environ['DJANGO_SETTINGS_MODULE'] = 'config.settings.local'
-
 django.setup()
 
 from channels.auth import AuthMiddlewareStack
