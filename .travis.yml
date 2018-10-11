@@ -12,7 +12,9 @@ before_install:
 - sudo apt-get install -qq libsqlite3-dev libxml2 libxml2-dev libssl-dev libbz2-dev
   wget curl llvm
 install:
-- pip install pipenv coveralls
+- pip install pip==10.0.1
+- pip install pipenv==11.10.1
+- pip install coveralls
 - pipenv install --dev
 script:
 - py.test --cov-report=

@@ -8,7 +8,8 @@ RUN apk add --no-cache bash ca-certificates wget shadow build-base python3-dev p
     && wget https://s3.amazonaws.com/rds-downloads/rds-ca-2015-root.pem -P /usr/local/share/ca-certificates/ \
     && mv /usr/local/share/ca-certificates/rds-ca-2015-root.pem /usr/local/share/ca-certificates/rds-ca-2015-root.crt \
     && update-ca-certificates \
-    && pip install pipenv \
+    && pip install pip==10.0.1 \
+    && pip install pipenv==11.10.1 \
     && pipenv install --system \
     && apk del --purge build-base python3-dev \
     && groupadd -r django \
