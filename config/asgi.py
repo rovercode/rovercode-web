@@ -20,7 +20,3 @@ application = ProtocolTypeRouter({
         )
     ),
 })
-
-if os.environ.get('DJANGO_SETTINGS_MODULE') == 'config.settings.production':
-    from raven.contrib.django.raven_compat.middleware.wsgi import Sentry
-    application = Sentry(application)
