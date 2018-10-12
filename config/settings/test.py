@@ -7,6 +7,13 @@ Test settings
 
 from .common import *  # noqa
 
+# CHANNEL LAYERS CONFIGURATION
+# ------------------------------------------------------------------------------
+CHANNEL_LAYERS = {
+    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
+}
+
+print(CHANNEL_LAYERS)
 
 # DEBUG
 # ------------------------------------------------------------------------------

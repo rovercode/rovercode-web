@@ -1,7 +1,7 @@
 """Mission Control models."""
 from django.db import models
-from rovercode_web.users.models import User
 from oauth2_provider.models import Application
+from rovercode_web.users.models import User
 
 
 class Rover(models.Model):

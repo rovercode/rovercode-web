@@ -12,6 +12,7 @@ from __future__ import absolute_import, unicode_literals
 import datetime
 
 import environ
+from urllib.parse import urlparse
 
 ROOT_DIR = environ.Path(__file__) - 3  # (rovercode_web/config/settings/common.py - 3 = rovercode_web/)
 APPS_DIR = ROOT_DIR
@@ -35,6 +36,7 @@ DJANGO_APPS = (
 
     # Admin
     'django.contrib.admin',
+
 )
 THIRD_PARTY_APPS = (
     'crispy_forms',  # Form layouts
@@ -46,6 +48,7 @@ THIRD_PARTY_APPS = (
     'rest_framework',
     'oauth2_provider',
     'django_filters',
+    'channels',
 )
 
 # Apps specific for this project go here.
@@ -154,6 +157,7 @@ TEMPLATES = [
         'DIRS': [
             str(APPS_DIR.path('rovercode_web/templates')),
             str(APPS_DIR.path('rovercode_web/blog/templates')),
+            str(APPS_DIR.path('realtime/templates')),
             str(APPS_DIR.path('mission_control/templates')),
         ],
         'OPTIONS': {
@@ -220,6 +224,11 @@ ROOT_URLCONF = 'config.urls'
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
 WSGI_APPLICATION = 'config.wsgi.application'
 
+ASGI_APPLICATION = 'config.asgi.application'
+
+redis_url = urlparse(env('REDIS_URL', default='redis://127.0.0.1:6379'))
+REDIS_HOST = redis_url.hostname
+REDIS_PORT = redis_url.port
 
 # PASSWORD VALIDATION
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
