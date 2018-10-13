@@ -26,7 +26,7 @@ services:
   django-websockets:
     build:
       context: .
-      dockerfile: ./compose/django-websockets/Dockerfile
+      dockerfile: ./compose/django/Dockerfile
     user: django
     depends_on:
       - postgres

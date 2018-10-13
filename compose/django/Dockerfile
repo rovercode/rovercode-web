@@ -19,13 +19,17 @@ COPY . /app
 RUN chown -R django /app
 
 COPY ./compose/django/gunicorn.sh /gunicorn.sh
+COPY ./compose/django/daphne.sh /daphne.sh
 COPY ./compose/django/entrypoint.sh /entrypoint.sh
 RUN sed -i 's/\r//' /entrypoint.sh \
     && sed -i 's/\r//' /gunicorn.sh \
+    && sed -i 's/\r//' /daphne.sh \
     && chmod +x /entrypoint.sh \
     && chown django /entrypoint.sh \
     && chmod +x /gunicorn.sh \
     && chown django /gunicorn.sh
+    && chmod +x /daphne.sh \
+    && chown django /daphne.sh
 
 WORKDIR /app
 
