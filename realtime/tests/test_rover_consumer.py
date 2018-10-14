@@ -19,6 +19,7 @@ async def test_rover_consumer():
     # Test sending text
     await communicator.send_to(text_data=message)
     response = await communicator.receive_from()
+    message = json.dumps({"message": "hello", "type": "group_message"})
     assert response == message
     # Close
     await communicator.disconnect()
