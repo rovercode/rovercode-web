@@ -1,11 +1,11 @@
-"""Consumers for Realtime app."""
+"""Consumers for Support app."""
 import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
 
-class RoverConsumer(WebsocketConsumer):
-    """Handles bidir communication between rover and browser clients."""
+class SupportConsumer(WebsocketConsumer):
+    """Handles bidir communication between support clients."""
 
     room_name = None
     room_group_name = None

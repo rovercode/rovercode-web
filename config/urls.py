@@ -24,6 +24,7 @@ urlpatterns = [
 
     # Your stuff: custom urls includes go here
     url(r'^realtime/', include('realtime.urls', namespace='realtime')),
+    url(r'^support/', include('support.urls', namespace='support')),
     url(r'^mission-control/', include('mission_control.urls', namespace='mission-control')),
     url(r'^blog/', include('rovercode_web.blog.urls', namespace='blog')),
     url(r'^api/', include('api.urls', namespace='api')),

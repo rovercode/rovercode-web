@@ -158,6 +158,7 @@ TEMPLATES = [
             str(APPS_DIR.path('rovercode_web/templates')),
             str(APPS_DIR.path('rovercode_web/blog/templates')),
             str(APPS_DIR.path('realtime/templates')),
+            str(APPS_DIR.path('support/templates')),
             str(APPS_DIR.path('mission_control/templates')),
         ],
         'OPTIONS': {
