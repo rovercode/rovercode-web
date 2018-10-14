@@ -4,7 +4,9 @@ from rest_framework import viewsets, permissions, serializers
 
 from mission_control.filters import RoverFilter
 from mission_control.models import Rover, BlockDiagram
+from support.models import SupportRequest
 from mission_control.serializers import RoverSerializer, BlockDiagramSerializer
+from support.serializers import SupportRequestSerializer
 
 
 class RoverViewSet(viewsets.ModelViewSet):
@@ -85,3 +87,38 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(
                 'You may only modify your own block diagrams')
         serializer.save()
+
+
+class SupportRequestViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows support requests to be created, viewed or removed.
+
+    retrieve:
+        Return a support instance.
+
+    list:
+        Return all support requests.
+
+    create:
+        Register a new support request.
+
+    delete:
+        Remove an existing support request.
+
+    partial_update:
+        Update one or more fields on an existing rover.
+
+    update:
+        Update a rover.
+    """
+
+    queryset = SupportRequest.objects.all()
+    serializer_class = SupportRequestSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+    filter_backends = (DjangoFilterBackend,)
+
+    def perform_create(self, serializer):
+        """Perform the create operation."""
+        user = self.request.user
+        serializer.save(owner=user)
+
