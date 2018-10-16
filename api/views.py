@@ -106,10 +106,10 @@ class SupportRequestViewSet(viewsets.ModelViewSet):
         Remove an existing support request.
 
     partial_update:
-        Update one or more fields on an existing rover.
+        Update one or more fields on an existing support request.
 
     update:
-        Update a rover.
+        Update a support request.
     """
 
     queryset = SupportRequest.objects.all()
@@ -121,4 +121,11 @@ class SupportRequestViewSet(viewsets.ModelViewSet):
         """Perform the create operation."""
         user = self.request.user
         serializer.save(owner=user)
+
+    def perform_update(self, serializer):
+        """Perform the update operation."""
+        if self.get_object().owner.id is not self.request.user.id:
+            raise serializers.ValidationError(
+                'You may only modify your own support requests')
+        serializer.save()
 
