@@ -27,7 +27,7 @@ RUN sed -i 's/\r//' /entrypoint.sh \
     && chmod +x /entrypoint.sh \
     && chown django /entrypoint.sh \
     && chmod +x /gunicorn.sh \
-    && chown django /gunicorn.sh
+    && chown django /gunicorn.sh \
     && chmod +x /daphne.sh \
     && chown django /daphne.sh
 
