@@ -3,6 +3,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from oauth2_provider.models import Application
 from rovercode_web.users.models import User
+from mission_control.models import BlockDiagram
 
 
 class SupportRequest(models.Model):
@@ -20,6 +21,7 @@ class SupportRequest(models.Model):
     owner = models.ForeignKey(User)
     creation_time = models.DateTimeField(auto_now=True)
     in_progress = models.BooleanField(null=False, default=False)
+    program = models.ForeignKey(BlockDiagram)
 
     class Meta:
         """Meta class."""
