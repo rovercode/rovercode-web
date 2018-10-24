@@ -9,14 +9,15 @@ import django
 django.setup()
 
 from channels.auth import AuthMiddlewareStack
+from channels.sessions import SessionMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 import realtime.routing
 
 application = ProtocolTypeRouter({
     # (http->django views is added by default)
-    'websocket': AuthMiddlewareStack(
+    'websocket': SessionMiddlewareStack(AuthMiddlewareStack(
         URLRouter(
             realtime.routing.websocket_urlpatterns
         )
-    ),
+    )),
 })
