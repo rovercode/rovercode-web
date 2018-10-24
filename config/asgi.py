@@ -12,12 +12,13 @@ from channels.auth import AuthMiddlewareStack
 from channels.sessions import SessionMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 import realtime.routing
+from middleware.ChannelsJwtMiddleware import ChannelsJwtMiddleware
 
 application = ProtocolTypeRouter({
     # (http->django views is added by default)
-    'websocket': SessionMiddlewareStack(AuthMiddlewareStack(
+    'websocket': SessionMiddlewareStack(ChannelsJwtMiddleware(AuthMiddlewareStack(
         URLRouter(
             realtime.routing.websocket_urlpatterns
         )
-    )),
+    ))),
 })

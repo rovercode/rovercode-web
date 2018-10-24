@@ -12,18 +12,8 @@ class RoverConsumer(WebsocketConsumer):
     room_name = None
     room_group_name = None
 
-    def get_user(self):
-        data = {'token': self.scope["cookies"]["auth_jwt"]}
-        if not data:
-            return None
-        valid_data = VerifyJSONWebTokenSerializer().validate(data)
-        user = valid_data['user']
-        if not user:
-            return None
-        return user
-
     def connect(self):
-        user = self.get_user()
+        user = self.scope['user']
         if not user:
             self.close()
             return
