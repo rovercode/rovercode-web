@@ -13,8 +13,8 @@ class RoverConsumer(WebsocketConsumer):
     room_group_name = None
 
     def connect(self):
-        user = self.scope['user']
-        if not user:
+        user = self.scope.get('user')
+        if user.is_anonymous:
             self.close()
             return
 
@@ -22,6 +22,7 @@ class RoverConsumer(WebsocketConsumer):
         self.room_group_name = 'chat_%s' % self.room_name
 
         try:
+            print(Rover.objects.all())
             rover = Rover.objects.get(oauth_application__client_id=self.room_name)
         except Rover.DoesNotExist:
             self.close()

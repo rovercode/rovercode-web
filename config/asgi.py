@@ -12,7 +12,7 @@ from channels.auth import AuthMiddlewareStack
 from channels.sessions import SessionMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 import realtime.routing
-from middleware.ChannelsJwtMiddleware import ChannelsJwtMiddleware
+from middleware.channels_jwt_middleware import ChannelsJwtMiddleware
 
 application = ProtocolTypeRouter({
     # (http->django views is added by default)
