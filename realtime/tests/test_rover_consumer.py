@@ -1,7 +1,6 @@
 """Rover websocket consumer test."""
 import json
 import pytest
-from test_plus.test import TestCase
 from django.conf.urls import url
 from channels.testing import WebsocketCommunicator
 from channels.routing import URLRouter
@@ -13,10 +12,16 @@ from rovercode_web.users.models import User
 
 
 @pytest.mark.asyncio
-@patch("realtime.consumers.Rover")
-async def test_rover_consumer(mock_rover):
+@pytest.mark.django_db
+async def test_rover_consumer():
     """Test sending a message to the room and having it echo it back."""
-    mock_rover.objects.get.return_value = Rover(owner=User(id=MOCK_USER_ID))
+    user = User.objects.create(id=0)
+    rover = Rover.objects.create(
+        name='rover',
+        owner=user,
+        local_ip='8.8.8.8'
+    )
+    print(Rover.objects.all())
     application = MockAuthMiddleware(URLRouter([
         url(r'^ws/realtime/(?P<room_name>[^/]+)/$', RoverConsumer),
     ]))
