@@ -24,6 +24,7 @@ class RoverConsumer(WebsocketConsumer):
         try:
             print(Rover.objects.all())
             rover = Rover.objects.get(oauth_application__client_id=self.room_name)
+            print(rover)
         except Rover.DoesNotExist:
             self.close()
             return

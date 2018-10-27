@@ -11,8 +11,8 @@ from mission_control.models import Rover
 from rovercode_web.users.models import User
 
 
+@pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-@pytest.mark.django_db
 async def test_rover_consumer():
     """Test sending a message to the room and having it echo it back."""
     user = User.objects.create(id=0)
