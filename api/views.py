@@ -116,6 +116,7 @@ class SupportRequestViewSet(viewsets.ModelViewSet):
     serializer_class = SupportRequestSerializer
     permission_classes = (permissions.IsAuthenticated, )
     filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('experience_level', 'category', 'creation_time', 'in_progress', 'owner', 'program')
 
     def perform_create(self, serializer):
         """Perform the create operation."""

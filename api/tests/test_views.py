@@ -11,6 +11,7 @@ from urllib.parse import urlencode
 
 from oauth2_provider.models import Application
 from mission_control.models import Rover, BlockDiagram
+from support.models import SupportRequest
 
 
 class BaseAuthenticatedTestCase(TestCase):
@@ -246,3 +247,184 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             b'["You may only modify your own block diagrams"]')
         self.assertEqual(BlockDiagram.objects.last().user.id, user.id)
         self.assertEqual(BlockDiagram.objects.last().name, 'test1')
+
+
+class TestSupportRequestViewSet(BaseAuthenticatedTestCase):
+    """Tests the support request API view."""
+
+    def test_support_request(self):
+        """Test the supportrequest API view displays the correct items."""
+        self.client.login(username='administrator', password='password')
+        user = self.make_user()
+        bd1 = BlockDiagram.objects.create(
+            user=user,
+            name='test1',
+            content='<xml></xml>'
+        )
+        bd2 = BlockDiagram.objects.create(
+            user=user,
+            name='test2',
+            content='<xml></xml>'
+        )
+        sr1 = SupportRequest.objects.create(
+            owner=self.admin,
+            subject='Help 1',
+            body='Foo',
+            experience_level=1,
+            category='DEBUG',
+            program=bd1
+        )
+        sr2 = SupportRequest.objects.create(
+            owner=self.admin,
+            subject='Help 2',
+            body='Bar',
+            experience_level=2,
+            category='WHAT_NEXT',
+            program=bd2
+        )
+        response = self.get(reverse('api:v1:supportrequest-list'))
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, len(response.json()))
+        self.assertEqual(response.json()[0]['id'], sr1.id)
+        self.assertEqual(response.json()[0]['owner'], self.admin.id)
+        self.assertEqual(response.json()[0]['subject'], sr1.subject)
+        self.assertEqual(response.json()[0]['body'], sr1.body)
+        self.assertEqual(response.json()[0]['experience_level'], sr1.experience_level)
+        self.assertEqual(response.json()[0]['category'], sr1.category)
+        self.assertEqual(response.json()[0]['program'], sr1.program.id)
+        self.assertEqual(response.json()[1]['id'], sr2.id)
+        self.assertEqual(response.json()[1]['owner'], self.admin.id)
+        self.assertEqual(response.json()[1]['subject'], sr2.subject)
+        self.assertEqual(response.json()[1]['body'], sr2.body)
+        self.assertEqual(response.json()[1]['experience_level'], sr2.experience_level)
+        self.assertEqual(response.json()[1]['category'], sr2.category)
+        self.assertEqual(response.json()[1]['program'], sr2.program.id)
+
+
+    def test_support_request_owner_filter(self):
+        """Test the support request API view filters on owner correctly."""
+        self.client.login(username='administrator', password='password')
+        user1 = self.make_user('user1')
+        bd1 = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        bd2 = BlockDiagram.objects.create(
+            user=user1,
+            name='test2',
+            content='<xml></xml>'
+        )
+        sr1 = SupportRequest.objects.create(
+            owner=self.admin,
+            subject='Help 1',
+            body='Foo',
+            experience_level=2,
+            category='DEBUG',
+            program=bd1
+        )
+        sr2 = SupportRequest.objects.create(
+            owner=user1,
+            subject='Help 2',
+            body='Bar',
+            experience_level=2,
+            category='WHAT_NEXT',
+            program=bd2
+        )
+        response = self.get(
+            reverse('api:v1:supportrequest-list') +
+            '?owner=' + str(user1.id))
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()))
+        self.assertEqual(response.json()[0]['id'], bd2.id)
+        self.assertEqual(response.json()[0]['owner'], user1.id)
+        self.assertEqual(response.json()[0]['subject'], sr2.subject)
+        self.assertEqual(response.json()[0]['body'], sr2.body)
+        self.assertEqual(response.json()[0]['experience_level'], sr2.experience_level)
+        self.assertEqual(response.json()[0]['category'], sr2.category)
+        self.assertEqual(response.json()[0]['program'], sr2.program.id)
+
+    def test_support_request_not_logged_in(self):
+        """Test the support request view denies unauthenticated user."""
+        response = self.get(reverse('api:v1:supportrequest-list'))
+        self.assertEqual(401, response.status_code)
+
+    def test_support_request_create(self):
+        """Test creating support request sets user and in_progress."""
+        self.client.login(username='administrator', password='password')
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        data = {
+            'subject': 'Help 1',
+            'body': 'Foo',
+            'experience_level': 2,
+            'category': 'DEBUG',
+            'program': bd.id
+        }
+        response = self.client.post(
+            reverse('api:v1:supportrequest-list'), data)
+        self.assertEqual(201, response.status_code)
+        self.assertEqual(SupportRequest.objects.last().owner.id, self.admin.id)
+        self.assertEqual(SupportRequest.objects.last().subject, data['subject'])
+        self.assertEqual(SupportRequest.objects.last().in_progress, False)
+
+    def test_support_request_update_as_valid_user(self):
+        """Test updating support request as owner."""
+        self.client.login(username='administrator', password='password')
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        sr = SupportRequest.objects.create(
+            owner=self.admin,
+            subject='Help 1',
+            body='Foo',
+            experience_level=2,
+            category='DEBUG',
+            program=bd
+        )
+        data = {
+            'subject': 'Help New',
+        }
+        response = self.client.patch(
+            reverse(
+                'api:v1:supportrequest-detail', kwargs={'pk': sr.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(SupportRequest.objects.last().owner.id, self.admin.id)
+        self.assertEqual(SupportRequest.objects.last().subject, data['subject'])
+
+    def test_support_request_update_as_invalid_user(self):
+        """Test updating support request as another user."""
+        self.client.login(username='administrator', password='password')
+        user = self.make_user()
+        bd = BlockDiagram.objects.create(
+            user=user,
+            name='test1',
+            content='<xml></xml>'
+        )
+        sr = SupportRequest.objects.create(
+            owner=user,
+            subject='Help 1',
+            body='Foo',
+            experience_level=2,
+            category='DEBUG',
+            program=bd
+        )
+        data = {
+            'subject': 'Help New',
+        }
+        response = self.client.patch(
+            reverse(
+                'api:v1:supportrequest-detail', kwargs={'pk': sr.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(
+            response.content,
+            b'["You may only modify your own support requests"]')
+        self.assertEqual(SupportRequest.objects.last().owner.id, user.id)
+        self.assertEqual(SupportRequest.objects.last().subject, 'Help 1')
