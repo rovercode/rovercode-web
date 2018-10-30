@@ -1,10 +1,12 @@
+"""JWT auth middleware for Django Channels."""
 from django.contrib.auth.models import AnonymousUser
 
 from rest_framework_jwt.serializers import VerifyJSONWebTokenSerializer
 
+
 class ChannelsJwtMiddleware:
     """
-    Note: Relies of SessionMiddlewareStack for easy cookie access
+    Note: Relies of SessionMiddlewareStack for easy cookie access.
 
     Usage:
 
@@ -30,9 +32,11 @@ class ChannelsJwtMiddleware:
     """
 
     def __init__(self, inner):
+        """Init the middleware."""
         self.inner = inner
 
     def __call__(self, scope):
+        """Call the middleware."""
         if "method" not in scope:
             scope['method'] = "FAKE"
 

@@ -4,12 +4,12 @@ import pytest
 from django.conf.urls import url
 from channels.testing import WebsocketCommunicator
 from channels.routing import URLRouter
-from unittest.mock import MagicMock, patch
 from realtime.consumers import RoverConsumer
-from middleware.tests.mock_auth_middleware import MockAuthMiddleware, MOCK_USER_ID
+from middleware.tests.mock_auth_middleware \
+    import MockAuthMiddleware, MOCK_USER_ID
 from mission_control.models import Rover
-from rovercode_web.users.models import User
 from oauth2_provider.models import Application
+from rovercode_web.users.models import User
 
 
 @pytest.mark.django_db(transaction=True)
@@ -23,7 +23,7 @@ async def test_rover_consumer():
         client_type=Application.CLIENT_CONFIDENTIAL,
         name='rover'
     )
-    rover = Rover.objects.create(
+    Rover.objects.create(
         name='rover',
         owner=user,
         local_ip='8.8.8.8',
@@ -32,7 +32,10 @@ async def test_rover_consumer():
     application = MockAuthMiddleware(URLRouter([
         url(r'^ws/realtime/(?P<room_name>[^/]+)/$', RoverConsumer),
     ]))
-    communicator = WebsocketCommunicator(application, "/ws/realtime/{}/".format(oauth_app.client_id))
+    communicator = WebsocketCommunicator(
+        application,
+        "/ws/realtime/{}/".format(oauth_app.client_id)
+    )
     connected, _ = await communicator.connect()
     assert connected
     message = json.dumps({"message": "hello"})
@@ -48,11 +51,12 @@ async def test_rover_consumer():
 @pytest.mark.asyncio
 async def test_rover_consumer_no_user():
     """Test sending a message to the room and having it echo it back."""
-    user = User.objects.create(id=MOCK_USER_ID)
+    User.objects.create(id=MOCK_USER_ID)
     application = URLRouter([
         url(r'^ws/realtime/(?P<room_name>[^/]+)/$', RoverConsumer),
     ])
-    communicator = WebsocketCommunicator(application, "/ws/realtime/{}/".format('foobar'))
+    communicator = WebsocketCommunicator(application,
+                                         "/ws/realtime/{}/".format('foobar'))
     connected, _ = await communicator.connect()
     assert not connected
 
@@ -68,7 +72,7 @@ async def test_rover_consumer_nonexistent_client_id():
         client_type=Application.CLIENT_CONFIDENTIAL,
         name='rover'
     )
-    rover = Rover.objects.create(
+    Rover.objects.create(
         name='rover',
         owner=user,
         local_ip='8.8.8.8',
@@ -77,7 +81,10 @@ async def test_rover_consumer_nonexistent_client_id():
     application = MockAuthMiddleware(URLRouter([
         url(r'^ws/realtime/(?P<room_name>[^/]+)/$', RoverConsumer),
     ]))
-    communicator = WebsocketCommunicator(application, "/ws/realtime/{}/".format("not_a_real_clientid"))
+    communicator = WebsocketCommunicator(
+        application,
+        "/ws/realtime/{}/".format("not_a_real_clientid")
+    )
     connected, _ = await communicator.connect()
     assert not connected
 
@@ -93,7 +100,7 @@ async def test_rover_consumer_disallowed_user():
         client_type=Application.CLIENT_CONFIDENTIAL,
         name='rover'
     )
-    rover = Rover.objects.create(
+    Rover.objects.create(
         name='rover',
         owner=user,
         local_ip='8.8.8.8',
@@ -102,6 +109,9 @@ async def test_rover_consumer_disallowed_user():
     application = MockAuthMiddleware(URLRouter([
         url(r'^ws/realtime/(?P<room_name>[^/]+)/$', RoverConsumer),
     ]))
-    communicator = WebsocketCommunicator(application, "/ws/realtime/{}/".format(oauth_app.client_id))
+    communicator = WebsocketCommunicator(
+        application,
+        "/ws/realtime/{}/".format(oauth_app.client_id)
+    )
     connected, _ = await communicator.connect()
     assert not connected

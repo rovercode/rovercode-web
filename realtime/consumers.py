@@ -2,7 +2,6 @@
 import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-from rest_framework_jwt.serializers import VerifyJSONWebTokenSerializer
 from mission_control.models import Rover
 
 
@@ -13,6 +12,7 @@ class RoverConsumer(WebsocketConsumer):
     room_group_name = None
 
     def connect(self):
+        """Handle new connection requests."""
         user = self.scope.get('user')
         if not user or user.is_anonymous:
             self.close()
@@ -22,7 +22,8 @@ class RoverConsumer(WebsocketConsumer):
         self.room_group_name = 'chat_%s' % self.room_name
 
         try:
-            rover = Rover.objects.get(oauth_application__client_id=self.room_name)
+            rover = Rover.objects.get(
+                oauth_application__client_id=self.room_name)
         except Rover.DoesNotExist:
             self.close()
             return
@@ -31,7 +32,8 @@ class RoverConsumer(WebsocketConsumer):
             self.close()
             return
 
-        print("Realtime: user {} connected to rover {}".format(user, self.room_name))
+        print("Realtime: user {} connected to rover {}"
+              .format(user, self.room_name))
 
         # Join room group
         async_to_sync(self.channel_layer.group_add)(

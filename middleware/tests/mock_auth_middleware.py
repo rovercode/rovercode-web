@@ -1,5 +1,4 @@
-from django.contrib.auth.models import AnonymousUser
-
+"""Middleware for Channels testing that puts a user in the context."""
 from rovercode_web.users.models import User
 
 MOCK_USER_ID = 1
@@ -7,7 +6,7 @@ MOCK_USER_ID = 1
 
 class MockAuthMiddleware:
     """
-    Note: Puts a dummy user in the scope
+    Puts a dummy user in the scope.
 
     Usage:
 
@@ -23,8 +22,10 @@ class MockAuthMiddleware:
     """
 
     def __init__(self, inner):
+        """Initialize the middleware."""
         self.inner = inner
 
     def __call__(self, scope):
+        """Call the middleware."""
         scope['user'] = User(id=MOCK_USER_ID)
         return self.inner(scope)
