@@ -1,8 +1,10 @@
 """Consumers for Realtime app."""
 import json
+import logging
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from mission_control.models import Rover
+LOGGER = logging.getLogger(__name__)
 
 
 class RoverConsumer(WebsocketConsumer):
@@ -32,8 +34,8 @@ class RoverConsumer(WebsocketConsumer):
             self.close()
             return
 
-        print("Realtime: user {} connected to rover {}"
-              .format(user, self.room_name))
+        LOGGER.info("Realtime: user %s connected to rover %s",
+                    user, self.room_name)
 
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
