@@ -17,7 +17,7 @@ class RoverConsumer(WebsocketConsumer):
         """Handle new connection requests."""
         user = self.scope.get('user')
         if not user or user.is_anonymous:
-            self.close()
+            self.close(code=401)
             return
 
         self.room_name = self.scope['url_route']['kwargs']['room_name']
@@ -27,11 +27,11 @@ class RoverConsumer(WebsocketConsumer):
             rover = Rover.objects.get(
                 oauth_application__client_id=self.room_name)
         except Rover.DoesNotExist:
-            self.close()
+            self.close(code=404)
             return
 
         if rover.owner.id != user.id:
-            self.close()
+            self.close(code=403)
             return
 
         LOGGER.info("Realtime: user %s connected to rover %s",

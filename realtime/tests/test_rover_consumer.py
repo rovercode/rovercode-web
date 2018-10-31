@@ -57,7 +57,8 @@ async def test_rover_consumer_no_user():
     ])
     communicator = WebsocketCommunicator(application,
                                          "/ws/realtime/{}/".format('foobar'))
-    connected, _ = await communicator.connect()
+    connected, code = await communicator.connect()
+    assert code == 401
     assert not connected
 
 
@@ -85,7 +86,8 @@ async def test_rover_consumer_nonexistent_client_id():
         application,
         "/ws/realtime/{}/".format("not_a_real_clientid")
     )
-    connected, _ = await communicator.connect()
+    connected, code = await communicator.connect()
+    assert code == 404
     assert not connected
 
 
@@ -113,5 +115,6 @@ async def test_rover_consumer_disallowed_user():
         application,
         "/ws/realtime/{}/".format(oauth_app.client_id)
     )
-    connected, _ = await communicator.connect()
+    connected, code = await communicator.connect()
+    assert code == 403
     assert not connected
