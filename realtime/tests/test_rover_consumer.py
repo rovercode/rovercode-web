@@ -50,7 +50,7 @@ async def test_rover_consumer():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_rover_consumer_no_user():
-    """Test sending a message to the room and having it echo it back."""
+    """Test trying to connect while unauthenticated."""
     User.objects.create(id=MOCK_USER_ID)
     application = URLRouter([
         url(r'^ws/realtime/(?P<room_name>[^/]+)/$', RoverConsumer),
@@ -65,7 +65,7 @@ async def test_rover_consumer_no_user():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_rover_consumer_nonexistent_client_id():
-    """Test sending a message to the room and having it echo it back."""
+    """Test trying to connect to a nonexistent rover."""
     user = User.objects.create(id=MOCK_USER_ID+1)
     oauth_app = Application.objects.create(
         user=user,
@@ -94,7 +94,7 @@ async def test_rover_consumer_nonexistent_client_id():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_rover_consumer_disallowed_user():
-    """Test sending a message to the room and having it echo it back."""
+    """Test trying to connect to a rover the user doesn't own."""
     user = User.objects.create(id=MOCK_USER_ID+1)
     oauth_app = Application.objects.create(
         user=user,
