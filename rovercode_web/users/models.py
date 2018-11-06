@@ -15,6 +15,8 @@ class User(AbstractUser):
     # around the globe.
     name = models.CharField(_('Name of User'), blank=True, max_length=255)
 
+    blocked_users = models.ManyToManyField("self")
+
     def __str__(self):
         return self.username
 

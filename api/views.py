@@ -1,10 +1,12 @@
 """API views."""
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, permissions, serializers
+from rest_framework import viewsets, mixins, permissions, serializers
 
 from mission_control.filters import RoverFilter
 from mission_control.models import Rover, BlockDiagram
 from support.models import SupportRequest
+from rovercode_web.users.models import User
+from rovercode_web.users.serializers import UserSerializer
 from mission_control.serializers import RoverSerializer, BlockDiagramSerializer
 from support.serializers import SupportRequestSerializer
 
@@ -130,3 +132,29 @@ class SupportRequestViewSet(viewsets.ModelViewSet):
                 'You may only modify your own support requests')
         serializer.save()
 
+
+class UserViewSet(mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
+                  viewsets.GenericViewSet):
+
+    """
+    API endpoint that allows users to be updated.
+
+    partial_update:
+        Update one or more fields on an existing user.
+
+    update:
+        Update a user.
+    """
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+    filter_backends = (DjangoFilterBackend,)
+
+    def perform_update(self, serializer):
+        """Perform the update operation."""
+        if self.get_object().id is not self.request.user.id:
+            raise serializers.ValidationError(
+                'You may only modify your own user')
+        serializer.save()
