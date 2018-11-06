@@ -12,6 +12,12 @@ class SupportConsumer(WebsocketConsumer):
 
     def connect(self):
         """Handle connections."""
+        user = self.scope.get('user')
+        print(user)
+        if not user or user.is_anonymous:
+            self.close(code=401)
+            return
+
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
 
