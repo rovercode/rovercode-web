@@ -20,6 +20,17 @@ services:
     depends_on:
       - postgres
       - redis
+    command: /gunicorn.sh
+    env_file: .env
+
+  django-websockets:
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile
+    user: django
+    depends_on:
+      - postgres
+      - redis
     command: /daphne.sh
     env_file: .env
 
@@ -27,7 +38,7 @@ services:
     build: ./compose/nginx
     depends_on:
       - django
-
+      - django-websockets
       - certbot
 
     ports:
@@ -43,7 +54,7 @@ services:
       - /var/lib/letsencrypt:/var/lib/letsencrypt
 
   certbot:
-    image: certbot/certbot 
+    image: certbot/certbot
     command: sh -c "sleep 6 && certbot certonly -n --standalone -d rovercode.com --text --agree-tos --email bradyhurlburt@gmail.com --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --keep-until-expiring --standalone-supported-challenges http-01"
     entrypoint: ""
     volumes:
