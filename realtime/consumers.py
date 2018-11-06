@@ -1,7 +1,10 @@
 """Consumers for Realtime app."""
 import json
+import logging
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
+from mission_control.models import Rover
+LOGGER = logging.getLogger(__name__)
 
 
 class RoverConsumer(WebsocketConsumer):
@@ -11,9 +14,28 @@ class RoverConsumer(WebsocketConsumer):
     room_group_name = None
 
     def connect(self):
-        """Handle connections."""
+        """Handle new connection requests."""
+        user = self.scope.get('user')
+        if not user or user.is_anonymous:
+            self.close(code=401)
+            return
+
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
+
+        try:
+            rover = Rover.objects.get(
+                oauth_application__client_id=self.room_name)
+        except Rover.DoesNotExist:
+            self.close(code=404)
+            return
+
+        if rover.owner.id != user.id:
+            self.close(code=403)
+            return
+
+        LOGGER.info("Realtime: user %s connected to rover %s",
+                    user, self.room_name)
 
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
