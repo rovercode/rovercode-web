@@ -14,6 +14,7 @@ router = routers.DefaultRouter()
 router.register(r'rovers', views.RoverViewSet, base_name='rover')
 router.register(r'block-diagrams', views.BlockDiagramViewSet)
 router.register(r'support-requests', views.SupportRequestViewSet)
+router.register(r'abuse-reports', views.AbuseReportViewSet)
 router.register(r'users', views.UserViewSet)
 
 

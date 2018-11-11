@@ -5,7 +5,7 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from middleware.tests.mock_auth_middleware \
     import MockAuthMiddleware, MOCK_USER_ID
-from .models import SupportRequest
+from .models import SupportRequest, AbuseReport
 LOGGER = logging.getLogger(__name__)
 
 
@@ -14,10 +14,12 @@ class SupportConsumer(WebsocketConsumer):
 
     room_name = None
     room_group_name = None
+    participating_users = []
 
     def connect(self):
         """Handle connections."""
         user = self.scope.get('user')
+        self.participating_users.append(user)
         if not user or user.is_anonymous:
             self.close(code=401)
             return
@@ -59,6 +61,27 @@ class SupportConsumer(WebsocketConsumer):
         """Handle messages received via WebSocket connection."""
         text_data_dict = json.loads(text_data)
         text_data_dict['type'] = 'group_message'
+
+        if text_data_dict['message'] == 'REPORT_ABUSE':
+            reporter = self.scope.get('user')
+            users = list(self.participating_users)
+            users.remove(reporter)
+            if len(users) < 1:
+                accused_user = None
+            else:
+                accused_user = users[0]
+                if reporter.blocked_users.all().values():
+                    blocked_users = reporter.blocked_users.all().values()
+                else:
+                    blocked_users = []
+                blocked_users.append(accused_user)
+                reporter.blocked_users.set(blocked_users)
+            AbuseReport.objects.create(
+                reporter=self.scope.get('user'),
+                accused_user=accused_user,
+                support_request=SupportRequest.objects.get(id=int(self.room_name)),
+                transcript='TODO'
+            )
 
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(

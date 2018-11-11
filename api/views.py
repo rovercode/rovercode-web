@@ -4,11 +4,11 @@ from rest_framework import viewsets, mixins, permissions, serializers
 
 from mission_control.filters import RoverFilter
 from mission_control.models import Rover, BlockDiagram
-from support.models import SupportRequest
+from support.models import SupportRequest, AbuseReport
 from rovercode_web.users.models import User
 from rovercode_web.users.serializers import UserSerializer
 from mission_control.serializers import RoverSerializer, BlockDiagramSerializer
-from support.serializers import SupportRequestSerializer
+from support.serializers import SupportRequestSerializer, AbuseReportSerializer
 
 
 class RoverViewSet(viewsets.ModelViewSet):
@@ -89,6 +89,44 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(
                 'You may only modify your own block diagrams')
         serializer.save()
+
+
+class AbuseReportViewSet(mixins.CreateModelMixin,
+                  mixins.ListModelMixin,
+                  mixins.RetrieveModelMixin,
+                  viewsets.GenericViewSet):
+    """
+    API endpoint that allows abuse reports to be created and viewed.
+
+    list:
+        Return all abuse reports.
+
+    retrieve:
+        Return a support instance.
+
+    create:
+        Register a new support request.
+
+    """
+
+    queryset = AbuseReport.objects.all()
+    serializer_class = AbuseReportSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('reporter', 'accused_user')
+
+    def get_permissions(self):
+        if self.action == 'list':
+            self.permission_classes = [permissions.IsAdminUser, ]
+        elif self.action == 'retrieve':
+            self.permission_classes = [permissions.IsAdminUser]
+        elif self.action == 'create':
+            self.permission_classes = [permissions.IsAuthenticated]
+        return super(self.__class__, self).get_permissions()
+
+    def perform_create(self, serializer):
+        """Perform the create operation."""
+        user = self.request.user
+        serializer.save(reporter=user)
 
 
 class SupportRequestViewSet(viewsets.ModelViewSet):

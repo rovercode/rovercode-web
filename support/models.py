@@ -29,3 +29,19 @@ class SupportRequest(models.Model):
     def __str__(self):
         """Convert the model to a human readable string."""
         return "Support Request {}: {}".format(self.id, self.subject)
+
+
+class AbuseReport(models.Model):
+    """Attributes to describe a single abuse report."""
+    reporter = models.ForeignKey(User, related_name='reporter')
+    accused_user = models.ForeignKey(User, null=True, related_name='accused_user')
+    support_request = models.ForeignKey(SupportRequest)
+    transcript = models.CharField(null=False, max_length=100000)
+    creation_time = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        """Meta class."""
+
+    def __str__(self):
+        """Convert the model to a human readable string."""
+        return "Abuse Report {}: User {} against {}".format(self.id, self.reporter, self.accused_user)
