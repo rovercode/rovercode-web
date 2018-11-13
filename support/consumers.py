@@ -35,7 +35,7 @@ class SupportConsumer(WebsocketConsumer):
 
         blocked_user_ids = [user.id for user in supportRequest.owner.blocked_users.all()]
         if user.id in blocked_user_ids:
-            self.close(code=404)
+            self.close(code=403)
             return
 
         # Join room group
@@ -80,7 +80,7 @@ class SupportConsumer(WebsocketConsumer):
                 reporter=self.scope.get('user'),
                 accused_user=accused_user,
                 support_request=SupportRequest.objects.get(id=int(self.room_name)),
-                transcript='TODO'
+                transcript=text_data_dict.get('transcript', '')
             )
 
         # Send message to room group
