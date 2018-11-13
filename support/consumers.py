@@ -71,7 +71,8 @@ class SupportConsumer(WebsocketConsumer):
             else:
                 accused_user = users[0]
                 if reporter.blocked_users.all().values():
-                    blocked_users = [user for user in reporter.blocked_users.all().values()]
+                    # blocked_users = [user for user in reporter.blocked_users.all().values()]
+                    blocked_users = []
                 else:
                     blocked_users = []
                 blocked_users.append(accused_user)
