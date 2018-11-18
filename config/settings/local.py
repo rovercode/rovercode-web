@@ -18,7 +18,7 @@ from .common import *  # noqa
 # ------------------------------------------------------------------------------
 DEBUG = env.bool('DJANGO_DEBUG', default=True)
 TEMPLATES[0]['OPTIONS']['debug'] = DEBUG
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', 'rovercodeweb']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', 'rovercodeweb', '*']
 
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------
