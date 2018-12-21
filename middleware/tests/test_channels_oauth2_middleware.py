@@ -33,6 +33,20 @@ class TestChannelsOauth2Middleware(TestCase):
             inner.assert_called_once_with(scope)
             self.assertEqual("test_user", scope["user"])
 
+    def test__call__already_auth(self):
+        """Test the __call__ method if there is already an user."""
+        inner = MagicMock()
+        uut = ChannelsOAuth2Middleware(inner)
+        user = self.make_user()
+        scope = {
+            "headers": [(b'authorization', b'baz')],
+            "path": "/asdf",
+            "user": user
+        }
+        uut.__call__(scope)
+        inner.assert_called_once_with(scope)
+        self.assertEqual(user, scope["user"])
+
     def test__call__not_auth(self):
         """Test the __call__ method when the token is not for a valid user."""
         inner = MagicMock()

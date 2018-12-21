@@ -53,6 +53,10 @@ class ChannelsOAuth2Middleware:
                 return r.user, r.access_token
             return AnonymousUser, None
 
+        if scope.get('user') and scope['user'] != AnonymousUser:
+            # We already have an authenticated user
+            return self.inner(scope)
+
         if "method" not in scope:
             scope['method'] = "FAKE"
 
