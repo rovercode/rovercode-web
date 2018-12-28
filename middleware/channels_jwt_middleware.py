@@ -37,6 +37,10 @@ class ChannelsJwtMiddleware:
 
     def __call__(self, scope):
         """Call the middleware."""
+        if scope.get('user') and scope['user'] != AnonymousUser:
+            # We already have an authenticated user
+            return self.inner(scope)
+
         if "method" not in scope:
             scope['method'] = "FAKE"
 

@@ -26,8 +26,18 @@ class TestChannelsJwtMiddleware(TestCase):
             inner.assert_called_once_with(scope)
             self.assertEqual("some_user", scope["user"])
 
+    def test__call__already_auth(self):
+        """Test the __call__ method if there is already an user."""
+        inner = MagicMock()
+        uut = ChannelsJwtMiddleware(inner)
+        user = self.make_user()
+        scope = {"cookies": {"auth_jwt": "foobar"}, "user": user}
+        uut.__call__(scope)
+        inner.assert_called_once_with(scope)
+        self.assertEqual(user, scope["user"])
+
     def test__call__not_auth(self):
-        """Test the __call__ method."""
+        """Test the __call__ method if the user is not authorized."""
         inner = MagicMock()
         uut = ChannelsJwtMiddleware(inner)
         scope = {"cookies": {"auth_jwt": "foobar"}}
@@ -39,7 +49,7 @@ class TestChannelsJwtMiddleware(TestCase):
             self.assertEqual(AnonymousUser, scope["user"])
 
     def test__call__no_cookie(self):
-        """Test the __call__ method."""
+        """Test the __call__ method if the needed cookie is absent."""
         inner = MagicMock()
         uut = ChannelsJwtMiddleware(inner)
         scope = {"cookies": {"auth_jwt": None}}
@@ -51,7 +61,7 @@ class TestChannelsJwtMiddleware(TestCase):
             self.assertEqual(AnonymousUser, scope["user"])
 
     def test__call__no_cookies(self):
-        """Test the __call__ method."""
+        """Test the __call__ method if there are no cookies at all."""
         inner = MagicMock()
         uut = ChannelsJwtMiddleware(inner)
         scope = {}
