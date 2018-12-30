@@ -46,14 +46,16 @@ class ChannelsJwtMiddleware:
 
         cookies = scope.get("cookies")
         if not cookies:
-            scope['user'] = AnonymousUser
             return self.inner(scope)
 
-        data = {'token': cookies.get("auth_jwt")}
+        jwt_cookie = cookies.get("auth_jwt")
+        if not jwt_cookie:
+            return self.inner(scope)
+
+        data = {'token': jwt_cookie}
         valid_data = VerifyJSONWebTokenSerializer().validate(data)
-        user = valid_data['user']
+        user = valid_data.get("user")
         if not user:
-            scope['user'] = AnonymousUser
             return self.inner(scope)
 
         scope['user'] = user

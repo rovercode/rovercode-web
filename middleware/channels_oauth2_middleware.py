@@ -45,13 +45,13 @@ class ChannelsOAuth2Middleware:
             Authenticate the request.
 
             Returns a tuple containing the user and their access token.
-            If it's not valid then AnonymousUser is returned.
+            If it's not valid then None is returned.
             """
             oauthlib_core = get_oauthlib_core()
             valid, r = oauthlib_core.verify_request(request, scopes=[])
             if valid:
                 return r.user, r.access_token
-            return AnonymousUser, None
+            return None, None
 
         if scope.get('user') and scope['user'] != AnonymousUser:
             # We already have an authenticated user
@@ -64,8 +64,7 @@ class ChannelsOAuth2Middleware:
 
         if request.META.get("HTTP_AUTHORIZATION"):
             user, _ = authenticate(request)
-            scope['user'] = user
-        else:
-            scope['user'] = AnonymousUser
+            if user:
+                scope['user'] = user
 
         return self.inner(scope)
