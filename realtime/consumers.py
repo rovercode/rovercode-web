@@ -55,23 +55,17 @@ class RoverConsumer(WebsocketConsumer):
 
     def receive(self, text_data=None, bytes_data=None):
         """Handle messages received via WebSocket connection."""
-        text_data_json = json.loads(text_data)
-        message_raw = text_data_json['message']
 
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
                 'type': 'group_message',
-                'message': message_raw
+                'body': text_data
             }
         )
 
     def group_message(self, event):
         """Handle messages received via the room group channel layer."""
-        message = event['message']
-
         # Send message to WebSocket
-        self.send(text_data=json.dumps({
-            'message': message
-        }))
+        self.send(text_data=event['body'])
