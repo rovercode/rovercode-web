@@ -1,6 +1,5 @@
 """Channels OAuth2 Middleware test models."""
 from unittest.mock import MagicMock, patch
-from django.contrib.auth.models import AnonymousUser
 from test_plus.test import TestCase
 
 
@@ -62,7 +61,7 @@ class TestChannelsOauth2Middleware(TestCase):
 
             uut.__call__(scope)
             inner.assert_called_once_with(scope)
-            self.assertEqual(AnonymousUser, scope["user"])
+            self.assertFalse("user" in scope)
 
     def test__call__no_token(self):
         """Test the __call__ method when there is no token."""
@@ -71,4 +70,4 @@ class TestChannelsOauth2Middleware(TestCase):
         scope = {"path": "/asdf"}
         uut.__call__(scope)
         inner.assert_called_once_with(scope)
-        self.assertEqual(AnonymousUser, scope["user"])
+        self.assertFalse("user" in scope)
