@@ -1,5 +1,4 @@
 """Consumers for Realtime app."""
-import json
 import logging
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
@@ -56,7 +55,6 @@ class RoverConsumer(WebsocketConsumer):
 
     def receive(self, text_data=None, bytes_data=None):
         """Handle messages received via WebSocket connection."""
-
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
