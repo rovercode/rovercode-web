@@ -1,7 +1,10 @@
 """JWT auth middleware for Django Channels."""
+import logging
 from django.contrib.auth.models import AnonymousUser
 
+from rest_framework.exceptions import ValidationError
 from rest_framework_jwt.serializers import VerifyJSONWebTokenSerializer
+LOGGER = logging.getLogger(__name__)
 
 
 class ChannelsJwtMiddleware:
@@ -53,7 +56,12 @@ class ChannelsJwtMiddleware:
             return self.inner(scope)
 
         data = {'token': jwt_cookie}
-        valid_data = VerifyJSONWebTokenSerializer().validate(data)
+        try:
+            valid_data = VerifyJSONWebTokenSerializer().validate(data)
+        except ValidationError as err:
+            LOGGER.warning("Token present, but couldn't be verified: %s", err)
+            return self.inner(scope)
+
         user = valid_data.get("user")
         if not user:
             return self.inner(scope)
