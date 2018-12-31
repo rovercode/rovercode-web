@@ -54,6 +54,11 @@
         <button class="btn btn-secondary" id="download-env">{% trans "Download Credentials" %}</button>
       </div>
     </div>
+    <div class="row">
+      <div class="col-md-12">
+        <button class="btn btn-secondary" onclick="location.href = '{% url 'realtime:debug-room' room_name=client_id %}';" id="debug-rover">{% trans "Debug" %}</button>
+      </div>
+    </div>
   {% endif %}
 {% endblock content %}
 

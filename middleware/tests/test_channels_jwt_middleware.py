@@ -1,6 +1,5 @@
 """Channels JWT Middleware test models."""
 from unittest.mock import MagicMock, patch
-from django.contrib.auth.models import AnonymousUser
 from test_plus.test import TestCase
 
 
@@ -46,7 +45,7 @@ class TestChannelsJwtMiddleware(TestCase):
             validate.return_value = {"user": None}
             uut.__call__(scope)
             inner.assert_called_once_with(scope)
-            self.assertEqual(AnonymousUser, scope["user"])
+            self.assertFalse("user" in scope)
 
     def test__call__no_cookie(self):
         """Test the __call__ method if the needed cookie is absent."""
@@ -58,7 +57,7 @@ class TestChannelsJwtMiddleware(TestCase):
             validate.return_value = {"user": None}
             uut.__call__(scope)
             inner.assert_called_once_with(scope)
-            self.assertEqual(AnonymousUser, scope["user"])
+            self.assertFalse("user" in scope)
 
     def test__call__no_cookies(self):
         """Test the __call__ method if there are no cookies at all."""
@@ -71,4 +70,4 @@ class TestChannelsJwtMiddleware(TestCase):
             validate.return_value = {"user": None}
             uut.__call__(scope)
             inner.assert_called_once_with(scope)
-            self.assertEqual(AnonymousUser, scope["user"])
+            self.assertFalse("user" in scope)
