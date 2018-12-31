@@ -40,7 +40,8 @@
         var messageInputDom = document.querySelector('#chat-message-input');
         var message = messageInputDom.value;
         chatSocket.send(JSON.stringify({
-            'debug-message': message
+            'type': 'debug-message',
+            'message': message
         }));
 
         messageInputDom.value = '';
