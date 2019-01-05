@@ -1,6 +1,7 @@
 """Channels JWT Middleware test models."""
 from unittest.mock import MagicMock, patch
 from test_plus.test import TestCase
+from rest_framework.exceptions import ValidationError
 
 
 from middleware.channels_jwt_middleware import ChannelsJwtMiddleware
@@ -43,6 +44,18 @@ class TestChannelsJwtMiddleware(TestCase):
         with patch('rest_framework_jwt.serializers.'
                    'VerifyJSONWebTokenSerializer.validate') as validate:
             validate.return_value = {"user": None}
+            uut.__call__(scope)
+            inner.assert_called_once_with(scope)
+            self.assertFalse("user" in scope)
+
+    def test__call__validation_error(self):
+        """Test the __call__ method when a jwt that does not authorize."""
+        inner = MagicMock()
+        uut = ChannelsJwtMiddleware(inner)
+        scope = {"cookies": {"auth_jwt": "foobar"}}
+        with patch('rest_framework_jwt.serializers.'
+                   'VerifyJSONWebTokenSerializer.validate') as validate:
+            validate.side_effect = ValidationError()
             uut.__call__(scope)
             inner.assert_called_once_with(scope)
             self.assertFalse("user" in scope)
