@@ -38,7 +38,7 @@ deploy:
     deployment_group: alpha-rovercode-web
     on:
       repo: rovercode/rovercode-web
-      branch: development
+      branch: alpha
   - provider: codedeploy
     access_key_id: AKIAIIORSR4VN3YQY2YQ
     secret_access_key:
