@@ -60,7 +60,8 @@
         chatSocket.send(JSON.stringify({
           'type': 'motor-command',
           'motor-id': 'left-motor',
-          'motor-value': 80
+          'motor-value': 80,
+          'unit': 'percent'
         }));
     };
 
@@ -68,7 +69,8 @@
         chatSocket.send(JSON.stringify({
           'type': 'motor-command',
           'motor-id': 'right-motor',
-          'motor-value': 80
+          'motor-value': 80,
+          'unit': 'percent'
         }));
     };
 
@@ -76,7 +78,8 @@
         chatSocket.send(JSON.stringify({
           'type': 'motor-command',
           'motor-id': 'left-motor',
-          'motor-value': 0
+          'motor-value': 0,
+          'unit': 'percent'
         }));
     };
 
@@ -84,7 +87,8 @@
         chatSocket.send(JSON.stringify({
           'type': 'motor-command',
           'motor-id': 'right-motor',
-          'motor-value': 0
+          'motor-value': 0,
+          'unit': 'percent'
         }));
     };
 </script>
