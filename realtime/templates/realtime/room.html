@@ -4,13 +4,26 @@
 <head>
     <meta charset="utf-8"/>
     <title>Rover Realtime Debug</title>
+    <style>
+      div {
+        margin-bottom: 4em;
+      }
+    </style>
 </head>
 <body>
     <h1>Rover Realtime Debug</h1>
     <h2>Rover client id: {{ room_name_json }}</h2>
-    <textarea id="chat-log" cols="100" rows="20"></textarea><br/>
-    <input id="chat-message-input" type="text" size="100"/><br/>
-    <input id="chat-message-submit" type="button" value="Send"/>
+    <div>
+      <textarea id="chat-log" cols="100" rows="20"></textarea><br/>
+      <input id="chat-message-input" type="text" size="100"/><br/>
+      <input id="chat-message-submit" type="button" value="Send custom message"/>
+    </div>
+    <div>
+      <input id="left-motor-on" type="button" value="Test left motor on"/>
+      <input id="left-motor-off" type="button" value="Test left motor off"/>
+      <input id="right-motor-on" type="button" value="Test right motor on"/>
+      <input id="right-motor-off" type="button" value="Test right motor off"/>
+    </div>
 </body>
 <script>
     var roomName = {{ room_name_json }};
@@ -39,12 +52,44 @@
     document.querySelector('#chat-message-submit').onclick = function(e) {
         var messageInputDom = document.querySelector('#chat-message-input');
         var message = messageInputDom.value;
-        chatSocket.send(JSON.stringify({
-            'type': 'debug-message',
-            'message': message
-        }));
-
+        chatSocket.send(message);
         messageInputDom.value = '';
+    };
+
+    document.querySelector('#left-motor-on').onclick = function(e) {
+        chatSocket.send(JSON.stringify({
+          'type': 'motor-command',
+          'motor-id': 'left-motor',
+          'motor-value': 80,
+          'unit': 'percent'
+        }));
+    };
+
+    document.querySelector('#right-motor-on').onclick = function(e) {
+        chatSocket.send(JSON.stringify({
+          'type': 'motor-command',
+          'motor-id': 'right-motor',
+          'motor-value': 80,
+          'unit': 'percent'
+        }));
+    };
+
+    document.querySelector('#left-motor-off').onclick = function(e) {
+        chatSocket.send(JSON.stringify({
+          'type': 'motor-command',
+          'motor-id': 'left-motor',
+          'motor-value': 0,
+          'unit': 'percent'
+        }));
+    };
+
+    document.querySelector('#right-motor-off').onclick = function(e) {
+        chatSocket.send(JSON.stringify({
+          'type': 'motor-command',
+          'motor-id': 'right-motor',
+          'motor-value': 0,
+          'unit': 'percent'
+        }));
     };
 </script>
 </html>
