@@ -66,7 +66,7 @@ async def test_rover_consumer_no_user():
 @pytest.mark.asyncio
 async def test_rover_consumer_nonexistent_client_id():
     """Test trying to connect to a nonexistent rover."""
-    user = User.objects.create(id=MOCK_USER_ID+1)
+    user = User.objects.create(id=MOCK_USER_ID + 1)
     oauth_app = Application.objects.create(
         user=user,
         authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS,
@@ -95,7 +95,7 @@ async def test_rover_consumer_nonexistent_client_id():
 @pytest.mark.asyncio
 async def test_rover_consumer_disallowed_user():
     """Test trying to connect to a rover the user doesn't own."""
-    user = User.objects.create(id=MOCK_USER_ID+1)
+    user = User.objects.create(id=MOCK_USER_ID + 1)
     oauth_app = Application.objects.create(
         user=user,
         authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS,
