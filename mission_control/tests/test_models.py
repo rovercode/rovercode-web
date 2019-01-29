@@ -12,8 +12,7 @@ class TestRover(TestCase):
         user = self.make_user()
         rover = Rover.objects.create(
             name='rover',
-            owner=user,
-            local_ip='8.8.8.8'
+            owner=user
         )
         self.assertEqual(str(rover), 'rover')
 

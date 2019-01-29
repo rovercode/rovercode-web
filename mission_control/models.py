@@ -10,7 +10,7 @@ class Rover(models.Model):
     name = models.CharField(null=False, max_length=25)
     owner = models.ForeignKey(User)
     oauth_application = models.ForeignKey(Application, blank=True, null=True)
-    local_ip = models.CharField(max_length=15)
+    local_ip = models.CharField(max_length=15, null=True)
     last_checkin = models.DateTimeField(auto_now=True)
     left_forward_pin = models.CharField(
         null=False, default='XIO-P0', max_length=25)
