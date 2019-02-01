@@ -11,6 +11,7 @@ from urllib.parse import urlencode
 
 from oauth2_provider.models import Application
 from mission_control.models import Rover, BlockDiagram
+from rovercode_web.users.models import User
 
 
 class BaseAuthenticatedTestCase(TestCase):
@@ -56,6 +57,18 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         checkin_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 200)
         self.assertGreater(checkin_time, creation_time)
+
+    def test_rover_create_with_shared_user(self):
+        """Test the rover registration interface."""
+        shared_user = User.objects.create()
+        self.client.login(username='administrator', password='password')
+        rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10', 'shared_users': shared_user.id}
+
+        # Create the rover
+        response = self.client.post(
+            reverse('api:v1:rover-list'), rover_info)
+        self.assertEqual(response.data['shared_users'], [shared_user.id])
+        self.assertEqual(response.status_code, 201)
 
     def test_rover(self):
         """Test the rover view displays the correct items."""

@@ -38,8 +38,14 @@ class RoverSerializer(serializers.ModelSerializer):
             client_type=Application.CLIENT_CONFIDENTIAL,
             name=name
         )
-        return Rover.objects.create(oauth_application=oauth_application,
+        shared_users = validated_data.pop('shared_users', None)
+        rover = Rover.objects.create(oauth_application=oauth_application,
                                     **validated_data)
+        if shared_users:
+            rover.shared_users.set(shared_users)
+            rover.save()
+
+        return rover
 
 
 class BlockDiagramSerializer(serializers.ModelSerializer):
