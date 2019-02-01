@@ -34,7 +34,7 @@ urlpatterns = [
         TemplateView.as_view(template_name="password_reset_confirm.html"),
         name='password_reset_confirm'),
     url(r'^docs/', include_docs_urls(
-        title='rovercode API',
+        title='Rovercode API',
         description='API for the rovercode web service.',
         public=False)),
     url(r'^oauth2/', include('oauth2_provider.urls', namespace='oauth2_provider')),

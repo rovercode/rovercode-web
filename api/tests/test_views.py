@@ -37,6 +37,8 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         response = self.client.post(
             reverse('api:v1:rover-list'), rover_info)
         id = response.data['id']
+        self.assertIn('client_id', response.data)
+        self.assertIn('client_secret', response.data)
         creation_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 201)
 
