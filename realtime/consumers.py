@@ -29,7 +29,11 @@ class RoverConsumer(WebsocketConsumer):
             self.close(code=404)
             return
 
-        if rover.owner.id != user.id:
+        print("\n\n\n\n\nShared users:")
+        print(rover.shared_users.all())
+        print(user.id)
+        print("\n\n\n\n")
+        if user != rover.owner and user not in rover.shared_users.all():
             self.close(code=403)
             return
 

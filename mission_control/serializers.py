@@ -24,7 +24,7 @@ class RoverSerializer(serializers.ModelSerializer):
             'left_forward_pin', 'left_backward_pin', 'right_forward_pin',
             'right_backward_pin', 'left_eye_pin', 'right_eye_pin',
             'left_eye_i2c_port', 'left_eye_i2c_addr', 'right_eye_i2c_port',
-            'right_eye_i2c_addr', 'client_id', 'client_secret'
+            'right_eye_i2c_addr', 'client_id', 'client_secret', 'shared_users'
         )
         read_only_fields = ('owner',)
 

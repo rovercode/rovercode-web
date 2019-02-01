@@ -36,6 +36,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         # Create the rover
         response = self.client.post(
             reverse('api:v1:rover-list'), rover_info)
+        print(response)
         id = response.data['id']
         self.assertIn('client_id', response.data)
         self.assertIn('client_secret', response.data)

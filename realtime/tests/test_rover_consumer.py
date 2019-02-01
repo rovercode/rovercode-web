@@ -90,6 +90,35 @@ async def test_rover_consumer_nonexistent_client_id():
     assert code == 404
     assert not connected
 
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.asyncio
+async def test_rover_consumer_shared_user():
+    """Test trying to connect to a rover the user doesn't own."""
+    requesting_user = User.objects.create(username='req_user', id=MOCK_USER_ID)
+    owner = User.objects.create(username='owner', id=MOCK_USER_ID + 1)
+    oauth_app = Application.objects.create(
+        user=owner,
+        authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+        client_type=Application.CLIENT_CONFIDENTIAL,
+        name='rover'
+    )
+    rover = Rover.objects.create(
+        name='rover',
+        owner=owner,
+        local_ip='8.8.8.8',
+        oauth_application=oauth_app,
+    )
+    rover.shared_users.set([requesting_user])
+    application = MockAuthMiddleware(URLRouter([
+        url(r'^ws/realtime/(?P<room_name>[^/]+)/$', RoverConsumer),
+    ]))
+    communicator = WebsocketCommunicator(
+        application,
+        "/ws/realtime/{}/".format(oauth_app.client_id)
+    )
+    connected, _ = await communicator.connect()
+    assert connected
+
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio

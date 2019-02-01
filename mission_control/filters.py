@@ -14,4 +14,4 @@ class RoverFilter(FilterSet):
         """Meta class."""
 
         model = Rover
-        fields = ['name', 'client_id']
+        fields = ['name', 'client_id', 'shared_users']
