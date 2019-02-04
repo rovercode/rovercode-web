@@ -30,10 +30,10 @@ class RoverSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Create an oauth application when the Rover is created."""
-        user = validated_data.get('user')
+        owner = validated_data.get('owner')
         name = validated_data.get('name')
         oauth_application = Application.objects.create(
-            user=user,
+            user=owner,
             authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS,
             client_type=Application.CLIENT_CONFIDENTIAL,
             name=name

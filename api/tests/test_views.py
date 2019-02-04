@@ -42,6 +42,9 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         creation_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 201)
 
+        application = Application.objects.get(client_id=response.data['client_id'])
+        self.assertEqual(application.user.id, self.admin.id)
+
         # Try and fail to create the same rover again
         with self.assertRaises(IntegrityError):
             self.client.post(reverse('api:v1:rover-list'), rover_info)
