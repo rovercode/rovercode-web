@@ -6,7 +6,6 @@ import json
 
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
-from django.db.utils import IntegrityError
 from urllib.parse import urlencode
 
 from oauth2_provider.models import Application
@@ -42,9 +41,12 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         creation_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 201)
 
+        application = Application.objects.get(client_id=response.data['client_id'])
+        self.assertEqual(application.user.id, self.admin.id)
+
         # Try and fail to create the same rover again
-        with self.assertRaises(IntegrityError):
-            self.client.post(reverse('api:v1:rover-list'), rover_info)
+        response = self.client.post(reverse('api:v1:rover-list'), rover_info)
+        self.assertEqual(response.status_code, 400)
 
         # Update the rover
         response = self.client.put(
