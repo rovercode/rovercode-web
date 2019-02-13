@@ -1,18 +1,10 @@
 """Mission Control models."""
 import json
 
-from django.core.exceptions import ValidationError
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from oauth2_provider.models import Application
 from rovercode_web.users.models import User
-
-
-def validate_json(value):
-    """Validate that the value is JSON."""
-    try:
-        json.loads(value)
-    except ValueError:
-        raise ValidationError('Invalid JSON')
 
 
 class Rover(models.Model):
@@ -30,8 +22,7 @@ class Rover(models.Model):
     oauth_application = models.ForeignKey(Application, blank=True, null=True)
     local_ip = models.CharField(max_length=15, null=True)
     last_checkin = models.DateTimeField(auto_now=True)
-    config = models.CharField(default=json.dumps(DEFAULT_CONFIG),
-                              max_length=10000, validators=[validate_json])
+    config = JSONField(default=json.dumps(DEFAULT_CONFIG))
 
     class Meta:
         """Meta class."""
