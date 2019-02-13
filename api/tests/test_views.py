@@ -40,6 +40,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         self.assertIn('client_secret', response.data)
         creation_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['config'], json.dumps(Rover.DEFAULT_CONFIG))
 
         application = Application.objects.get(client_id=response.data['client_id'])
         self.assertEqual(application.user.id, self.admin.id)
@@ -57,6 +58,18 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         checkin_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 200)
         self.assertGreater(checkin_time, creation_time)
+
+    def test_rover_create_invalid_config(self):
+        """Test the rover registration interface."""
+        self.client.login(username='administrator', password='password')
+        rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10',
+                      'config': 'not-valid-json'}
+
+        # Create the rover
+        response = self.client.post(
+            reverse('api:v1:rover-list'), rover_info)
+        self.assertEqual(response.status_code, 400)
+
 
     def test_rover(self):
         """Test the rover view displays the correct items."""

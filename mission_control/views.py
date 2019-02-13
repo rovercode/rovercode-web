@@ -3,11 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.views.decorators.csrf import ensure_csrf_cookie
-from oauth2_provider.models import Application
 from rest_framework.renderers import JSONRenderer
 
-from .forms import RoverForm
-from .models import Rover, BlockDiagram
+from .models import BlockDiagram
 from .serializers import BlockDiagramSerializer
 
 
@@ -28,49 +26,3 @@ def bd_list(request):
     """Block diagram list view for the logged in user."""
     bds = BlockDiagram.objects.filter(user=request.user.id)
     return render(request, 'bd_list.html', {'bd_list': bds})
-
-
-@login_required
-def rover_list(request):
-    """Rover list view for the logged in user."""
-    rovers = Rover.objects.filter(owner=request.user.id)
-    return render(request, 'rover_list.html', {'rover_list': rovers})
-
-
-@login_required
-def rover_settings(request, pk=None):
-    """Rover settings view for the specific rover."""
-    if pk:
-        rover = get_object_or_404(Rover, owner=request.user, pk=pk)
-    else:
-        rover = Rover(owner=request.user)
-    if request.method == 'POST':
-        form = RoverForm(instance=rover, data=request.POST)
-
-        if form.is_valid():
-            form.save()
-            if not rover.oauth_application:
-                rover.oauth_application = _create_app(
-                    request.user,
-                    rover.name
-                )
-            rover.save()
-
-    form = RoverForm(instance=rover)
-
-    oa = rover.oauth_application
-    return render(request, 'rover_settings.html', {
-        'name': rover.name,
-        'client_id': oa.client_id if oa else "",
-        'client_secret': oa.client_secret if oa else "",
-        'form': form
-    })
-
-
-def _create_app(user, name):
-    return Application.objects.create(
-        user=user,
-        authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS,
-        client_type=Application.CLIENT_CONFIDENTIAL,
-        name=name
-    )
