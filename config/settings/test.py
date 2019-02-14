@@ -5,6 +5,8 @@ Test settings
 - Used to run tests fast on the continuous integration server and locally
 '''
 
+import os
+
 from .common import *  # noqa
 
 # CHANNEL LAYERS CONFIGURATION
@@ -67,3 +69,15 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
         'django.template.loaders.app_directories.Loader',
     ]),
 ]
+
+if 'TRAVIS' in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE':   'django.db.backends.postgresql_psycopg2',
+            'NAME':     'travisci',
+            'USER':     'postgres',
+            'PASSWORD': '',
+            'HOST':     'localhost',
+            'PORT':     '',
+        }
+    }
