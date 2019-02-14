@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 from __future__ import absolute_import, unicode_literals
 import datetime
+import os
 
 import environ
 from urllib.parse import urlparse
@@ -114,9 +115,21 @@ MANAGERS = ADMINS
 # DATABASE CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-DATABASES = {
-    'default': env.db('DATABASE_URL', default='postgres:///rovercode_web'),
-}
+if 'TRAVIS' in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE':   'django.db.backends.postgresql_psycopg2',
+            'NAME':     'travisci',
+            'USER':     'postgres',
+            'PASSWORD': '',
+            'HOST':     'localhost',
+            'PORT':     '',
+        }
+    }
+else:
+    DATABASES = {
+        'default': env.db('DATABASE_URL', default='postgres:///rovercode_web'),
+    }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 if env.bool('POSTGRES_USE_AWS_SSL', False):
