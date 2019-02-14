@@ -1,6 +1,8 @@
 sudo: true
 services:
 - postgresql
+addons:
+  postgresql: "9.4"
 env:
   - POSTGRES_HOST=localhost POSTGRES_URL=postgres POSTGRES_PASSWORD= POSTGRES_USE_AWS_SSL=false
 before_install:
