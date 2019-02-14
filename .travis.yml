@@ -1,4 +1,6 @@
 sudo: true
+services:
+- postgresql
 before_install:
 - sudo apt-get update -qq
 - sudo apt-get install -qq build-essential gettext python-dev zlib1g-dev libpq-dev
@@ -16,6 +18,8 @@ install:
 - pip install pipenv==11.10.1
 - pip install coveralls
 - pipenv install --dev
+before_script:
+- psql -c 'create database travis_ci_test;' -U postgres
 script:
 - py.test --cov-report=
 - prospector
