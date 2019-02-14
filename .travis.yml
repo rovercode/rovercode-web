@@ -1,6 +1,11 @@
 sudo: true
 services:
 - postgresql
+env:
+  - POSTGRES_HOST=localhost
+  - POSTGRES_URL=postgres
+  - POSTGRES_PASSWORD=
+  - POSTGRES_USE_AWS_SSL=false
 before_install:
 - sudo apt-get update -qq
 - sudo apt-get install -qq build-essential gettext python-dev zlib1g-dev libpq-dev
