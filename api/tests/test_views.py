@@ -31,16 +31,17 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         """Test the rover registration interface."""
         self.client.login(username='administrator', password='password')
         rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10'}
-
+        default_rover_config = {'some_setting': 'foobar'}
         # Create the rover
-        response = self.client.post(
-            reverse('api:v1:rover-list'), rover_info)
+        with self.settings(DEFAULT_ROVER_CONFIG=default_rover_config):
+            response = self.client.post(
+                reverse('api:v1:rover-list'), rover_info)
         id = response.data['id']
         self.assertIn('client_id', response.data)
         self.assertIn('client_secret', response.data)
         creation_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data['config'], json.dumps(Rover.DEFAULT_CONFIG))
+        self.assertEqual(response.data['config'], default_rover_config)
 
         application = Application.objects.get(client_id=response.data['client_id'])
         self.assertEqual(application.user.id, self.admin.id)
@@ -58,6 +59,18 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         checkin_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 200)
         self.assertGreater(checkin_time, creation_time)
+
+    def test_rover_create_custom_config(self):
+        """Test the rover registration with invalid config."""
+        self.client.login(username='administrator', password='password')
+        config = {'some_field': True}
+        rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10',
+                      'config': json.dumps(config)}
+        # Create the rover
+        response = self.client.post(
+            reverse('api:v1:rover-list'), rover_info)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['config'], config)
 
     def test_rover_create_invalid_config(self):
         """Test the rover registration with invalid config."""
