@@ -340,3 +340,6 @@ SOCIAL_CALLBACK_URL = env(
     'SOCIAL_CALLBACK_URL',
     default='http://localhost:8080/accounts/login/callback/{service}'
 )
+
+# Loads the default rover config
+DEFAULT_ROVER_CONFIG = env.json('DEFAULT_ROVER_CONFIG', {'no_default_specified': True})
