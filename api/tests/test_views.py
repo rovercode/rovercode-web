@@ -61,7 +61,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         self.assertGreater(checkin_time, creation_time)
 
     def test_rover_create_custom_config(self):
-        """Test the rover registration with invalid config."""
+        """Test the rover registration with a custom config."""
         self.client.login(username='administrator', password='password')
         config = {'some_field': True}
         rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10',
