@@ -57,7 +57,6 @@ LOCAL_APPS = (
     'rovercode_web.users.apps.UsersConfig',
     # Your stuff: custom apps go here
     'mission_control.apps.MissionControlConfig',
-    'rovercode_web.blog.apps.BlogConfig',
     'api.apps.ApiConfig',
     'authorize.apps.AuthorizeConfig',
 )
