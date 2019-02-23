@@ -6,6 +6,7 @@ import json
 
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
+from rest_framework.test import APIClient
 from urllib.parse import urlencode
 
 from oauth2_provider.models import Application
@@ -22,6 +23,23 @@ class BaseAuthenticatedTestCase(TestCase):
             email='admin@example.com',
             password='password'
         )
+        self.client = APIClient()
+
+    def authenticate(self):
+        """Authenticate the test client."""
+        credentials = {
+            'username': 'administrator',
+            'password': 'password',
+        }
+        response = self.client.post(
+            reverse('api:api-token-auth'),
+            data=json.dumps(credentials),
+            content_type='application/json')
+
+        self.assertEqual(200, response.status_code)
+
+        self.client.credentials(
+            HTTP_AUTHORIZATION='JWT {0}'.format(response.json()['token']))
 
 
 class TestRoverViewSet(BaseAuthenticatedTestCase):
@@ -29,7 +47,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
 
     def test_rover_create(self):
         """Test the rover registration interface."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10'}
         default_rover_config = {'some_setting': 'foobar'}
         # Create the rover
@@ -62,7 +80,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
 
     def test_rover_create_custom_config(self):
         """Test the rover registration with a custom config."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         config = {'some_field': True}
         rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10',
                       'config': json.dumps(config)}
@@ -74,7 +92,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
 
     def test_rover_create_invalid_config(self):
         """Test the rover registration with invalid config."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10',
                       'config': 'not-valid-json'}
 
@@ -86,7 +104,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
 
     def test_rover(self):
         """Test the rover view displays the correct items."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         Rover.objects.create(
             name='rover',
             owner=self.admin,
@@ -106,7 +124,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
 
     def test_rover_name_filter(self):
         """Test the rover view filters correctly on name."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         Rover.objects.create(
             name='rover',
             owner=self.admin,
@@ -127,7 +145,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
 
     def test_rover_client_id_filter(self):
         """Test the rover view filters correctly on oauth application client id."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         Rover.objects.create(
             name='rover',
             owner=self.admin,
@@ -169,7 +187,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 
     def test_bd(self):
         """Test the block diagram API view displays the correct items."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         user = self.make_user()
         bd1 = BlockDiagram.objects.create(
             user=self.admin,
@@ -195,7 +213,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 
     def test_bd_user_filter(self):
         """Test the block diagram API view filters on user correctly."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         user1 = self.make_user('user1')
         BlockDiagram.objects.create(
             user=self.admin,
@@ -224,7 +242,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 
     def test_bd_create(self):
         """Test creating block diagram sets user."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         data = {
             'name': 'test',
             'content': '<xml></xml>'
@@ -237,7 +255,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 
     def test_bd_update_as_valid_user(self):
         """Test updating block diagram as owner."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         bd = BlockDiagram.objects.create(
             user=self.admin,
             name='test1',
@@ -256,7 +274,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 
     def test_bd_update_as_invalid_user(self):
         """Test updating block diagram as another user."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         user = self.make_user()
         bd = BlockDiagram.objects.create(
             user=user,

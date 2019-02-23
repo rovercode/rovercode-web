@@ -24,8 +24,6 @@ urlpatterns = [
 
     # Your stuff: custom urls includes go here
     url(r'^realtime/', include('realtime.urls', namespace='realtime')),
-    url(r'^mission-control/', include('mission_control.urls', namespace='mission-control')),
-    url(r'^blog/', include('rovercode_web.blog.urls', namespace='blog')),
     url(r'^api/', include('api.urls', namespace='api')),
     url(r'^api-auth/',
         include('rest_framework.urls', namespace='rest_framework')),
@@ -35,8 +33,7 @@ urlpatterns = [
         name='password_reset_confirm'),
     url(r'^docs/', include_docs_urls(
         title='Rovercode API',
-        description='API for the rovercode web service.',
-        public=False)),
+        description='API for the rovercode web service.')),
     url(r'^oauth2/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

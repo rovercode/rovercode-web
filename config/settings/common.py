@@ -57,7 +57,6 @@ LOCAL_APPS = (
     'rovercode_web.users.apps.UsersConfig',
     # Your stuff: custom apps go here
     'mission_control.apps.MissionControlConfig',
-    'rovercode_web.blog.apps.BlogConfig',
     'api.apps.ApiConfig',
     'authorize.apps.AuthorizeConfig',
 )
@@ -72,7 +71,6 @@ MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
@@ -302,8 +300,6 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
     ),
 }
 
