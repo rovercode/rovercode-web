@@ -33,8 +33,7 @@ urlpatterns = [
         name='password_reset_confirm'),
     url(r'^docs/', include_docs_urls(
         title='Rovercode API',
-        description='API for the rovercode web service.',
-        public=False)),
+        description='API for the rovercode web service.')),
     url(r'^oauth2/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
