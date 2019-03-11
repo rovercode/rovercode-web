@@ -13,7 +13,7 @@ from rest_framework.documentation import include_docs_urls
 urlpatterns = [
     # User management
     url(r'^users/', include('rovercode_web.users.urls', namespace='users')),
-    url(r'^accounts/', include('allauth.urls')),
+    url(r'^authorize/', include('allauth.urls')),
 
     url(r'^realtime/', include('realtime.urls', namespace='realtime')),
     url(r'^api/', include('api.urls', namespace='api')),
