@@ -1,7 +1,7 @@
 """API views."""
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions, serializers
 
+from mission_control.filters import BlockDiagramFilter
 from mission_control.filters import RoverFilter
 from mission_control.models import Rover, BlockDiagram
 from mission_control.serializers import RoverSerializer, BlockDiagramSerializer
@@ -32,8 +32,10 @@ class RoverViewSet(viewsets.ModelViewSet):
 
     serializer_class = RoverSerializer
     permission_classes = (permissions.IsAuthenticated, )
-    filter_backends = (DjangoFilterBackend,)
     filter_class = RoverFilter
+    ordering_fields = ('name',)
+    ordering = ('name',)
+    search_fields = ('name',)
 
     def get_queryset(self):
         """List of rovers for the user."""
@@ -71,8 +73,10 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
     queryset = BlockDiagram.objects.all()
     serializer_class = BlockDiagramSerializer
     permission_classes = (permissions.IsAuthenticated, )
-    filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('user', 'name')
+    filter_class = BlockDiagramFilter
+    ordering_fields = ('user', 'name')
+    ordering = ('name',)
+    search_fields = ('name',)
 
     def perform_create(self, serializer):
         """Perform the create operation."""
