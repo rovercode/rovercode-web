@@ -238,6 +238,31 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(
             response.json()['results'][0]['content'], '<xml></xml>')
 
+    def test_bd_user_exclude_filter(self):
+        """Test the block diagram API view filters on user exclude correctly."""
+        self.authenticate()
+        user1 = self.make_user('user1')
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        BlockDiagram.objects.create(
+            user=user1,
+            name='test2',
+            content='<xml></xml>'
+        )
+        response = self.get(
+            reverse('api:v1:blockdiagram-list') +
+            '?user__not=' + str(user1.id))
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()['results']))
+        self.assertEqual(response.json()['results'][0]['id'], bd.id)
+        self.assertEqual(response.json()['results'][0]['user'], self.admin.id)
+        self.assertEqual(response.json()['results'][0]['name'], 'test1')
+        self.assertEqual(
+            response.json()['results'][0]['content'], '<xml></xml>')
+
     def test_bd_not_logged_in(self):
         """Test the block diagram view denies unauthenticated user."""
         response = self.get(reverse('api:v1:blockdiagram-list'))
