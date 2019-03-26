@@ -56,7 +56,7 @@ class TestApiApps(TestCase):
             HTTP_AUTHORIZATION='Bearer {0}'.format(access_token))
 
         self.assertEqual(200, response.status_code)
-        self.assertEqual(1, len(response.json()))
-        self.assertEqual(response.json()[0]['name'], 'rover')
-        self.assertEqual(response.json()[0]['owner'], admin.id)
-        self.assertEqual(response.json()[0]['local_ip'], '8.8.8.8')
+        self.assertEqual(1, len(response.json()['results']))
+        self.assertEqual(response.json()['results'][0]['name'], 'rover')
+        self.assertEqual(response.json()['results'][0]['owner'], admin.id)
+        self.assertEqual(response.json()['results'][0]['local_ip'], '8.8.8.8')
