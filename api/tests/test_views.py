@@ -117,6 +117,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         )
         response = self.get(reverse('api:v1:rover-list'))
         self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
         self.assertEqual(1, len(response.json()['results']))
         self.assertEqual(response.json()['results'][0]['name'], 'rover')
         self.assertEqual(response.json()['results'][0]['owner'], self.admin.id)
@@ -138,6 +139,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         response = self.get(
             reverse('api:v1:rover-list') + '?name=' + rover2.name)
         self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
         self.assertEqual(1, len(response.json()['results']))
         self.assertEqual(response.json()['results'][0]['name'], 'rover2')
         self.assertEqual(response.json()['results'][0]['owner'], self.admin.id)
@@ -171,6 +173,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         response = self.get(
             reverse('api:v1:rover-list') + '?client_id=' + rover2.oauth_application.client_id)
         self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
         self.assertEqual(1, len(response.json()['results']))
         self.assertEqual(response.json()['results'][0]['name'], 'rover2')
         self.assertEqual(response.json()['results'][0]['owner'], self.admin.id)
@@ -201,6 +204,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         )
         response = self.get(reverse('api:v1:blockdiagram-list'))
         self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
         self.assertEqual(2, len(response.json()['results']))
         self.assertEqual(response.json()['results'][0]['id'], bd1.id)
         self.assertEqual(response.json()['results'][0]['user'], self.admin.id)
@@ -231,6 +235,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             reverse('api:v1:blockdiagram-list') +
             '?user=' + str(user1.id))
         self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
         self.assertEqual(1, len(response.json()['results']))
         self.assertEqual(response.json()['results'][0]['id'], bd.id)
         self.assertEqual(response.json()['results'][0]['user'], user1.id)
@@ -256,6 +261,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             reverse('api:v1:blockdiagram-list') +
             '?user__not=' + str(user1.id))
         self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
         self.assertEqual(1, len(response.json()['results']))
         self.assertEqual(response.json()['results'][0]['id'], bd.id)
         self.assertEqual(response.json()['results'][0]['user'], self.admin.id)
