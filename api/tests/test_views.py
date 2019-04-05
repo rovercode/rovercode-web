@@ -207,12 +207,16 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(1, response.json()['total_pages'])
         self.assertEqual(2, len(response.json()['results']))
         self.assertEqual(response.json()['results'][0]['id'], bd1.id)
-        self.assertEqual(response.json()['results'][0]['user'], self.admin.id)
+        self.assertDictEqual(response.json()['results'][0]['user'], {
+            'username': self.admin.username,
+        })
         self.assertEqual(response.json()['results'][0]['name'], 'test')
         self.assertEqual(
             response.json()['results'][0]['content'], '<xml></xml>')
         self.assertEqual(response.json()['results'][1]['id'], bd2.id)
-        self.assertEqual(response.json()['results'][1]['user'], user.id)
+        self.assertDictEqual(response.json()['results'][1]['user'], {
+            'username': user.username,
+        })
         self.assertEqual(response.json()['results'][1]['name'], 'test1')
         self.assertEqual(
             response.json()['results'][1]['content'], '<xml></xml>')
@@ -238,7 +242,9 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(1, response.json()['total_pages'])
         self.assertEqual(1, len(response.json()['results']))
         self.assertEqual(response.json()['results'][0]['id'], bd.id)
-        self.assertEqual(response.json()['results'][0]['user'], user1.id)
+        self.assertDictEqual(response.json()['results'][0]['user'], {
+            'username': user1.username,
+        })
         self.assertEqual(response.json()['results'][0]['name'], 'test2')
         self.assertEqual(
             response.json()['results'][0]['content'], '<xml></xml>')
@@ -264,7 +270,9 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(1, response.json()['total_pages'])
         self.assertEqual(1, len(response.json()['results']))
         self.assertEqual(response.json()['results'][0]['id'], bd.id)
-        self.assertEqual(response.json()['results'][0]['user'], self.admin.id)
+        self.assertDictEqual(response.json()['results'][0]['user'], {
+            'username': self.admin.username,
+        })
         self.assertEqual(response.json()['results'][0]['name'], 'test1')
         self.assertEqual(
             response.json()['results'][0]['content'], '<xml></xml>')

@@ -1,4 +1,5 @@
 """Mission Control serializers."""
+from django.contrib.auth import get_user_model
 from django.db.utils import IntegrityError
 from rest_framework import serializers
 from oauth2_provider.models import Application
@@ -45,12 +46,23 @@ class RoverSerializer(serializers.ModelSerializer):
                 'There is already a rover with that name')
 
 
+class UserSerializer(serializers.ModelSerializer):
+    """User model serializer."""
+
+    class Meta:
+        """Meta class."""
+
+        model = get_user_model()
+        fields = ('username', )
+
+
 class BlockDiagramSerializer(serializers.ModelSerializer):
     """Block diagram model serializer."""
+
+    user = UserSerializer(read_only=True)
 
     class Meta:
         """Meta class."""
 
         model = BlockDiagram
         fields = '__all__'
-        read_only_fields = ('user',)
