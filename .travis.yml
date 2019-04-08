@@ -21,7 +21,7 @@ install:
 - pip install pip==10.0.1
 - pip install pipenv==11.10.1
 - pip install coveralls
-- pipenv install --dev
+- pipenv install --ignore-pipfile --dev
 before_script:
 - psql -c 'create database travis_ci_test;' -U postgres
 script:
