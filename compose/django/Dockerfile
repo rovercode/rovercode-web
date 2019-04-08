@@ -10,7 +10,7 @@ RUN apk add --no-cache bash ca-certificates wget shadow build-base python3-dev p
     && update-ca-certificates \
     && pip install pip==10.0.1 \
     && pip install pipenv==11.10.1 \
-    && pipenv install --system \
+    && pipenv install --ignore-pipfile --system \
     && apk del --purge build-base python3-dev \
     && groupadd -r django \
     && useradd -r -g django django
