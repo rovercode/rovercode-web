@@ -18,7 +18,7 @@ router.register(r'block-diagrams', views.BlockDiagramViewSet)
 urlpatterns = [
     url(r'^api-token-auth/', obtain_jwt_token, name='api-token-auth'),
     url(r'^api-token-verify/', verify_jwt_token, name='api-token-verify'),
-    url(r'^v1/', include(router.urls, namespace='v1')),
+    url(r'^v1/', include((router.urls, 'api'), namespace='v1')),
     url(r'^$', RedirectView.as_view(
         pattern_name='api:v1:api-root', permanent=False)),
 ]

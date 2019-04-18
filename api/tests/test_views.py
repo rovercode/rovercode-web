@@ -5,7 +5,7 @@ import dateutil.parser
 import json
 
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from rest_framework.test import APIClient
 from urllib.parse import urlencode
 

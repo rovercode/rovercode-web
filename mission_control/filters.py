@@ -10,7 +10,7 @@ from .models import Rover
 class RoverFilter(FilterSet):
     """Filterset for the Rover model."""
 
-    client_id = CharFilter(name='oauth_application__client_id')
+    client_id = CharFilter(field_name='oauth_application__client_id')
 
     class Meta:
         """Meta class."""

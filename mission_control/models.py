@@ -1,6 +1,4 @@
 """Mission Control models."""
-import json
-
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.db import models
@@ -12,11 +10,12 @@ class Rover(models.Model):
     """Attributes to describe a single rover."""
 
     name = models.CharField(null=False, max_length=25)
-    owner = models.ForeignKey(User)
-    oauth_application = models.ForeignKey(Application, blank=True, null=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    oauth_application = models.ForeignKey(
+        Application, blank=True, null=True, on_delete=models.CASCADE)
     local_ip = models.CharField(max_length=15, null=True)
     last_checkin = models.DateTimeField(auto_now=True)
-    config = JSONField(blank=True, default=json.dumps({}))
+    config = JSONField(blank=True, default=dict)
 
     class Meta:
         """Meta class."""
@@ -27,7 +26,7 @@ class Rover(models.Model):
     # pylint: disable=arguments-differ
     def save(self, *args, **kwargs):
         """Set the default config and save the Rover."""
-        if self.config == json.dumps({}):
+        if self.config == {}:
             self.config = settings.DEFAULT_ROVER_CONFIG
         super().save(*args, **kwargs)
 
@@ -39,7 +38,7 @@ class Rover(models.Model):
 class BlockDiagram(models.Model):
     """Attributes to describe a single block diagram."""
 
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.TextField()
     content = models.TextField()
 
