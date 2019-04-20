@@ -1,7 +1,7 @@
 """Realtime test views."""
 from test_plus.test import TestCase
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 
 class TestRealtimeViews(TestCase):

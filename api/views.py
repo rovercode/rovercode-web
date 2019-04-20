@@ -32,7 +32,7 @@ class RoverViewSet(viewsets.ModelViewSet):
 
     serializer_class = RoverSerializer
     permission_classes = (permissions.IsAuthenticated, )
-    filter_class = RoverFilter
+    filterset_class = RoverFilter
     ordering_fields = ('name',)
     ordering = ('name',)
     search_fields = ('name',)
@@ -73,7 +73,7 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
     queryset = BlockDiagram.objects.all()
     serializer_class = BlockDiagramSerializer
     permission_classes = (permissions.IsAuthenticated, )
-    filter_class = BlockDiagramFilter
+    filterset_class = BlockDiagramFilter
     ordering_fields = ('user', 'name')
     ordering = ('name',)
     search_fields = ('name',)

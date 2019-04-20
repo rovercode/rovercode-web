@@ -337,3 +337,8 @@ SOCIAL_CALLBACK_URL = env(
 
 # Loads the default rover config
 DEFAULT_ROVER_CONFIG = env.json('DEFAULT_ROVER_CONFIG', {'no_default_specified': True})
+
+SILENCED_SYSTEM_CHECKS = [
+    # Not using Django admin
+    'admin.E408',
+]
