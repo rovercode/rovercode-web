@@ -6,6 +6,7 @@ from rest_framework.exceptions import ValidationError
 
 from middleware.channels_jwt_middleware import ChannelsJwtMiddleware
 
+
 class TestChannelsJwtMiddleware(TestCase):
     """Test Channels JWT middleware functions."""
 

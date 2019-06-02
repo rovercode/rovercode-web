@@ -17,6 +17,8 @@ services:
       context: .
       dockerfile: ./compose/django/Dockerfile
     user: django
+    ports:
+      - "0.0.0.0:5000:5000"
     depends_on:
       - postgres
       - redis
@@ -28,6 +30,8 @@ services:
       context: .
       dockerfile: ./compose/django/Dockerfile
     user: django
+    ports:
+      - "0.0.0.0:6000:6000"
     depends_on:
       - postgres
       - redis

@@ -57,7 +57,6 @@ LOCAL_APPS = (
     'rovercode_web.users.apps.UsersConfig',
     # Your stuff: custom apps go here
     'mission_control.apps.MissionControlConfig',
-    'rovercode_web.blog.apps.BlogConfig',
     'api.apps.ApiConfig',
     'authorize.apps.AuthorizeConfig',
 )
@@ -72,7 +71,6 @@ MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
@@ -186,9 +184,6 @@ TEMPLATES = [
     },
 ]
 
-# See: http://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
 # STATIC FILE CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-root
@@ -196,12 +191,6 @@ STATIC_ROOT = str(ROOT_DIR('staticfiles'))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = '/static/'
-
-# See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
-STATICFILES_DIRS = (
-    str(APPS_DIR.path('rovercode_web/static')),
-    str(APPS_DIR.path('mission_control/static')),
-)
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = (
@@ -302,9 +291,14 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
     ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.OrderingFilter',
+        'rest_framework.filters.SearchFilter',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'mission_control.pagination.CustomPagination',
+    'PAGE_SIZE': 15,
 }
 
 # SOCIAL ACCOUNT CONFIGURATION
@@ -340,3 +334,11 @@ SOCIAL_CALLBACK_URL = env(
     'SOCIAL_CALLBACK_URL',
     default='http://localhost:8080/accounts/login/callback/{service}'
 )
+
+# Loads the default rover config
+DEFAULT_ROVER_CONFIG = env.json('DEFAULT_ROVER_CONFIG', {'no_default_specified': True})
+
+SILENCED_SYSTEM_CHECKS = [
+    # Not using Django admin
+    'admin.E408',
+]

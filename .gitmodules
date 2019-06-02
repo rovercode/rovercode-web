@@ -1,6 +1,0 @@
-[submodule "blockly"]
-	path = mission_control/static/blockly
-	url = https://github.com/aninternetof/blockly
-[submodule "JS-Interpreter"]
-	path = mission_control/static/JS-Interpreter
-	url = https://github.com/NeilFraser/JS-Interpreter

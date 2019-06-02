@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
-from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views import defaults as default_views
 
@@ -12,32 +11,22 @@ from rest_framework.documentation import include_docs_urls
 
 
 urlpatterns = [
-    url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
-    url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name='about'),
-
-    # Django Admin, use {% url 'admin:index' %}
-    url(settings.ADMIN_URL, admin.site.urls),
-
     # User management
-    url(r'^users/', include('rovercode_web.users.urls', namespace='users')),
-    url(r'^accounts/', include('allauth.urls')),
+    url(r'^users/', include(('rovercode_web.users.urls', 'rovercode_web'), namespace='users')),
+    url(r'^authorize/', include('allauth.urls')),
 
-    # Your stuff: custom urls includes go here
-    url(r'^realtime/', include('realtime.urls', namespace='realtime')),
-    url(r'^mission-control/', include('mission_control.urls', namespace='mission-control')),
-    url(r'^blog/', include('rovercode_web.blog.urls', namespace='blog')),
-    url(r'^api/', include('api.urls', namespace='api')),
+    url(r'^realtime/', include(('realtime.urls', 'realtime'), namespace='realtime')),
+    url(r'^api/', include(('api.urls', 'api'), namespace='api')),
     url(r'^api-auth/',
-        include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^jwt/', include('authorize.urls', namespace='jwt')),
+        include(('rest_framework.urls', 'restframework'), namespace='rest_framework')),
+    url(r'^jwt/', include(('authorize.urls', 'authorize'), namespace='jwt')),
     url(r'^jwt/auth/password-reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',  # noqa
         TemplateView.as_view(template_name="password_reset_confirm.html"),
         name='password_reset_confirm'),
     url(r'^docs/', include_docs_urls(
-        title='rovercode API',
-        description='API for the rovercode web service.',
-        public=False)),
-    url(r'^oauth2/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+        title='Rovercode API',
+        description='API for the rovercode web service.')),
+    url(r'^oauth2/', include(('oauth2_provider.urls', 'oauth2_provider'), namespace='oauth2_provider')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

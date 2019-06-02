@@ -5,8 +5,8 @@ import dateutil.parser
 import json
 
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse
-from django.db.utils import IntegrityError
+from django.urls import reverse
+from rest_framework.test import APIClient
 from urllib.parse import urlencode
 
 from oauth2_provider.models import Application
@@ -23,6 +23,23 @@ class BaseAuthenticatedTestCase(TestCase):
             email='admin@example.com',
             password='password'
         )
+        self.client = APIClient()
+
+    def authenticate(self):
+        """Authenticate the test client."""
+        credentials = {
+            'username': 'administrator',
+            'password': 'password',
+        }
+        response = self.client.post(
+            reverse('api:api-token-auth'),
+            data=json.dumps(credentials),
+            content_type='application/json')
+
+        self.assertEqual(200, response.status_code)
+
+        self.client.credentials(
+            HTTP_AUTHORIZATION='JWT {0}'.format(response.json()['token']))
 
 
 class TestRoverViewSet(BaseAuthenticatedTestCase):
@@ -30,19 +47,26 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
 
     def test_rover_create(self):
         """Test the rover registration interface."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10'}
-
+        default_rover_config = {'some_setting': 'foobar'}
         # Create the rover
-        response = self.client.post(
-            reverse('api:v1:rover-list'), rover_info)
+        with self.settings(DEFAULT_ROVER_CONFIG=default_rover_config):
+            response = self.client.post(
+                reverse('api:v1:rover-list'), rover_info)
         id = response.data['id']
+        self.assertIn('client_id', response.data)
+        self.assertIn('client_secret', response.data)
         creation_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['config'], default_rover_config)
+
+        application = Application.objects.get(client_id=response.data['client_id'])
+        self.assertEqual(application.user.id, self.admin.id)
 
         # Try and fail to create the same rover again
-        with self.assertRaises(IntegrityError):
-            self.client.post(reverse('api:v1:rover-list'), rover_info)
+        response = self.client.post(reverse('api:v1:rover-list'), rover_info)
+        self.assertEqual(response.status_code, 400)
 
         # Update the rover
         response = self.client.put(
@@ -54,9 +78,33 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertGreater(checkin_time, creation_time)
 
+    def test_rover_create_custom_config(self):
+        """Test the rover registration with a custom config."""
+        self.authenticate()
+        config = {'some_field': True}
+        rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10',
+                      'config': json.dumps(config)}
+        # Create the rover
+        response = self.client.post(
+            reverse('api:v1:rover-list'), rover_info)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['config'], config)
+
+    def test_rover_create_invalid_config(self):
+        """Test the rover registration with invalid config."""
+        self.authenticate()
+        rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10',
+                      'config': 'not-valid-json'}
+
+        # Create the rover
+        response = self.client.post(
+            reverse('api:v1:rover-list'), rover_info)
+        self.assertEqual(response.status_code, 400)
+
+
     def test_rover(self):
         """Test the rover view displays the correct items."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         Rover.objects.create(
             name='rover',
             owner=self.admin,
@@ -69,14 +117,15 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         )
         response = self.get(reverse('api:v1:rover-list'))
         self.assertEqual(200, response.status_code)
-        self.assertEqual(1, len(response.json()))
-        self.assertEqual(response.json()[0]['name'], 'rover')
-        self.assertEqual(response.json()[0]['owner'], self.admin.id)
-        self.assertEqual(response.json()[0]['local_ip'], '8.8.8.8')
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(1, len(response.json()['results']))
+        self.assertEqual(response.json()['results'][0]['name'], 'rover')
+        self.assertEqual(response.json()['results'][0]['owner'], self.admin.id)
+        self.assertEqual(response.json()['results'][0]['local_ip'], '8.8.8.8')
 
     def test_rover_name_filter(self):
         """Test the rover view filters correctly on name."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         Rover.objects.create(
             name='rover',
             owner=self.admin,
@@ -90,14 +139,15 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         response = self.get(
             reverse('api:v1:rover-list') + '?name=' + rover2.name)
         self.assertEqual(200, response.status_code)
-        self.assertEqual(1, len(response.json()))
-        self.assertEqual(response.json()[0]['name'], 'rover2')
-        self.assertEqual(response.json()[0]['owner'], self.admin.id)
-        self.assertEqual(response.json()[0]['local_ip'], '8.8.8.8')
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(1, len(response.json()['results']))
+        self.assertEqual(response.json()['results'][0]['name'], 'rover2')
+        self.assertEqual(response.json()['results'][0]['owner'], self.admin.id)
+        self.assertEqual(response.json()['results'][0]['local_ip'], '8.8.8.8')
 
     def test_rover_client_id_filter(self):
         """Test the rover view filters correctly on oauth application client id."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         Rover.objects.create(
             name='rover',
             owner=self.admin,
@@ -123,10 +173,11 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         response = self.get(
             reverse('api:v1:rover-list') + '?client_id=' + rover2.oauth_application.client_id)
         self.assertEqual(200, response.status_code)
-        self.assertEqual(1, len(response.json()))
-        self.assertEqual(response.json()[0]['name'], 'rover2')
-        self.assertEqual(response.json()[0]['owner'], self.admin.id)
-        self.assertEqual(response.json()[0]['local_ip'], '8.8.8.8')
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(1, len(response.json()['results']))
+        self.assertEqual(response.json()['results'][0]['name'], 'rover2')
+        self.assertEqual(response.json()['results'][0]['owner'], self.admin.id)
+        self.assertEqual(response.json()['results'][0]['local_ip'], '8.8.8.8')
 
     def test_rover_not_logged_in(self):
         """Test the rover view denies unauthenticated user."""
@@ -139,7 +190,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 
     def test_bd(self):
         """Test the block diagram API view displays the correct items."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         user = self.make_user()
         bd1 = BlockDiagram.objects.create(
             user=self.admin,
@@ -153,19 +204,26 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         )
         response = self.get(reverse('api:v1:blockdiagram-list'))
         self.assertEqual(200, response.status_code)
-        self.assertEqual(2, len(response.json()))
-        self.assertEqual(response.json()[0]['id'], bd1.id)
-        self.assertEqual(response.json()[0]['user'], self.admin.id)
-        self.assertEqual(response.json()[0]['name'], 'test')
-        self.assertEqual(response.json()[0]['content'], '<xml></xml>')
-        self.assertEqual(response.json()[1]['id'], bd2.id)
-        self.assertEqual(response.json()[1]['user'], user.id)
-        self.assertEqual(response.json()[1]['name'], 'test1')
-        self.assertEqual(response.json()[1]['content'], '<xml></xml>')
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(2, len(response.json()['results']))
+        self.assertEqual(response.json()['results'][0]['id'], bd1.id)
+        self.assertDictEqual(response.json()['results'][0]['user'], {
+            'username': self.admin.username,
+        })
+        self.assertEqual(response.json()['results'][0]['name'], 'test')
+        self.assertEqual(
+            response.json()['results'][0]['content'], '<xml></xml>')
+        self.assertEqual(response.json()['results'][1]['id'], bd2.id)
+        self.assertDictEqual(response.json()['results'][1]['user'], {
+            'username': user.username,
+        })
+        self.assertEqual(response.json()['results'][1]['name'], 'test1')
+        self.assertEqual(
+            response.json()['results'][1]['content'], '<xml></xml>')
 
     def test_bd_user_filter(self):
         """Test the block diagram API view filters on user correctly."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         user1 = self.make_user('user1')
         BlockDiagram.objects.create(
             user=self.admin,
@@ -181,11 +239,43 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             reverse('api:v1:blockdiagram-list') +
             '?user=' + str(user1.id))
         self.assertEqual(200, response.status_code)
-        self.assertEqual(1, len(response.json()))
-        self.assertEqual(response.json()[0]['id'], bd.id)
-        self.assertEqual(response.json()[0]['user'], user1.id)
-        self.assertEqual(response.json()[0]['name'], 'test2')
-        self.assertEqual(response.json()[0]['content'], '<xml></xml>')
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(1, len(response.json()['results']))
+        self.assertEqual(response.json()['results'][0]['id'], bd.id)
+        self.assertDictEqual(response.json()['results'][0]['user'], {
+            'username': user1.username,
+        })
+        self.assertEqual(response.json()['results'][0]['name'], 'test2')
+        self.assertEqual(
+            response.json()['results'][0]['content'], '<xml></xml>')
+
+    def test_bd_user_exclude_filter(self):
+        """Test the block diagram API view filters on user exclude correctly."""
+        self.authenticate()
+        user1 = self.make_user('user1')
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        BlockDiagram.objects.create(
+            user=user1,
+            name='test2',
+            content='<xml></xml>'
+        )
+        response = self.get(
+            reverse('api:v1:blockdiagram-list') +
+            '?user__not=' + str(user1.id))
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(1, len(response.json()['results']))
+        self.assertEqual(response.json()['results'][0]['id'], bd.id)
+        self.assertDictEqual(response.json()['results'][0]['user'], {
+            'username': self.admin.username,
+        })
+        self.assertEqual(response.json()['results'][0]['name'], 'test1')
+        self.assertEqual(
+            response.json()['results'][0]['content'], '<xml></xml>')
 
     def test_bd_not_logged_in(self):
         """Test the block diagram view denies unauthenticated user."""
@@ -194,7 +284,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 
     def test_bd_create(self):
         """Test creating block diagram sets user."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         data = {
             'name': 'test',
             'content': '<xml></xml>'
@@ -207,7 +297,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 
     def test_bd_update_as_valid_user(self):
         """Test updating block diagram as owner."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         bd = BlockDiagram.objects.create(
             user=self.admin,
             name='test1',
@@ -226,7 +316,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 
     def test_bd_update_as_invalid_user(self):
         """Test updating block diagram as another user."""
-        self.client.login(username='administrator', password='password')
+        self.authenticate()
         user = self.make_user()
         bd = BlockDiagram.objects.create(
             user=user,
