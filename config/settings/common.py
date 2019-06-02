@@ -9,8 +9,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/dev/ref/settings/
 """
 from __future__ import absolute_import, unicode_literals
+import datetime
 
 import environ
+from urllib.parse import urlparse
 
 ROOT_DIR = environ.Path(__file__) - 3  # (rovercode_web/config/settings/common.py - 3 = rovercode_web/)
 APPS_DIR = ROOT_DIR
@@ -34,6 +36,7 @@ DJANGO_APPS = (
 
     # Admin
     'django.contrib.admin',
+
 )
 THIRD_PARTY_APPS = (
     'crispy_forms',  # Form layouts
@@ -44,7 +47,8 @@ THIRD_PARTY_APPS = (
     'allauth.socialaccount.providers.google',
     'rest_framework',
     'oauth2_provider',
-    'rest_framework_swagger',
+    'django_filters',
+    'channels',
 )
 
 # Apps specific for this project go here.
@@ -53,8 +57,8 @@ LOCAL_APPS = (
     'rovercode_web.users.apps.UsersConfig',
     # Your stuff: custom apps go here
     'mission_control.apps.MissionControlConfig',
-    'rovercode_web.blog.apps.BlogConfig',
     'api.apps.ApiConfig',
+    'authorize.apps.AuthorizeConfig',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -67,7 +71,6 @@ MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
@@ -152,6 +155,7 @@ TEMPLATES = [
         'DIRS': [
             str(APPS_DIR.path('rovercode_web/templates')),
             str(APPS_DIR.path('rovercode_web/blog/templates')),
+            str(APPS_DIR.path('realtime/templates')),
             str(APPS_DIR.path('mission_control/templates')),
         ],
         'OPTIONS': {
@@ -180,9 +184,6 @@ TEMPLATES = [
     },
 ]
 
-# See: http://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
 # STATIC FILE CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-root
@@ -190,12 +191,6 @@ STATIC_ROOT = str(ROOT_DIR('staticfiles'))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = '/static/'
-
-# See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
-STATICFILES_DIRS = (
-    str(APPS_DIR.path('rovercode_web/static')),
-    str(APPS_DIR.path('mission_control/static')),
-)
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = (
@@ -218,6 +213,11 @@ ROOT_URLCONF = 'config.urls'
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
 WSGI_APPLICATION = 'config.wsgi.application'
 
+ASGI_APPLICATION = 'config.asgi.application'
+
+redis_url = urlparse(env('REDIS_URL', default='redis://127.0.0.1:6379'))
+REDIS_HOST = redis_url.hostname
+REDIS_PORT = redis_url.port
 
 # PASSWORD VALIDATION
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
@@ -288,14 +288,17 @@ OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 # REST FRAMEWORK CONFIGURATION
 # ------------------------------------------------------------------------------
 REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
     ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.OrderingFilter',
+        'rest_framework.filters.SearchFilter',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'mission_control.pagination.CustomPagination',
+    'PAGE_SIZE': 15,
 }
 
 # SOCIAL ACCOUNT CONFIGURATION
@@ -312,3 +315,30 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
+# JWT CONFIGURATION
+# ------------------------------------------------------------------------------
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_SECRET_KEY': env(
+        'JWT_SECRET_KEY',
+        default='ac9fb5054311bfeeefe79fbe31740850'
+    ),
+}
+
+# Enables django-rest-auth to use JWT tokens instead of regular tokens.
+REST_USE_JWT = True
+
+SOCIAL_CALLBACK_URL = env(
+    'SOCIAL_CALLBACK_URL',
+    default='http://localhost:8080/accounts/login/callback/{service}'
+)
+
+# Loads the default rover config
+DEFAULT_ROVER_CONFIG = env.json('DEFAULT_ROVER_CONFIG', {'no_default_specified': True})
+
+SILENCED_SYSTEM_CHECKS = [
+    # Not using Django admin
+    'admin.E408',
+]

@@ -30,6 +30,7 @@ SECRET_KEY = env('DJANGO_SECRET_KEY')
 # This ensures that Django will be able to detect a secure connection
 # properly on Heroku.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = env.bool('DJANGO_USE_X_FORWARDED_HOST', default=True)
 # raven sentry client
 # See https://docs.sentry.io/clients/python/integrations/django/
 INSTALLED_APPS += ('raven.contrib.django.raven_compat', )
@@ -69,7 +70,6 @@ ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['rovercode.com'])
 # END SITE CONFIGURATION
 
 INSTALLED_APPS += ('gunicorn', )
-
 
 # STORAGE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -219,3 +219,14 @@ ADMIN_URL = env('DJANGO_ADMIN_URL')
 # SOCIAL ACCOUNT CONFIGURATION
 # ------------------------------------------------------------------------------
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+
+# CHANNEL LAYERS CONFIGURATION
+# ------------------------------------------------------------------------------
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
+        },
+    },
+}

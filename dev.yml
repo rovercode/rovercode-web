@@ -21,8 +21,9 @@ services:
     depends_on:
       - postgres
     environment:
-      - POSTGRES_USER=rovercode_web
-      - USE_DOCKER=yes
+      POSTGRES_USER: 'rovercode_web'
+      USE_DOCKER: 'yes'
+      DEFAULT_ROVER_CONFIG: '{"left_eye_port": 1, "right_eye_port": 2, "left_motor_port": 3, "right_motor_port": 4}'
     volumes:
       - .:/app
     ports:
@@ -31,6 +32,9 @@ services:
       - postgres
 
       - mailhog
+
+  redis:
+    image: redis:alpine
 
 
 

@@ -1,1 +1,0 @@
-"""Blog tests init."""

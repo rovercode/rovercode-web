@@ -1,4 +1,10 @@
 sudo: true
+services:
+- postgresql
+addons:
+  postgresql: "9.4"
+env:
+  - POSTGRES_HOST=localhost POSTGRES_URL=postgres POSTGRES_PASSWORD= POSTGRES_USE_AWS_SSL=false
 before_install:
 - sudo apt-get update -qq
 - sudo apt-get install -qq build-essential gettext python-dev zlib1g-dev libpq-dev
@@ -12,9 +18,12 @@ before_install:
 - sudo apt-get install -qq libsqlite3-dev libxml2 libxml2-dev libssl-dev libbz2-dev
   wget curl llvm
 install:
-- pip install pipenv
-- pipenv install --dev
-- pipenv install coveralls
+- pip install pip==10.0.1
+- pip install pipenv==11.10.1
+- pip install coveralls
+- pipenv install --ignore-pipfile --dev
+before_script:
+- psql -c 'create database travis_ci_test;' -U postgres
 script:
 - py.test --cov-report=
 - prospector
@@ -49,6 +58,17 @@ deploy:
     on:
       repo: rovercode/rovercode-web
       branch: master
+  - provider: codedeploy
+    access_key_id: AKIAIIORSR4VN3YQY2YQ
+    secret_access_key:
+      secure: NDD69o8NxncxdsqxeEL574kqoQ27jiN0K0U53dUWnjLrl1SVOg+8WRITsyU5e9DS4hzFiKWO5qOkbnh9xoKLRO/sYRxUGOwW5ZKxqkXWHFpyL/uIs2KpzmXRcaJSs3iYmowrbniKI7awH31HIvPM6EbX2EsDlb89nb2C7FNUaAlt+HZ6cwSBJsMBoQPuEe7nw5TDjZBYBhWjFfuK+MJTXc3quB2msXuBsdwvobg0AvPHEWAQl5Yyamj182Zc0DveqEeB0HbBUU2eZDvZTJclL99iBQPGiUuXfU71j5e9dg0VlF+GqY85b9kkYjoFndMWLBqCDL3855KqRIg6ouqsJsvPCTD+s4f0DNvvqt4H30T56gq8IGMqS4WOWpIWFOg/g82H23MFhsrc1IwHkdxsfWwaw/IGq3fVqeahpFqQczViYdvEU0C+JOVHdKNxy8FxU7hvXB/fZSNlPy/1VniBQK6AmzP1uA/wOURG2Oo3l4jzGQ4y7A4k7wFZVSH43iZ5hKCqNcrP5skDeu43/prrCpO0E9XsjiuexCwU2cEeTAKVLrrzBNviKHPrYH8LjwZlAtioxNXSYcAvF7+z8/wLO4lHIGzU/Vi+A55vedhaFLHefWfTJW8i6LrPjTMURzsZ921ZQOKKj4q6Tfcfcl0XkSWQxPgx7qDr12ehw7Q9NZg=
+    revision_type: github
+    region: us-east-2
+    application: alpha-rovercode-web
+    deployment_group: alpha-rovercode-web
+    on:
+      repo: rovercode/rovercode-web
+      branch: alpha
   - provider: s3
     access_key_id: AKIAIIORSR4VN3YQY2YQ
     secret_access_key:
