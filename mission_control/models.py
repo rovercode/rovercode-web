@@ -42,6 +42,12 @@ class BlockDiagram(models.Model):
     name = models.TextField()
     content = models.TextField()
 
+    class Meta:
+        """Meta class."""
+
+        # Don't allow a user to use the same rover name
+        unique_together = ('user', 'name',)
+
     def __str__(self):
         """Convert the model to a human readable string."""
         return self.name
