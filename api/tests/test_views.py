@@ -295,6 +295,51 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
         self.assertEqual(BlockDiagram.objects.last().name, data['name'])
 
+    def test_bd_create_name_exist(self):
+        """Test creating block diagram when name already exists."""
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>'
+        )
+
+        self.authenticate()
+        data = {
+            'name': 'test',
+            'content': '<xml></xml>'
+        }
+        response = self.client.post(
+            reverse('api:v1:blockdiagram-list'), data)
+        self.assertEqual(201, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
+        self.assertEqual(
+            BlockDiagram.objects.last().name, data['name'] + ' (1)')
+
+    def test_bd_create_name_exist_with_number(self):
+        """Test creating block diagram when name already exists with number."""
+        user1 = self.make_user('user1')
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test (1) (2)',
+            content='<xml></xml>'
+        )
+        BlockDiagram.objects.create(
+            user=user1,
+            name='test (1) (3)',
+            content='<xml></xml>'
+        )
+
+        self.authenticate()
+        data = {
+            'name': 'test (1) (2)',
+            'content': '<xml></xml>'
+        }
+        response = self.client.post(
+            reverse('api:v1:blockdiagram-list'), data)
+        self.assertEqual(201, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
+        self.assertEqual(BlockDiagram.objects.last().name, 'test (1) (3)')
+
     def test_bd_update_as_valid_user(self):
         """Test updating block diagram as owner."""
         self.authenticate()
