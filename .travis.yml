@@ -38,7 +38,7 @@ python:
 - '3.6'
 deploy:
   - provider: script
-    script: bash ecr-deploy.sh debugging
+    script: echo "Deploying to ECR" && bash ecr-deploy.sh debugging
     on:
       branch: add-ecr-deploy
   - provider: codedeploy
