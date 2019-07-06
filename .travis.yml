@@ -38,9 +38,17 @@ python:
 - '3.6'
 deploy:
   - provider: script
-    script: bash ecr-deploy.sh debugging
+    script: bash ecr-deploy.sh alpha
     on:
-      branch: add-ecr-deploy
+      branch: alpha
+  - provider: script
+    script: bash ecr-deploy.sh beta
+    on:
+      branch: beta
+  - provider: script
+    script: bash ecr-deploy.sh prod
+    on:
+      branch: prod
   - provider: codedeploy
     access_key_id: AKIAIIORSR4VN3YQY2YQ
     secret_access_key:
