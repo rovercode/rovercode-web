@@ -6,8 +6,7 @@ fi
 
 echo "Deploying $1 image to ECR"
 
-pip install --user awscli
-export PATH=$PATH:$HOME/.local/bin
+pip install awscli
 
 cp ./compose/django/Dockerfile .
 docker build -t 795223264977.dkr.ecr.us-east-2.amazonaws.com/rovercode:$1 .
