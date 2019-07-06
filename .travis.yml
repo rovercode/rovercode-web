@@ -1,6 +1,7 @@
 sudo: true
 services:
 - postgresql
+- docker
 addons:
   postgresql: "9.4"
 env:
@@ -36,6 +37,10 @@ language: python
 python:
 - '3.6'
 deploy:
+  - provider: script
+    script: bash ecr-deploy.sh debugging
+    on:
+      branch: add-ecr-deploy
   - provider: codedeploy
     access_key_id: AKIAIIORSR4VN3YQY2YQ
     secret_access_key:
