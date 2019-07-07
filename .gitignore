@@ -75,5 +75,3 @@ tests.xml
 .cache/
 
 staticfiles/
-
-Dockerfile
