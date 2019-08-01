@@ -128,20 +128,33 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         Rover.objects.create(
             name='rover2',
             owner=other_user,
-            local_ip='8.8.8.8'
+            local_ip='127.0.0.1'
+        )
+        other_rover = Rover.objects.create(
+            name='shared',
+            owner=other_user,
+            local_ip='127.0.0.1'
         )
         rover.shared_users.add(other_user)
+        other_rover.shared_users.add(self.admin)
 
         response = self.get(reverse('api:v1:rover-list'))
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()['total_pages'])
-        self.assertEqual(1, len(response.json()['results']))
+        self.assertEqual(2, len(response.json()['results']))
         self.assertEqual(response.json()['results'][0]['name'], 'rover')
         self.assertEqual(response.json()['results'][0]['owner'], self.admin.id)
         self.assertEqual(response.json()['results'][0]['local_ip'], '8.8.8.8')
         self.assertListEqual(
             response.json()['results'][0]['shared_users'],
             [other_user.username]
+        )
+        self.assertEqual(response.json()['results'][1]['name'], 'shared')
+        self.assertEqual(response.json()['results'][1]['owner'], other_user.id)
+        self.assertEqual(response.json()['results'][1]['local_ip'], '127.0.0.1')
+        self.assertListEqual(
+            response.json()['results'][1]['shared_users'],
+            [self.admin.username]
         )
 
     def test_rover_name_filter(self):
@@ -279,6 +292,32 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         self.assertIn('shared_users', response.data)
         self.assertEqual(
             0, Rover.objects.get(id=rover.id).shared_users.count())
+
+    def test_rover_update_add_unauthorized_user(self):
+        """Test the rover update by an unauthorized user."""
+        self.authenticate()
+        user1 = self.make_user('user1')
+        user2 = self.make_user('user2')
+        rover = Rover.objects.create(
+            name='rover',
+            owner=user1,
+            local_ip='8.8.8.8'
+        )
+        rover.shared_users.add(user2)
+        self.assertEqual(
+            1, Rover.objects.get(id=rover.id).shared_users.count())
+
+        # Add the invalid shared user
+        data = {
+            'shared_users': [self.admin.username],
+        }
+        response = self.client.patch(
+            reverse('api:v1:rover-detail', kwargs={'pk': rover.pk}),
+            json.dumps(data), content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            1, Rover.objects.get(id=rover.id).shared_users.count())
 
     def test_rover_not_logged_in(self):
         """Test the rover view denies unauthenticated user."""

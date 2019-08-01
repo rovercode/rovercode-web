@@ -44,7 +44,9 @@ class RoverViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """List of rovers for the user."""
-        return Rover.objects.filter(owner=self.request.user.id)
+        owned_rovers = Rover.objects.filter(owner=self.request.user)
+        shared_rovers = self.request.user.shared_rovers.all()
+        return (owned_rovers | shared_rovers).distinct()
 
     def perform_create(self, serializer):
         """Perform the create operation."""
