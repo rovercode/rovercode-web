@@ -1,9 +1,11 @@
 """Mission Control models."""
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from oauth2_provider.models import Application
-from rovercode_web.users.models import User
+
+User = get_user_model()
 
 
 class Rover(models.Model):

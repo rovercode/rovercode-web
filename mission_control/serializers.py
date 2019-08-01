@@ -10,6 +10,9 @@ from .models import Rover, BlockDiagram
 
 NAME_REGEX = re.compile(r'\((?P<number>\d)\)$')
 
+User = get_user_model()
+
+
 
 class RoverSerializer(serializers.ModelSerializer):
     """Rover model serializer."""
@@ -56,7 +59,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class."""
 
-        model = get_user_model()
+        model = User
         fields = ('username', )
 
 
