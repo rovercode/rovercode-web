@@ -14,7 +14,7 @@ class Rover(models.Model):
     name = models.CharField(null=False, max_length=25)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     oauth_application = models.ForeignKey(
-        Application, blank=True, null=True, on_delete=models.CASCADE)
+        Application, blank=True, null=True, on_delete=models.SET_NULL)
     local_ip = models.CharField(max_length=15, null=True)
     last_checkin = models.DateTimeField(auto_now=True)
     config = JSONField(blank=True, default=dict)
