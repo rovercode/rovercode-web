@@ -1,10 +1,15 @@
 """API views."""
-from rest_framework import viewsets, permissions, serializers
+from django.contrib.auth import get_user_model
+from rest_framework import viewsets, permissions, serializers, mixins
 
 from mission_control.filters import BlockDiagramFilter
 from mission_control.filters import RoverFilter
 from mission_control.models import Rover, BlockDiagram
-from mission_control.serializers import RoverSerializer, BlockDiagramSerializer
+from mission_control.serializers import BlockDiagramSerializer
+from mission_control.serializers import RoverSerializer
+from mission_control.serializers import UserSerializer
+
+User = get_user_model()
 
 
 class RoverViewSet(viewsets.ModelViewSet):
@@ -89,3 +94,20 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(
                 'You may only modify your own block diagrams')
         serializer.save()
+
+
+class UserViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    """
+    API endpoint that allows users to be viewed.
+
+    list:
+        Return all users.
+    """
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+    ordering_fields = ('username',)
+    ordering = ('username',)
+    search_fields = ('username',)
+    pagination_class = None
