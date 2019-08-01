@@ -18,6 +18,8 @@ class Rover(models.Model):
     local_ip = models.CharField(max_length=15, null=True)
     last_checkin = models.DateTimeField(auto_now=True)
     config = JSONField(blank=True, default=dict)
+    shared_users = models.ManyToManyField(
+        User, related_name='shared_rovers', blank=True)
 
     class Meta:
         """Meta class."""

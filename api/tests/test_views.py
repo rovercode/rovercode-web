@@ -7,7 +7,6 @@ import json
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework.test import APIClient
-from urllib.parse import urlencode
 
 from oauth2_provider.models import Application
 from mission_control.models import Rover, BlockDiagram
@@ -48,7 +47,10 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
     def test_rover_create(self):
         """Test the rover registration interface."""
         self.authenticate()
-        rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10'}
+        user1 = self.make_user('user1')
+        user2 = self.make_user('user2')
+        rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10',
+                      'shared_users': [user1.username, user2.username]}
         default_rover_config = {'some_setting': 'foobar'}
         # Create the rover
         with self.settings(DEFAULT_ROVER_CONFIG=default_rover_config):
@@ -60,6 +62,8 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         creation_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['config'], default_rover_config)
+        self.assertIn(user1.username, response.data['shared_users'])
+        self.assertIn(user2.username, response.data['shared_users'])
 
         application = Application.objects.get(client_id=response.data['client_id'])
         self.assertEqual(application.user.id, self.admin.id)
@@ -71,8 +75,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         # Update the rover
         response = self.client.put(
             reverse('api:v1:rover-detail', kwargs={'pk': id}),
-            urlencode(rover_info),
-            content_type="application/x-www-form-urlencoded"
+            json.dumps(rover_info), content_type='application/json'
         )
         checkin_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 200)
@@ -101,20 +104,34 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
             reverse('api:v1:rover-list'), rover_info)
         self.assertEqual(response.status_code, 400)
 
+    def test_rover_create_invalid_shared(self):
+        """Test the rover registration with invalid shared user."""
+        self.authenticate()
+        rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10',
+                      'shared_users': ['unknown']}
+
+        # Create the rover
+        response = self.client.post(
+            reverse('api:v1:rover-list'), rover_info)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('shared_users', response.data)
 
     def test_rover(self):
         """Test the rover view displays the correct items."""
         self.authenticate()
-        Rover.objects.create(
+        rover = Rover.objects.create(
             name='rover',
             owner=self.admin,
             local_ip='8.8.8.8'
         )
+        other_user = self.make_user()
         Rover.objects.create(
             name='rover2',
-            owner=self.make_user(),
+            owner=other_user,
             local_ip='8.8.8.8'
         )
+        rover.shared_users.add(other_user)
+
         response = self.get(reverse('api:v1:rover-list'))
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()['total_pages'])
@@ -122,6 +139,10 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(response.json()['results'][0]['name'], 'rover')
         self.assertEqual(response.json()['results'][0]['owner'], self.admin.id)
         self.assertEqual(response.json()['results'][0]['local_ip'], '8.8.8.8')
+        self.assertListEqual(
+            response.json()['results'][0]['shared_users'],
+            [other_user.username]
+        )
 
     def test_rover_name_filter(self):
         """Test the rover view filters correctly on name."""
@@ -178,6 +199,86 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(response.json()['results'][0]['name'], 'rover2')
         self.assertEqual(response.json()['results'][0]['owner'], self.admin.id)
         self.assertEqual(response.json()['results'][0]['local_ip'], '8.8.8.8')
+
+    def test_rover_update_remove_shared(self):
+        """Test the rover update to remove shared user."""
+        self.authenticate()
+        other_user = self.make_user()
+        rover = Rover.objects.create(
+            name='rover',
+            owner=self.admin,
+            local_ip='8.8.8.8'
+        )
+        rover.shared_users.add(other_user)
+        self.assertEqual(
+            1, Rover.objects.get(id=rover.id).shared_users.count())
+
+        # Remove the shared user
+        data = {
+            'shared_users': [],
+        }
+        response = self.client.patch(
+            reverse('api:v1:rover-detail', kwargs={'pk': rover.pk}),
+            json.dumps(data), content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            0, Rover.objects.get(id=rover.id).shared_users.count())
+
+    def test_rover_update_add_shared(self):
+        """Test the rover update to add shared user."""
+        self.authenticate()
+        user1 = self.make_user('user1')
+        user2 = self.make_user('user2')
+        rover = Rover.objects.create(
+            name='rover',
+            owner=self.admin,
+            local_ip='8.8.8.8'
+        )
+        self.assertEqual(
+            0, Rover.objects.get(id=rover.id).shared_users.count())
+
+        # Add the shared user
+        data = {
+            'shared_users': [user1.username, user2.username],
+        }
+        response = self.client.patch(
+            reverse('api:v1:rover-detail', kwargs={'pk': rover.pk}),
+            json.dumps(data), content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            2, Rover.objects.get(id=rover.id).shared_users.count())
+
+        response = self.client.get(
+            reverse('api:v1:rover-detail', kwargs={'pk': rover.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(user1.username, response.data['shared_users'])
+        self.assertIn(user2.username, response.data['shared_users'])
+
+    def test_rover_update_add_invalid_shared(self):
+        """Test the rover update to add invalid shared user."""
+        self.authenticate()
+        rover = Rover.objects.create(
+            name='rover',
+            owner=self.admin,
+            local_ip='8.8.8.8'
+        )
+        self.assertEqual(
+            0, Rover.objects.get(id=rover.id).shared_users.count())
+
+        # Add the invalid shared user
+        data = {
+            'shared_users': ['unknown'],
+        }
+        response = self.client.patch(
+            reverse('api:v1:rover-detail', kwargs={'pk': rover.pk}),
+            json.dumps(data), content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('shared_users', response.data)
+        self.assertEqual(
+            0, Rover.objects.get(id=rover.id).shared_users.count())
 
     def test_rover_not_logged_in(self):
         """Test the rover view denies unauthenticated user."""
