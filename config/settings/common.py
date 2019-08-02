@@ -215,7 +215,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 ASGI_APPLICATION = 'config.asgi.application'
 
-redis_url = urlparse(env('REDIS_URL', default='redis://127.0.0.1:6379'))
+redis_url = urlparse(env('REDIS_URL', default='redis://redis:6379'))
 REDIS_HOST = redis_url.hostname
 REDIS_PORT = redis_url.port
 
