@@ -6,9 +6,12 @@ from django.db.utils import IntegrityError
 from rest_framework import serializers
 from oauth2_provider.models import Application
 
+from .fields import UsernameStringRelatedField
 from .models import Rover, BlockDiagram
 
 NAME_REGEX = re.compile(r'\((?P<number>\d)\)$')
+
+User = get_user_model()
 
 
 class RoverSerializer(serializers.ModelSerializer):
@@ -20,6 +23,7 @@ class RoverSerializer(serializers.ModelSerializer):
     client_secret = serializers.CharField(
         source='oauth_application.client_secret',
         read_only=True)
+    shared_users = UsernameStringRelatedField(required=False, many=True)
 
     class Meta:
         """Meta class."""
@@ -27,7 +31,7 @@ class RoverSerializer(serializers.ModelSerializer):
         model = Rover
         fields = (
             'id', 'name', 'owner', 'local_ip', 'last_checkin',
-            'config', 'client_id', 'client_secret'
+            'config', 'client_id', 'client_secret', 'shared_users'
         )
         read_only_fields = ('owner',)
 
@@ -35,6 +39,7 @@ class RoverSerializer(serializers.ModelSerializer):
         """Create an oauth application when the Rover is created."""
         owner = validated_data.get('owner')
         name = validated_data.get('name')
+        shared_users = validated_data.pop('shared_users', [])
 
         oauth_application = Application.objects.create(
             user=owner,
@@ -43,11 +48,16 @@ class RoverSerializer(serializers.ModelSerializer):
             name=name
         )
         try:
-            return Rover.objects.create(oauth_application=oauth_application,
-                                        **validated_data)
+            rover = Rover.objects.create(oauth_application=oauth_application,
+                                         **validated_data)
         except IntegrityError:
             raise serializers.ValidationError(
                 'There is already a rover with that name')
+
+        for user in shared_users:
+            rover.shared_users.add(user)
+
+        return rover
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -56,7 +66,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class."""
 
-        model = get_user_model()
+        model = User
         fields = ('username', )
 
 
