@@ -29,8 +29,8 @@ class RoverConsumer(WebsocketConsumer):
             self.close(code=404)
             return
 
-        shared_user_ids = [user.id for user in rover.shared_users.all()]
-        if not (rover.owner.id == user.id or user.id in shared_user_ids):
+        is_shared_user = rover.shared_users.filter(id=user.id).exists()
+        if not (rover.owner.id == user.id or is_shared_user):
             self.close(code=403)
             return
 
