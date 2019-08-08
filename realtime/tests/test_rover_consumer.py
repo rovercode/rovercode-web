@@ -67,7 +67,7 @@ async def test_rover_consumer_shared_user():
         local_ip='8.8.8.8',
         oauth_application=oauth_app,
     )
-    rover.shared_users.set([shared_user])
+    rover.shared_users.add(shared_user)
     application = MockAuthMiddleware(URLRouter([
         url(r'^ws/realtime/(?P<room_name>[^/]+)/$', RoverConsumer),
     ]))
