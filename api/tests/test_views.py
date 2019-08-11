@@ -578,3 +578,63 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
         self.assertEqual(BlockDiagram.objects.last().name, 'test')
         self.assertEqual(0, BlockDiagram.objects.last().tags.count())
+
+    def test_bd_tag_filter(self):
+        """Test the block diagram API view filters on tags correctly."""
+        self.authenticate()
+        user1 = self.make_user('user1')
+        bd1 = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        bd2 = BlockDiagram.objects.create(
+            user=user1,
+            name='test2',
+            content='<xml></xml>'
+        )
+        tag1 = Tag.objects.create(name='tag1')
+        tag2 = Tag.objects.create(name='tag2')
+        tag3 = Tag.objects.create(name='tag3')
+        tag4 = Tag.objects.create(name='tag4')
+        bd1.owner_tags.set([tag1, tag2])
+        bd1.admin_tags.add(tag3)
+        bd2.owner_tags.add(tag4)
+        bd2.admin_tags.add(tag3)
+
+        response = self.get(
+            reverse('api:v1:blockdiagram-list') + '?tag={},{}'.format(
+                tag1.name, tag2.name))
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(1, len(response.json()['results']))
+        self.assertEqual(response.json()['results'][0]['id'], bd1.id)
+        self.assertDictEqual(response.json()['results'][0]['user'], {
+            'username': self.admin.username,
+        })
+        self.assertEqual(response.json()['results'][0]['name'], 'test1')
+        self.assertEqual(
+            response.json()['results'][0]['content'], '<xml></xml>')
+
+        response = self.get(
+            reverse('api:v1:blockdiagram-list') + '?tag=' + tag3.name)
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(2, len(response.json()['results']))
+
+        response = self.get(
+            reverse('api:v1:blockdiagram-list') + '?tag={},{}'.format(
+                tag2.name, tag3.name))
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(2, len(response.json()['results']))
+
+        response = self.get(
+            reverse('api:v1:blockdiagram-list') + '?tag=' + 'nothing')
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(0, len(response.json()['results']))
