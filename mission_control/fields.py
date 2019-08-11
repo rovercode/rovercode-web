@@ -24,5 +24,12 @@ class TagStringRelatedField(serializers.StringRelatedField):
 
     def to_internal_value(self, data):
         """Convert a tag string into the primary key for the tag."""
+        if len(data) < 3:
+            raise serializers.ValidationError(
+                'Tags must be at least 3 characters')
+        elif len(data) > 30:
+            raise serializers.ValidationError(
+                'Tags must be at most 30 characters')
+
         tag, _ = Tag.objects.get_or_create(name=data)
         return tag.pk

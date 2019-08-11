@@ -579,6 +579,46 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(BlockDiagram.objects.last().name, 'test')
         self.assertEqual(0, BlockDiagram.objects.last().tags.count())
 
+    def test_bd_update_add_tag_too_long(self):
+        """Test updating block diagram to add tag that is too long."""
+        self.authenticate()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+        )
+        self.assertEqual(0, BlockDiagram.objects.get(id=bd.id).tags.count())
+
+        # Add the tag
+        data = {
+            'owner_tags': ['a'*100],
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(0, BlockDiagram.objects.get(id=bd.id).tags.count())
+
+    def test_bd_update_add_tag_too_short(self):
+        """Test updating block diagram to add tag that is too short."""
+        self.authenticate()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+        )
+        self.assertEqual(0, BlockDiagram.objects.get(id=bd.id).tags.count())
+
+        # Add the tag
+        data = {
+            'owner_tags': ['a'],
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(0, BlockDiagram.objects.get(id=bd.id).tags.count())
+
     def test_bd_tag_filter(self):
         """Test the block diagram API view filters on tags correctly."""
         self.authenticate()
