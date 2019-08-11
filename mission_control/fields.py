@@ -2,6 +2,8 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from mission_control.models import Tag
+
 User = get_user_model()
 
 
@@ -15,3 +17,12 @@ class UsernameStringRelatedField(serializers.StringRelatedField):
         except User.DoesNotExist:
             raise serializers.ValidationError(
                 'User with username: {} not found'.format(data))
+
+
+class TagStringRelatedField(serializers.StringRelatedField):
+    """Custom field to allow for using tag strings in related fields."""
+
+    def to_internal_value(self, data):
+        """Convert a tag string into the primary key for the tag."""
+        tag, _ = Tag.objects.get_or_create(name=data)
+        return tag.pk

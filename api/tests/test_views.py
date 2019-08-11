@@ -9,7 +9,9 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 
 from oauth2_provider.models import Application
-from mission_control.models import Rover, BlockDiagram
+from mission_control.models import BlockDiagram
+from mission_control.models import Rover
+from mission_control.models import Tag
 
 
 class BaseAuthenticatedTestCase(TestCase):
@@ -427,13 +429,17 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.authenticate()
         data = {
             'name': 'test',
-            'content': '<xml></xml>'
+            'content': '<xml></xml>',
+            'owner_tags': ['tag1', 'tag 2'],
         }
         response = self.client.post(
             reverse('api:v1:blockdiagram-list'), data)
         self.assertEqual(201, response.status_code)
         self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
         self.assertEqual(BlockDiagram.objects.last().name, data['name'])
+        model_tags = [t.name for t in BlockDiagram.objects.last().tags.all()]
+        self.assertIn('tag1', model_tags)
+        self.assertIn('tag 2', model_tags)
 
     def test_bd_create_name_exist(self):
         """Test creating block diagram when name already exists."""
@@ -521,3 +527,54 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             b'["You may only modify your own block diagrams"]')
         self.assertEqual(BlockDiagram.objects.last().user.id, user.id)
         self.assertEqual(BlockDiagram.objects.last().name, 'test1')
+
+    def test_bd_update_add_tags(self):
+        """Test updating block diagram to add tags."""
+        self.authenticate()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+        )
+        self.assertEqual(0, BlockDiagram.objects.get(id=bd.id).tags.count())
+
+        # Add the tag
+        data = {
+            'owner_tags': ['test'],
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
+        self.assertEqual(BlockDiagram.objects.last().name, 'test')
+        self.assertEqual(1, BlockDiagram.objects.last().tags.count())
+
+        response = self.client.get(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('test', response.data['tags'])
+
+    def test_bd_update_remove_tags(self):
+        """Test updating block diagram to remove tags."""
+        self.authenticate()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+        )
+        tag = Tag.objects.create(name='tag1')
+        bd.owner_tags.add(tag)
+        self.assertEqual(1, BlockDiagram.objects.get(id=bd.id).tags.count())
+
+        # Remove the tag
+        data = {
+            'owner_tags': [],
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
+        self.assertEqual(BlockDiagram.objects.last().name, 'test')
+        self.assertEqual(0, BlockDiagram.objects.last().tags.count())
