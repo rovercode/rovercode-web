@@ -70,7 +70,7 @@ class BlockDiagram(models.Model):
 class Tag(models.Model):
     """Descriptor to add to another model."""
 
-    name = CICharField(max_length=30)
+    name = CICharField(max_length=30, unique=True)
 
     def __str__(self):
         """Convert the model to a human readable string."""
