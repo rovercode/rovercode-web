@@ -673,6 +673,23 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(2, len(response.json()['results']))
 
         response = self.get(
+            reverse('api:v1:blockdiagram-list') + '?owner_tags={},{}'.format(
+                tag4.name, tag3.name))
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(1, len(response.json()['results']))
+        self.assertEqual(response.json()['results'][0]['name'], 'test2')
+
+        response = self.get(
+            reverse('api:v1:blockdiagram-list') + '?admin_tags={}'.format(
+                tag3.name))
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(2, len(response.json()['results']))
+
+        response = self.get(
             reverse('api:v1:blockdiagram-list') + '?tag=' + 'nothing')
 
         self.assertEqual(200, response.status_code)
