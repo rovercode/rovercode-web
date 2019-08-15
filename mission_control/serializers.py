@@ -6,6 +6,7 @@ from django.db.utils import IntegrityError
 from rest_framework import serializers
 from oauth2_provider.models import Application
 
+from .fields import TagStringRelatedField
 from .fields import UsernameStringRelatedField
 from .models import Rover, BlockDiagram
 
@@ -73,6 +74,9 @@ class UserSerializer(serializers.ModelSerializer):
 class BlockDiagramSerializer(serializers.ModelSerializer):
     """Block diagram model serializer."""
 
+    admin_tags = serializers.StringRelatedField(read_only=True, many=True)
+    owner_tags = TagStringRelatedField(required=False, many=True)
+    tags = serializers.SerializerMethodField()
     user = UserSerializer(read_only=True)
 
     class Meta:
@@ -81,9 +85,16 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
         model = BlockDiagram
         fields = '__all__'
 
+    @staticmethod
+    def get_tags(obj):
+        """All tags for the block diagram."""
+        return [str(tag) for tag in obj.tags.all()]
+
     def create(self, validated_data):
         """Check for name conflict and create unique name if necessary."""
         name = validated_data['name']
+        owner_tags = validated_data.pop('owner_tags', [])
+
         match = NAME_REGEX.search(name)
         if match:
             number = int(match.group('number'))
@@ -100,4 +111,10 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
                 name = re.sub(NAME_REGEX, '({})'.format(number), name)
 
         validated_data['name'] = name
-        return super().create(validated_data)
+
+        block_diagram = super().create(validated_data)
+
+        for tag in owner_tags:
+            block_diagram.owner_tags.add(tag)
+
+        return block_diagram
