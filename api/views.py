@@ -4,9 +4,12 @@ from rest_framework import viewsets, permissions, serializers, mixins
 
 from mission_control.filters import BlockDiagramFilter
 from mission_control.filters import RoverFilter
-from mission_control.models import Rover, BlockDiagram
+from mission_control.models import BlockDiagram
+from mission_control.models import Rover
+from mission_control.models import Tag
 from mission_control.serializers import BlockDiagramSerializer
 from mission_control.serializers import RoverSerializer
+from mission_control.serializers import TagSerializer
 from mission_control.serializers import UserSerializer
 
 User = get_user_model()
@@ -113,3 +116,22 @@ class UserViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     ordering = ('username',)
     search_fields = ('username',)
     pagination_class = None
+
+
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows tags to be viewed.
+
+    retrieve:
+        Return a tag instance.
+
+    list:
+        Return all tags.
+    """
+
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+    ordering_fields = ('name',)
+    ordering = ('name',)
+    search_fields = ('name',)

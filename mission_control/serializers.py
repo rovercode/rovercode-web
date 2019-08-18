@@ -8,7 +8,9 @@ from oauth2_provider.models import Application
 
 from .fields import TagStringRelatedField
 from .fields import UsernameStringRelatedField
-from .models import Rover, BlockDiagram
+from .models import BlockDiagram
+from .models import Rover
+from .models import Tag
 
 NAME_REGEX = re.compile(r'\((?P<number>\d)\)$')
 
@@ -118,3 +120,13 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
             block_diagram.owner_tags.add(tag)
 
         return block_diagram
+
+
+class TagSerializer(serializers.ModelSerializer):
+    """Tag model serializer."""
+
+    class Meta:
+        """Meta class."""
+
+        model = Tag
+        fields = ('name', )
