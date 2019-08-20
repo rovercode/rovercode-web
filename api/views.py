@@ -135,3 +135,4 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     ordering_fields = ('name',)
     ordering = ('name',)
     search_fields = ('name',)
+    pagination_class = None
