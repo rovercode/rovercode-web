@@ -319,7 +319,7 @@ SOCIALACCOUNT_PROVIDERS = {
 # JWT CONFIGURATION
 # ------------------------------------------------------------------------------
 JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=4),
     'JWT_ALLOW_REFRESH': True,
     'JWT_SECRET_KEY': env(
         'JWT_SECRET_KEY',
