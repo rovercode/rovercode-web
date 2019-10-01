@@ -7,10 +7,11 @@ import json
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework.test import APIClient
-from urllib.parse import urlencode
 
 from oauth2_provider.models import Application
-from mission_control.models import Rover, BlockDiagram
+from mission_control.models import BlockDiagram
+from mission_control.models import Rover
+from mission_control.models import Tag
 
 
 class BaseAuthenticatedTestCase(TestCase):
@@ -48,7 +49,10 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
     def test_rover_create(self):
         """Test the rover registration interface."""
         self.authenticate()
-        rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10'}
+        user1 = self.make_user('user1')
+        user2 = self.make_user('user2')
+        rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10',
+                      'shared_users': [user1.username, user2.username]}
         default_rover_config = {'some_setting': 'foobar'}
         # Create the rover
         with self.settings(DEFAULT_ROVER_CONFIG=default_rover_config):
@@ -60,6 +64,8 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         creation_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['config'], default_rover_config)
+        self.assertIn(user1.username, response.data['shared_users'])
+        self.assertIn(user2.username, response.data['shared_users'])
 
         application = Application.objects.get(client_id=response.data['client_id'])
         self.assertEqual(application.user.id, self.admin.id)
@@ -71,8 +77,7 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         # Update the rover
         response = self.client.put(
             reverse('api:v1:rover-detail', kwargs={'pk': id}),
-            urlencode(rover_info),
-            content_type="application/x-www-form-urlencoded"
+            json.dumps(rover_info), content_type='application/json'
         )
         checkin_time = dateutil.parser.parse(response.data['last_checkin'])
         self.assertEqual(response.status_code, 200)
@@ -101,27 +106,58 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
             reverse('api:v1:rover-list'), rover_info)
         self.assertEqual(response.status_code, 400)
 
+    def test_rover_create_invalid_shared(self):
+        """Test the rover registration with invalid shared user."""
+        self.authenticate()
+        rover_info = {'name': 'Curiosity', 'local_ip': '192.168.0.10',
+                      'shared_users': ['unknown']}
+
+        # Create the rover
+        response = self.client.post(
+            reverse('api:v1:rover-list'), rover_info)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('shared_users', response.data)
 
     def test_rover(self):
         """Test the rover view displays the correct items."""
         self.authenticate()
-        Rover.objects.create(
+        rover = Rover.objects.create(
             name='rover',
             owner=self.admin,
             local_ip='8.8.8.8'
         )
+        other_user = self.make_user()
         Rover.objects.create(
             name='rover2',
-            owner=self.make_user(),
-            local_ip='8.8.8.8'
+            owner=other_user,
+            local_ip='127.0.0.1'
         )
+        other_rover = Rover.objects.create(
+            name='shared',
+            owner=other_user,
+            local_ip='127.0.0.1'
+        )
+        rover.shared_users.add(other_user)
+        other_rover.shared_users.add(self.admin)
+
         response = self.get(reverse('api:v1:rover-list'))
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()['total_pages'])
-        self.assertEqual(1, len(response.json()['results']))
+        self.assertEqual(2, len(response.json()['results']))
         self.assertEqual(response.json()['results'][0]['name'], 'rover')
         self.assertEqual(response.json()['results'][0]['owner'], self.admin.id)
         self.assertEqual(response.json()['results'][0]['local_ip'], '8.8.8.8')
+        self.assertListEqual(
+            response.json()['results'][0]['shared_users'],
+            [other_user.username]
+        )
+        self.assertEqual(response.json()['results'][1]['name'], 'shared')
+        self.assertEqual(response.json()['results'][1]['owner'], other_user.id)
+        self.assertEqual(response.json()['results'][1]['local_ip'], '127.0.0.1')
+        self.assertListEqual(
+            response.json()['results'][1]['shared_users'],
+            [self.admin.username]
+        )
 
     def test_rover_name_filter(self):
         """Test the rover view filters correctly on name."""
@@ -178,6 +214,112 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(response.json()['results'][0]['name'], 'rover2')
         self.assertEqual(response.json()['results'][0]['owner'], self.admin.id)
         self.assertEqual(response.json()['results'][0]['local_ip'], '8.8.8.8')
+
+    def test_rover_update_remove_shared(self):
+        """Test the rover update to remove shared user."""
+        self.authenticate()
+        other_user = self.make_user()
+        rover = Rover.objects.create(
+            name='rover',
+            owner=self.admin,
+            local_ip='8.8.8.8'
+        )
+        rover.shared_users.add(other_user)
+        self.assertEqual(
+            1, Rover.objects.get(id=rover.id).shared_users.count())
+
+        # Remove the shared user
+        data = {
+            'shared_users': [],
+        }
+        response = self.client.patch(
+            reverse('api:v1:rover-detail', kwargs={'pk': rover.pk}),
+            json.dumps(data), content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            0, Rover.objects.get(id=rover.id).shared_users.count())
+
+    def test_rover_update_add_shared(self):
+        """Test the rover update to add shared user."""
+        self.authenticate()
+        user1 = self.make_user('user1')
+        user2 = self.make_user('user2')
+        rover = Rover.objects.create(
+            name='rover',
+            owner=self.admin,
+            local_ip='8.8.8.8'
+        )
+        self.assertEqual(
+            0, Rover.objects.get(id=rover.id).shared_users.count())
+
+        # Add the shared user
+        data = {
+            'shared_users': [user1.username, user2.username],
+        }
+        response = self.client.patch(
+            reverse('api:v1:rover-detail', kwargs={'pk': rover.pk}),
+            json.dumps(data), content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            2, Rover.objects.get(id=rover.id).shared_users.count())
+
+        response = self.client.get(
+            reverse('api:v1:rover-detail', kwargs={'pk': rover.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(user1.username, response.data['shared_users'])
+        self.assertIn(user2.username, response.data['shared_users'])
+
+    def test_rover_update_add_invalid_shared(self):
+        """Test the rover update to add invalid shared user."""
+        self.authenticate()
+        rover = Rover.objects.create(
+            name='rover',
+            owner=self.admin,
+            local_ip='8.8.8.8'
+        )
+        self.assertEqual(
+            0, Rover.objects.get(id=rover.id).shared_users.count())
+
+        # Add the invalid shared user
+        data = {
+            'shared_users': ['unknown'],
+        }
+        response = self.client.patch(
+            reverse('api:v1:rover-detail', kwargs={'pk': rover.pk}),
+            json.dumps(data), content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('shared_users', response.data)
+        self.assertEqual(
+            0, Rover.objects.get(id=rover.id).shared_users.count())
+
+    def test_rover_update_add_unauthorized_user(self):
+        """Test the rover update by an unauthorized user."""
+        self.authenticate()
+        user1 = self.make_user('user1')
+        user2 = self.make_user('user2')
+        rover = Rover.objects.create(
+            name='rover',
+            owner=user1,
+            local_ip='8.8.8.8'
+        )
+        rover.shared_users.add(user2)
+        self.assertEqual(
+            1, Rover.objects.get(id=rover.id).shared_users.count())
+
+        # Add the invalid shared user
+        data = {
+            'shared_users': [self.admin.username],
+        }
+        response = self.client.patch(
+            reverse('api:v1:rover-detail', kwargs={'pk': rover.pk}),
+            json.dumps(data), content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            1, Rover.objects.get(id=rover.id).shared_users.count())
 
     def test_rover_not_logged_in(self):
         """Test the rover view denies unauthenticated user."""
@@ -287,13 +429,62 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.authenticate()
         data = {
             'name': 'test',
-            'content': '<xml></xml>'
+            'content': '<xml></xml>',
+            'owner_tags': ['tag1', 'tag 2'],
         }
         response = self.client.post(
             reverse('api:v1:blockdiagram-list'), data)
         self.assertEqual(201, response.status_code)
         self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
         self.assertEqual(BlockDiagram.objects.last().name, data['name'])
+        model_tags = [t.name for t in BlockDiagram.objects.last().tags.all()]
+        self.assertIn('tag1', model_tags)
+        self.assertIn('tag 2', model_tags)
+
+    def test_bd_create_name_exist(self):
+        """Test creating block diagram when name already exists."""
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>'
+        )
+
+        self.authenticate()
+        data = {
+            'name': 'test',
+            'content': '<xml></xml>'
+        }
+        response = self.client.post(
+            reverse('api:v1:blockdiagram-list'), data)
+        self.assertEqual(201, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
+        self.assertEqual(
+            BlockDiagram.objects.last().name, data['name'] + ' (1)')
+
+    def test_bd_create_name_exist_with_number(self):
+        """Test creating block diagram when name already exists with number."""
+        user1 = self.make_user('user1')
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test (1) (2)',
+            content='<xml></xml>'
+        )
+        BlockDiagram.objects.create(
+            user=user1,
+            name='test (1) (3)',
+            content='<xml></xml>'
+        )
+
+        self.authenticate()
+        data = {
+            'name': 'test (1) (2)',
+            'content': '<xml></xml>'
+        }
+        response = self.client.post(
+            reverse('api:v1:blockdiagram-list'), data)
+        self.assertEqual(201, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
+        self.assertEqual(BlockDiagram.objects.last().name, 'test (1) (3)')
 
     def test_bd_update_as_valid_user(self):
         """Test updating block diagram as owner."""
@@ -336,3 +527,171 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             b'["You may only modify your own block diagrams"]')
         self.assertEqual(BlockDiagram.objects.last().user.id, user.id)
         self.assertEqual(BlockDiagram.objects.last().name, 'test1')
+
+    def test_bd_update_add_tags(self):
+        """Test updating block diagram to add tags."""
+        self.authenticate()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+        )
+        self.assertEqual(0, BlockDiagram.objects.get(id=bd.id).tags.count())
+
+        # Add the tag
+        data = {
+            'owner_tags': ['test'],
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
+        self.assertEqual(BlockDiagram.objects.last().name, 'test')
+        self.assertEqual(1, BlockDiagram.objects.last().tags.count())
+
+        response = self.client.get(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('test', response.data['tags'])
+
+    def test_bd_update_remove_tags(self):
+        """Test updating block diagram to remove tags."""
+        self.authenticate()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+        )
+        tag = Tag.objects.create(name='tag1')
+        bd.owner_tags.add(tag)
+        self.assertEqual(1, BlockDiagram.objects.get(id=bd.id).tags.count())
+
+        # Remove the tag
+        data = {
+            'owner_tags': [],
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
+        self.assertEqual(BlockDiagram.objects.last().name, 'test')
+        self.assertEqual(0, BlockDiagram.objects.last().tags.count())
+
+    def test_bd_update_add_tag_too_long(self):
+        """Test updating block diagram to add tag that is too long."""
+        self.authenticate()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+        )
+        self.assertEqual(0, BlockDiagram.objects.get(id=bd.id).tags.count())
+
+        # Add the tag
+        data = {
+            'owner_tags': ['a'*100],
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(0, BlockDiagram.objects.get(id=bd.id).tags.count())
+
+    def test_bd_update_add_tag_too_short(self):
+        """Test updating block diagram to add tag that is too short."""
+        self.authenticate()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+        )
+        self.assertEqual(0, BlockDiagram.objects.get(id=bd.id).tags.count())
+
+        # Add the tag
+        data = {
+            'owner_tags': ['a'],
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(0, BlockDiagram.objects.get(id=bd.id).tags.count())
+
+    def test_bd_tag_filter(self):
+        """Test the block diagram API view filters on tags correctly."""
+        self.authenticate()
+        user1 = self.make_user('user1')
+        bd1 = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        bd2 = BlockDiagram.objects.create(
+            user=user1,
+            name='test2',
+            content='<xml></xml>'
+        )
+        tag1 = Tag.objects.create(name='tag1')
+        tag2 = Tag.objects.create(name='tag2')
+        tag3 = Tag.objects.create(name='tag3')
+        tag4 = Tag.objects.create(name='tag4')
+        bd1.owner_tags.set([tag1, tag2])
+        bd1.admin_tags.add(tag3)
+        bd2.owner_tags.add(tag4)
+        bd2.admin_tags.add(tag3)
+
+        response = self.get(
+            reverse('api:v1:blockdiagram-list') + '?tag={},{}'.format(
+                tag1.name, tag2.name))
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(1, len(response.json()['results']))
+        self.assertEqual(response.json()['results'][0]['id'], bd1.id)
+        self.assertDictEqual(response.json()['results'][0]['user'], {
+            'username': self.admin.username,
+        })
+        self.assertEqual(response.json()['results'][0]['name'], 'test1')
+        self.assertEqual(
+            response.json()['results'][0]['content'], '<xml></xml>')
+
+        response = self.get(
+            reverse('api:v1:blockdiagram-list') + '?tag=' + tag3.name)
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(2, len(response.json()['results']))
+
+        response = self.get(
+            reverse('api:v1:blockdiagram-list') + '?tag={},{}'.format(
+                tag2.name, tag3.name))
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(2, len(response.json()['results']))
+
+        response = self.get(
+            reverse('api:v1:blockdiagram-list') + '?owner_tags={},{}'.format(
+                tag4.name, tag3.name))
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(1, len(response.json()['results']))
+        self.assertEqual(response.json()['results'][0]['name'], 'test2')
+
+        response = self.get(
+            reverse('api:v1:blockdiagram-list') + '?admin_tags={}'.format(
+                tag3.name))
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(2, len(response.json()['results']))
+
+        response = self.get(
+            reverse('api:v1:blockdiagram-list') + '?tag=' + 'nothing')
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(0, len(response.json()['results']))

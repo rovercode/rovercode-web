@@ -1,10 +1,20 @@
 """Mission Control serializers."""
+import re
+
 from django.contrib.auth import get_user_model
 from django.db.utils import IntegrityError
 from rest_framework import serializers
 from oauth2_provider.models import Application
 
-from .models import Rover, BlockDiagram
+from .fields import TagStringRelatedField
+from .fields import UsernameStringRelatedField
+from .models import BlockDiagram
+from .models import Rover
+from .models import Tag
+
+NAME_REGEX = re.compile(r'\((?P<number>\d)\)$')
+
+User = get_user_model()
 
 
 class RoverSerializer(serializers.ModelSerializer):
@@ -16,6 +26,7 @@ class RoverSerializer(serializers.ModelSerializer):
     client_secret = serializers.CharField(
         source='oauth_application.client_secret',
         read_only=True)
+    shared_users = UsernameStringRelatedField(required=False, many=True)
 
     class Meta:
         """Meta class."""
@@ -23,7 +34,7 @@ class RoverSerializer(serializers.ModelSerializer):
         model = Rover
         fields = (
             'id', 'name', 'owner', 'local_ip', 'last_checkin',
-            'config', 'client_id', 'client_secret'
+            'config', 'client_id', 'client_secret', 'shared_users'
         )
         read_only_fields = ('owner',)
 
@@ -31,6 +42,7 @@ class RoverSerializer(serializers.ModelSerializer):
         """Create an oauth application when the Rover is created."""
         owner = validated_data.get('owner')
         name = validated_data.get('name')
+        shared_users = validated_data.pop('shared_users', [])
 
         oauth_application = Application.objects.create(
             user=owner,
@@ -39,11 +51,16 @@ class RoverSerializer(serializers.ModelSerializer):
             name=name
         )
         try:
-            return Rover.objects.create(oauth_application=oauth_application,
-                                        **validated_data)
+            rover = Rover.objects.create(oauth_application=oauth_application,
+                                         **validated_data)
         except IntegrityError:
             raise serializers.ValidationError(
                 'There is already a rover with that name')
+
+        for user in shared_users:
+            rover.shared_users.add(user)
+
+        return rover
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -52,13 +69,16 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class."""
 
-        model = get_user_model()
+        model = User
         fields = ('username', )
 
 
 class BlockDiagramSerializer(serializers.ModelSerializer):
     """Block diagram model serializer."""
 
+    admin_tags = serializers.StringRelatedField(read_only=True, many=True)
+    owner_tags = TagStringRelatedField(required=False, many=True)
+    tags = serializers.SerializerMethodField()
     user = UserSerializer(read_only=True)
 
     class Meta:
@@ -66,3 +86,47 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
 
         model = BlockDiagram
         fields = '__all__'
+
+    @staticmethod
+    def get_tags(obj):
+        """All tags for the block diagram."""
+        return [str(tag) for tag in obj.tags.all()]
+
+    def create(self, validated_data):
+        """Check for name conflict and create unique name if necessary."""
+        name = validated_data['name']
+        owner_tags = validated_data.pop('owner_tags', [])
+
+        match = NAME_REGEX.search(name)
+        if match:
+            number = int(match.group('number'))
+        else:
+            number = None
+
+        user = self.context['request'].user
+        while BlockDiagram.objects.filter(name=name, user=user).exists():
+            if number is None:
+                number = 1
+                name = '{} ({})'.format(name, number)
+            else:
+                number += 1
+                name = re.sub(NAME_REGEX, '({})'.format(number), name)
+
+        validated_data['name'] = name
+
+        block_diagram = super().create(validated_data)
+
+        for tag in owner_tags:
+            block_diagram.owner_tags.add(tag)
+
+        return block_diagram
+
+
+class TagSerializer(serializers.ModelSerializer):
+    """Tag model serializer."""
+
+    class Meta:
+        """Meta class."""
+
+        model = Tag
+        fields = ('name', )

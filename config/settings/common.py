@@ -215,7 +215,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 ASGI_APPLICATION = 'config.asgi.application'
 
-redis_url = urlparse(env('REDIS_URL', default='redis://127.0.0.1:6379'))
+redis_url = urlparse(env('REDIS_URL', default='redis://redis:6379'))
 REDIS_HOST = redis_url.hostname
 REDIS_PORT = redis_url.port
 
@@ -319,7 +319,7 @@ SOCIALACCOUNT_PROVIDERS = {
 # JWT CONFIGURATION
 # ------------------------------------------------------------------------------
 JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=4),
     'JWT_ALLOW_REFRESH': True,
     'JWT_SECRET_KEY': env(
         'JWT_SECRET_KEY',

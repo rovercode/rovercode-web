@@ -1,6 +1,7 @@
 sudo: true
 services:
 - postgresql
+- docker
 addons:
   postgresql: "9.4"
 env:
@@ -9,7 +10,7 @@ before_install:
 - sudo apt-get update -qq
 - sudo apt-get install -qq build-essential gettext python-dev zlib1g-dev libpq-dev
   xvfb
-- sudo apt-get install -qq libtiff4-dev libjpeg8-dev libfreetype6-dev liblcms1-dev
+- sudo apt-get install -qq libtiff5-dev libjpeg8-dev libfreetype6-dev liblcms2-dev
   libwebp-dev
 - sudo apt-get install -qq graphviz-dev python-setuptools python3-dev python-virtualenv
   python-pip
@@ -36,6 +37,19 @@ language: python
 python:
 - '3.6'
 deploy:
+# TODO: Re-add when ECR exists
+#  - provider: script
+#    script: bash ecr-deploy.sh alpha
+#    on:
+#      branch: alpha
+#  - provider: script
+#    script: bash ecr-deploy.sh beta
+#    on:
+#      branch: beta
+#  - provider: script
+#    script: bash ecr-deploy.sh prod
+#    on:
+#      branch: prod
   - provider: codedeploy
     access_key_id: AKIAIIORSR4VN3YQY2YQ
     secret_access_key:
