@@ -1,10 +1,18 @@
 """API views."""
-from rest_framework import viewsets, permissions, serializers
+from django.contrib.auth import get_user_model
+from rest_framework import viewsets, permissions, serializers, mixins
 
 from mission_control.filters import BlockDiagramFilter
 from mission_control.filters import RoverFilter
-from mission_control.models import Rover, BlockDiagram
-from mission_control.serializers import RoverSerializer, BlockDiagramSerializer
+from mission_control.models import BlockDiagram
+from mission_control.models import Rover
+from mission_control.models import Tag
+from mission_control.serializers import BlockDiagramSerializer
+from mission_control.serializers import RoverSerializer
+from mission_control.serializers import TagSerializer
+from mission_control.serializers import UserSerializer
+
+User = get_user_model()
 
 
 class RoverViewSet(viewsets.ModelViewSet):
@@ -39,7 +47,9 @@ class RoverViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """List of rovers for the user."""
-        return Rover.objects.filter(owner=self.request.user.id)
+        owned_rovers = Rover.objects.filter(owner=self.request.user)
+        shared_rovers = self.request.user.shared_rovers.all()
+        return (owned_rovers | shared_rovers).distinct()
 
     def perform_create(self, serializer):
         """Perform the create operation."""
@@ -89,3 +99,40 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(
                 'You may only modify your own block diagrams')
         serializer.save()
+
+
+class UserViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    """
+    API endpoint that allows users to be viewed.
+
+    list:
+        Return all users.
+    """
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+    ordering_fields = ('username',)
+    ordering = ('username',)
+    search_fields = ('username',)
+    pagination_class = None
+
+
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows tags to be viewed.
+
+    retrieve:
+        Return a tag instance.
+
+    list:
+        Return all tags.
+    """
+
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+    ordering_fields = ('name',)
+    ordering = ('name',)
+    search_fields = ('name',)
+    pagination_class = None
