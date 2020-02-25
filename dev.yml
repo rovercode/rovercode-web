@@ -25,6 +25,11 @@ services:
     ports:
       - 8000:8000
 
+  profanity-check:
+    build:
+      context: .
+      dockerfile: ./compose/profanity/Dockerfile
+
   redis:
     image: redis:alpine
     volumes:

@@ -38,6 +38,11 @@ services:
     command: /daphne.sh
     env_file: .env
 
+  profanity-check:
+    build:
+      context: .
+      dockerfile: ./compose/profanity/Dockerfile
+
   nginx:
     build: ./compose/nginx
     depends_on:

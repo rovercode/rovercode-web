@@ -50,6 +50,7 @@ class BlockDiagram(models.Model):
         'Tag', related_name='admin_block_diagrams', blank=True)
     owner_tags = models.ManyToManyField(
         'Tag', related_name='owner_block_diagrams', blank=True)
+    flagged = models.BooleanField(default=False)
 
     class Meta:
         """Meta class."""
