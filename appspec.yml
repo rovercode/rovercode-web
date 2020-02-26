@@ -9,7 +9,6 @@ hooks:
     - location: deploy-scripts/remove_prev_install.sh
   AfterInstall:
     - location: deploy-scripts/create_env.sh
-    - location: deploy-scripts/rename_app.sh
     - location: deploy-scripts/change_ownership.sh
   ApplicationStart:
     - location: deploy-scripts/start_app.sh
