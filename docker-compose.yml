@@ -13,9 +13,7 @@ services:
     env_file: .env
 
   django:
-    build:
-      context: .
-      dockerfile: ./compose/django/Dockerfile
+    image: 795223264977.dkr.ecr.us-east-2.amazonaws.com/rovercode-web-service:${TAG}
     user: django
     ports:
       - "0.0.0.0:5000:5000"
@@ -26,9 +24,7 @@ services:
     env_file: .env
 
   django-websockets:
-    build:
-      context: .
-      dockerfile: ./compose/django/Dockerfile
+    image: 795223264977.dkr.ecr.us-east-2.amazonaws.com/rovercode-web-service:${TAG}
     user: django
     ports:
       - "0.0.0.0:6000:6000"
@@ -39,9 +35,7 @@ services:
     env_file: .env
 
   profanity-check:
-    build:
-      context: .
-      dockerfile: ./compose/profanity/Dockerfile
+    image: 795223264977.dkr.ecr.us-east-2.amazonaws.com/rovercode-profanity-check:${TAG}
 
   nginx:
     build: ./compose/nginx
