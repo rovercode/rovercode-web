@@ -1,10 +1,13 @@
 """API test views."""
+from unittest.mock import patch
+
 from test_plus.test import TestCase
 
 import dateutil.parser
 import json
 
 from django.contrib.auth import get_user_model
+from django.core import mail
 from django.urls import reverse
 from rest_framework.test import APIClient
 
@@ -329,6 +332,18 @@ class TestRoverViewSet(BaseAuthenticatedTestCase):
 
 class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
     """Tests the block diagram API view."""
+
+    def setUp(self):
+        """Initialize the tests."""
+        super().setUp()
+        self.patcher = patch('requests.post')
+        self.mock_post = self.patcher.start()
+        self.mock_post.return_value.status_code = 404
+
+    def tearDown(self):
+        """Tear down the tests."""
+        super().tearDown()
+        self.patcher.stop()
 
     def test_bd(self):
         """Test the block diagram API view displays the correct items."""
@@ -695,3 +710,97 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()['total_pages'])
         self.assertEqual(0, len(response.json()['results']))
+
+    def test_profanity_check(self):
+        """Test that email is sent when profanity detected."""
+        self.mock_post.return_value.status_code = 200
+        self.mock_post.return_value.json.return_value = {
+            'censored': 'profane-word',
+            'original_profane_word': 'profane-word',
+            'uncensored': 'profane-word',
+        }
+
+        self.assertEqual(0, len(mail.outbox))
+
+        self.authenticate()
+        data = {
+            'name': 'profane-word',
+            'content': '<xml></xml>',
+        }
+        response = self.client.post(reverse('api:v1:blockdiagram-list'), data)
+        self.assertEqual(201, response.status_code)
+
+        self.assertEqual(1, len(mail.outbox))
+        self.assertIn(self.admin.username, mail.outbox[0].body)
+        self.assertIn('profane-word', mail.outbox[0].body)
+
+    @patch('mission_control.signals.handlers.LOGGER')
+    def test_profanity_check_failure(self, mock_logger):
+        """Test that error is logged if unable to contact profanity check."""
+        self.assertEqual(0, len(mail.outbox))
+
+        self.authenticate()
+        data = {
+            'name': 'profane-word',
+            'content': '<xml></xml>',
+        }
+        response = self.client.post(reverse('api:v1:blockdiagram-list'), data)
+        self.assertEqual(201, response.status_code)
+
+        self.assertEqual(0, len(mail.outbox))
+        self.assertTrue(mock_logger.error.called)
+        self.assertEqual(404, mock_logger.error.call_args[0][1])
+
+    def test_profanity_check_flag(self):
+        """Test that program is flagged correctly."""
+        profane_response = {
+            'censored': 'profane-word',
+            'original_profane_word': 'profane-word',
+            'uncensored': 'profane-word',
+        }
+        normal_response = {
+            'censored': 'word',
+            'original_profane_word': None,
+            'uncensored': 'word',
+        }
+        self.mock_post.return_value.status_code = 200
+        self.mock_post.return_value.json.side_effect = [
+            profane_response,
+            normal_response,
+            profane_response,
+        ]
+
+        self.assertEqual(0, len(mail.outbox))
+
+        self.authenticate()
+        data = {
+            'name': 'profane-word',
+            'content': '<xml></xml>',
+        }
+        response = self.client.post(reverse('api:v1:blockdiagram-list'), data)
+        self.assertEqual(201, response.status_code)
+
+        bd = BlockDiagram.objects.first()
+        self.assertTrue(bd.flagged)
+
+        data = {
+            'name': 'word',
+            'content': '<xml></xml>',
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.id}), data)
+        self.assertEqual(200, response.status_code)
+
+        bd = BlockDiagram.objects.first()
+        self.assertFalse(bd.flagged)
+
+        data = {
+            'name': 'profane-word',
+            'content': '<xml></xml>',
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.id}), data)
+        self.assertEqual(200, response.status_code)
+
+        bd = BlockDiagram.objects.first()
+        self.assertTrue(bd.flagged)
