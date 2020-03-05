@@ -18,7 +18,7 @@ LOGGER = logging.getLogger(__name__)
 def update_block_diagram(sender, instance, **kwargs):
     """Handle changes to BlockDiagram model."""
     response = requests.post(
-        'http://profanity-check:8000/censor-word/{}'.format(instance.name))
+        '{}/censor-word/{}'.format(settings.PROFANITY_CHECK_HOST, instance.name))
 
     if response.status_code != 200:
         LOGGER.error(

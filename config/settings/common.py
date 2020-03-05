@@ -316,6 +316,10 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+# OTHER SERVICES
+# ------------------------------------------------------------------------------
+PROFANITY_CHECK_HOST = env('PROFANITY_CHECK_HOST', default='http://profanity-check:8000')
+
 # JWT CONFIGURATION
 # ------------------------------------------------------------------------------
 JWT_AUTH = {
