@@ -18,18 +18,18 @@ RUN apk add --no-cache bash ca-certificates wget shadow build-base python3-dev p
 COPY . /app
 RUN chown -R django /app
 
-COPY ./compose/django/gunicorn.sh /gunicorn.sh
-COPY ./compose/django/daphne.sh /daphne.sh
+COPY ./compose/django/start.sh /start.sh
+COPY ./compose/django/start-websockets.sh /start-websockets.sh
 COPY ./compose/django/entrypoint.sh /entrypoint.sh
 RUN sed -i 's/\r//' /entrypoint.sh \
-    && sed -i 's/\r//' /gunicorn.sh \
-    && sed -i 's/\r//' /daphne.sh \
+    && sed -i 's/\r//' /start.sh \
+    && sed -i 's/\r//' /start-websockets.sh \
     && chmod +x /entrypoint.sh \
     && chown django /entrypoint.sh \
-    && chmod +x /gunicorn.sh \
-    && chown django /gunicorn.sh \
-    && chmod +x /daphne.sh \
-    && chown django /daphne.sh
+    && chmod +x /start.sh \
+    && chown django /start.sh \
+    && chmod +x /start-websockets.sh \
+    && chown django /start-websockets.sh
 
 WORKDIR /app
 
