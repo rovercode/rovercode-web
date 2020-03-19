@@ -18,16 +18,16 @@ RUN apk add --no-cache bash ca-certificates wget shadow build-base python3-dev p
 COPY . /app
 RUN chown -R django /app
 
-COPY ./compose/django/shart.sh /shart.sh
+COPY ./compose/django/start.sh /start.sh
 COPY ./compose/django/daphne.sh /daphne.sh
 COPY ./compose/django/entrypoint.sh /entrypoint.sh
 RUN sed -i 's/\r//' /entrypoint.sh \
-    && sed -i 's/\r//' /shart.sh \
+    && sed -i 's/\r//' /start.sh \
     && sed -i 's/\r//' /daphne.sh \
     && chmod +x /entrypoint.sh \
     && chown django /entrypoint.sh \
-    && chmod +x /shart.sh \
-    && chown django /shart.sh \
+    && chmod +x /start.sh \
+    && chown django /start.sh \
     && chmod +x /daphne.sh \
     && chown django /daphne.sh
 
