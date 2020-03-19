@@ -31,7 +31,7 @@ services:
     depends_on:
       - postgres
       - redis
-    command: /daphne.sh 6000
+    command: /start-websockets.sh 6000
     env_file: .env
 
   profanity-check:
