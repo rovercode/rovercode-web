@@ -20,7 +20,7 @@ services:
     depends_on:
       - postgres
       - redis
-    command: /gunicorn.sh
+    command: /start.sh 5000
     env_file: .env
 
   django-websockets:
@@ -31,7 +31,7 @@ services:
     depends_on:
       - postgres
       - redis
-    command: /daphne.sh
+    command: /start-websockets.sh 6000
     env_file: .env
 
   profanity-check:
