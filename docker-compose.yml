@@ -30,7 +30,6 @@ services:
     build: ./compose/nginx
     depends_on:
       - django
-      - django-websockets
 
     ports:
       - "0.0.0.0:80:80"
