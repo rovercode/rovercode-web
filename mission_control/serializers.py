@@ -2,65 +2,15 @@
 import re
 
 from django.contrib.auth import get_user_model
-from django.db.utils import IntegrityError
 from rest_framework import serializers
-from oauth2_provider.models import Application
 
 from .fields import TagStringRelatedField
-from .fields import UsernameStringRelatedField
 from .models import BlockDiagram
-from .models import Rover
 from .models import Tag
 
 NAME_REGEX = re.compile(r'\((?P<number>\d)\)$')
 
 User = get_user_model()
-
-
-class RoverSerializer(serializers.ModelSerializer):
-    """Rover model serializer."""
-
-    client_id = serializers.CharField(
-        source='oauth_application.client_id',
-        read_only=True)
-    client_secret = serializers.CharField(
-        source='oauth_application.client_secret',
-        read_only=True)
-    shared_users = UsernameStringRelatedField(required=False, many=True)
-
-    class Meta:
-        """Meta class."""
-
-        model = Rover
-        fields = (
-            'id', 'name', 'owner', 'local_ip', 'last_checkin',
-            'config', 'client_id', 'client_secret', 'shared_users'
-        )
-        read_only_fields = ('owner',)
-
-    def create(self, validated_data):
-        """Create an oauth application when the Rover is created."""
-        owner = validated_data.get('owner')
-        name = validated_data.get('name')
-        shared_users = validated_data.pop('shared_users', [])
-
-        oauth_application = Application.objects.create(
-            user=owner,
-            authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS,
-            client_type=Application.CLIENT_CONFIDENTIAL,
-            name=name
-        )
-        try:
-            rover = Rover.objects.create(oauth_application=oauth_application,
-                                         **validated_data)
-        except IntegrityError:
-            raise serializers.ValidationError(
-                'There is already a rover with that name')
-
-        for user in shared_users:
-            rover.shared_users.add(user)
-
-        return rover
 
 
 class UserSerializer(serializers.ModelSerializer):
