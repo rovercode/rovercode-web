@@ -3,20 +3,7 @@ from unittest.mock import patch
 
 from test_plus.test import TestCase
 
-from mission_control.models import Rover, BlockDiagram
-
-
-class TestRover(TestCase):
-    """Tests the Rover model."""
-
-    def test__str__(self):
-        """Test the stringify method."""
-        user = self.make_user()
-        rover = Rover.objects.create(
-            name='rover',
-            owner=user
-        )
-        self.assertEqual(str(rover), 'rover')
+from mission_control.models import BlockDiagram
 
 
 class TestBlockDiagram(TestCase):

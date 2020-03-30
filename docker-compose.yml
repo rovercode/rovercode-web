@@ -23,17 +23,6 @@ services:
     command: /start.sh 5000
     env_file: .env
 
-  django-websockets:
-    image: 795223264977.dkr.ecr.us-east-2.amazonaws.com/rovercode-web-service:${TAG}
-    user: django
-    ports:
-      - "0.0.0.0:6000:6000"
-    depends_on:
-      - postgres
-      - redis
-    command: /start-websockets.sh 6000
-    env_file: .env
-
   profanity-check:
     image: 795223264977.dkr.ecr.us-east-2.amazonaws.com/rovercode-profanity-check:${TAG}
 
