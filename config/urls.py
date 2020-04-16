@@ -15,7 +15,6 @@ urlpatterns = [
     url(r'^users/', include(('rovercode_web.users.urls', 'rovercode_web'), namespace='users')),
     url(r'^authorize/', include('allauth.urls')),
 
-    url(r'^realtime/', include(('realtime.urls', 'realtime'), namespace='realtime')),
     url(r'^api/', include(('api.urls', 'api'), namespace='api')),
     url(r'^api-auth/',
         include(('rest_framework.urls', 'restframework'), namespace='rest_framework')),
@@ -26,7 +25,6 @@ urlpatterns = [
     url(r'^docs/', include_docs_urls(
         title='Rovercode API',
         description='API for the rovercode web service.')),
-    url(r'^oauth2/', include(('oauth2_provider.urls', 'oauth2_provider'), namespace='oauth2_provider')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
