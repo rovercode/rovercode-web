@@ -10,14 +10,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        migrations.swappable_dependency(settings.OAUTH2_PROVIDER_APPLICATION_MODEL),
         ('mission_control', '0008_auto_20170605_0242'),
     ]
 
-    operations = [
-        migrations.AddField(
-            model_name='rover',
-            name='oauth_application',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.OAUTH2_PROVIDER_APPLICATION_MODEL),
-        ),
-    ]
+    operations = []

@@ -110,6 +110,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # EMAIL
 # ------------------------------------------------------------------------------
+INSTALLED_APPS += (
+    'anymail',
+)
 DEFAULT_FROM_EMAIL = env('DJANGO_DEFAULT_FROM_EMAIL')
 SERVER_EMAIL = env('DJANGO_SERVER_EMAIL', default=DEFAULT_FROM_EMAIL)
 EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
@@ -219,14 +222,3 @@ ADMIN_URL = env('DJANGO_ADMIN_URL')
 # SOCIAL ACCOUNT CONFIGURATION
 # ------------------------------------------------------------------------------
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
-
-# CHANNEL LAYERS CONFIGURATION
-# ------------------------------------------------------------------------------
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [(REDIS_HOST, REDIS_PORT)],
-        },
-    },
-}

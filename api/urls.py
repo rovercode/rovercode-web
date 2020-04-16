@@ -11,7 +11,6 @@ from rest_framework_jwt.views import verify_jwt_token
 from . import views
 
 router = routers.DefaultRouter()
-router.register(r'rovers', views.RoverViewSet, base_name='rover')
 router.register(r'block-diagrams', views.BlockDiagramViewSet)
 router.register(r'tags', views.TagViewSet)
 router.register(r'users', views.UserViewSet)
