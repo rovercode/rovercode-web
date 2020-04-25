@@ -5,6 +5,7 @@ test-warnings: true
 ignore-paths:
   - mission_control/static/
   - mission_control/migrations/
+  - curriculum/migrations/
   - rovercode_web/users/
   - rovercode_web/contrib/
   - rovercode_web/blog/migrations/

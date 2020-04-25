@@ -12,11 +12,17 @@ class BlockDiagram(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.TextField()
     content = models.TextField()
+    description = models.TextField(blank=True, null=True)
     admin_tags = models.ManyToManyField(
         'Tag', related_name='admin_block_diagrams', blank=True)
     owner_tags = models.ManyToManyField(
         'Tag', related_name='owner_block_diagrams', blank=True)
     flagged = models.BooleanField(default=False)
+    lesson = models.ForeignKey(
+        'curriculum.Lesson', on_delete=models.SET_NULL, blank=True, null=True,
+        related_name='block_diagrams')
+    state = models.ForeignKey(
+        'curriculum.State', on_delete=models.SET_NULL, blank=True, null=True)
 
     class Meta:
         """Meta class."""

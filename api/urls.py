@@ -12,6 +12,8 @@ from . import views
 
 router = routers.DefaultRouter()
 router.register(r'block-diagrams', views.BlockDiagramViewSet)
+router.register(r'courses', views.CourseViewSet)
+router.register(r'lessons', views.LessonViewSet)
 router.register(r'tags', views.TagViewSet)
 router.register(r'users', views.UserViewSet)
 

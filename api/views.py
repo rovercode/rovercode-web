@@ -2,6 +2,10 @@
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets, permissions, serializers, mixins
 
+from curriculum.models import Course
+from curriculum.models import Lesson
+from curriculum.serializers import CourseSerializer
+from curriculum.serializers import LessonSerializer
 from mission_control.filters import BlockDiagramFilter
 from mission_control.models import BlockDiagram
 from mission_control.models import Tag
@@ -91,3 +95,41 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ('name',)
     search_fields = ('name',)
     pagination_class = None
+
+
+class CourseViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows courses to be viewed.
+
+    retrieve:
+        Return a course instance.
+
+    list:
+        Return all courses.
+    """
+
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+    ordering_fields = ('name',)
+    ordering = ('name',)
+    search_fields = ('name',)
+
+
+class LessonViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows lessons to be viewed.
+
+    retrieve:
+        Return a lesson instance.
+
+    list:
+        Return all lessons.
+    """
+
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+    ordering_fields = ('reference', 'course')
+    ordering = ('reference',)
+    search_fields = ('reference__name', 'course__name')

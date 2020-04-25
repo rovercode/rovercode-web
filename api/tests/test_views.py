@@ -10,6 +10,10 @@ from django.core import mail
 from django.urls import reverse
 from rest_framework.test import APIClient
 
+from curriculum.models import Course
+from curriculum.models import Lesson
+from curriculum.models import ProgressState
+from curriculum.models import State
 from mission_control.models import BlockDiagram
 from mission_control.models import Tag
 
@@ -517,3 +521,70 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 
         bd = BlockDiagram.objects.first()
         self.assertTrue(bd.flagged)
+
+
+class TestCourseViewSet(BaseAuthenticatedTestCase):
+    """Tests the course API view."""
+
+    def test_course_list(self):
+        """Test listing courses."""
+        self.authenticate()
+        user = self.make_user()
+        bd1 = BlockDiagram.objects.create(
+            user=user,
+            name='test',
+            content='<xml></xml>'
+        )
+        bd2 = BlockDiagram.objects.create(
+            user=user,
+            name='test1',
+            content='<xml></xml>'
+        )
+        course1 = Course.objects.create(name='Course1')
+        course2 = Course.objects.create(name='Course2')
+        lesson1 = Lesson.objects.create(
+            course=course1, sequence_number=1, reference=bd1)
+        lesson2 = Lesson.objects.create(
+            course=course2, sequence_number=2, reference=bd2)
+
+        state = State.objects.create(progress=ProgressState.COMPLETE)
+        bd3 = BlockDiagram.objects.create(
+            user=self.admin,
+            name='remix',
+            content='<xml></xml>',
+            lesson=lesson2,
+            state=state
+        )
+
+        response = self.client.get(reverse('api:v1:course-list'))
+        self.assertEqual(200, response.status_code)
+
+        self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(2, len(response.json()['results']))
+        self.assertEqual(response.json()['results'][0]['id'], course1.id)
+        self.assertEqual(response.json()['results'][0]['name'], course1.name)
+        self.assertEqual(1, len(response.json()['results'][0]['lessons']))
+        self.assertDictEqual(response.json()['results'][0]['lessons'][0], {
+            'id': lesson1.id,
+            'reference': lesson1.reference.name,
+            'course': course1.name,
+            'description': lesson1.reference.description,
+            'sequence_number': lesson1.sequence_number,
+            'active_bd': lesson1.reference.id,
+            'state': None,
+        })
+
+        self.assertEqual(response.json()['results'][1]['id'], course2.id)
+        self.assertEqual(response.json()['results'][1]['name'], course2.name)
+        self.assertEqual(1, len(response.json()['results'][1]['lessons']))
+        self.assertDictEqual(response.json()['results'][1]['lessons'][0], {
+            'id': lesson2.id,
+            'reference': lesson2.reference.name,
+            'course': course2.name,
+            'description': lesson2.reference.description,
+            'sequence_number': lesson2.sequence_number,
+            'active_bd': bd3.id,
+            'state': {
+                'progress': state.progress.name,
+            },
+        })
