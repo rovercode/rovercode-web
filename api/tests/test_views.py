@@ -526,6 +526,18 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 class TestCourseViewSet(BaseAuthenticatedTestCase):
     """Tests the course API view."""
 
+    def setUp(self):
+        """Initialize the tests."""
+        super().setUp()
+        self.patcher = patch('requests.post')
+        self.mock_post = self.patcher.start()
+        self.mock_post.return_value.status_code = 404
+
+    def tearDown(self):
+        """Tear down the tests."""
+        super().tearDown()
+        self.patcher.stop()
+
     def test_course_list(self):
         """Test listing courses."""
         self.authenticate()
