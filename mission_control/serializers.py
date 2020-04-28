@@ -33,6 +33,7 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     lesson = serializers.StringRelatedField(read_only=True)
     state = StateSerializer(read_only=True)
+    reference_of = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         """Meta class."""
