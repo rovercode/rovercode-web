@@ -4,6 +4,8 @@ import re
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from curriculum.models import Lesson
+from curriculum.serializers import StateSerializer
 from .fields import TagStringRelatedField
 from .models import BlockDiagram
 from .models import Tag
@@ -30,6 +32,10 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
     owner_tags = TagStringRelatedField(required=False, many=True)
     tags = serializers.SerializerMethodField()
     user = UserSerializer(read_only=True)
+    lesson = serializers.PrimaryKeyRelatedField(
+        required=False, allow_null=True, queryset=Lesson.objects.all())
+    state = StateSerializer(read_only=True)
+    reference_of = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         """Meta class."""
