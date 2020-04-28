@@ -226,8 +226,12 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             name='test1',
             content='<xml></xml>'
         )
+        course = Course.objects.create(name='Course')
+        lesson = Lesson.objects.create(
+            course=course, sequence_number=1, reference=bd)
         data = {
             'name': 'test',
+            'lesson': lesson.id,
         }
         response = self.client.patch(
             reverse(
@@ -236,6 +240,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
         self.assertEqual(BlockDiagram.objects.last().name, 'test')
+        self.assertEqual(BlockDiagram.objects.last().lesson, lesson)
 
     def test_bd_update_as_invalid_user(self):
         """Test updating block diagram as another user."""
