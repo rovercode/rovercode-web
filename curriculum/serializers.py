@@ -1,4 +1,5 @@
 """Curriculum serializers."""
+from django.urls import reverse
 from rest_framework import serializers
 
 from .models import Course
@@ -48,7 +49,7 @@ class LessonSerializer(serializers.ModelSerializer):
         if not bd:
             bd = obj.reference
 
-        return bd.id
+        return reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk})
 
     def get_state(self, obj):
         """Get the state of this lesson."""

@@ -587,7 +587,9 @@ class TestCourseViewSet(BaseAuthenticatedTestCase):
             'course': course1.name,
             'description': lesson1.reference.description,
             'sequence_number': lesson1.sequence_number,
-            'active_bd': lesson1.reference.id,
+            'active_bd': reverse(
+                'api:v1:blockdiagram-detail', kwargs={'pk': lesson1.reference.pk}
+            ),
             'state': None,
         })
 
@@ -600,7 +602,9 @@ class TestCourseViewSet(BaseAuthenticatedTestCase):
             'course': course2.name,
             'description': lesson2.reference.description,
             'sequence_number': lesson2.sequence_number,
-            'active_bd': bd3.id,
+            'active_bd': reverse(
+                'api:v1:blockdiagram-detail', kwargs={'pk': bd3.pk}
+            ),
             'state': {
                 'progress': state.progress.name,
             },
