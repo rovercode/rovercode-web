@@ -52,7 +52,7 @@ class LessonSerializer(serializers.ModelSerializer):
         return bd.pk
 
     def get_active_bd_owned(self, obj):
-        """Get the block diagram to load for this lesson."""
+        """Indicate if the active block diagram is owned by the user."""
         return self._get_remix_bd(obj) is not None
 
     def get_state(self, obj):
