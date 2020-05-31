@@ -1,5 +1,4 @@
 """Curriculum serializers."""
-from django.urls import reverse
 from rest_framework import serializers
 
 from .models import Course
@@ -29,6 +28,7 @@ class LessonSerializer(serializers.ModelSerializer):
         read_only=True, source='reference.description')
     sequence_number = serializers.IntegerField(read_only=True, min_value=0)
     active_bd = serializers.SerializerMethodField()
+    active_bd_owned = serializers.SerializerMethodField()
     state = serializers.SerializerMethodField()
 
     class Meta:
@@ -49,7 +49,11 @@ class LessonSerializer(serializers.ModelSerializer):
         if not bd:
             bd = obj.reference
 
-        return reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk})
+        return bd.pk
+
+    def get_active_bd_owned(self, obj):
+        """Indicate if the active block diagram is owned by the user."""
+        return self._get_remix_bd(obj) is not None
 
     def get_state(self, obj):
         """Get the state of this lesson."""
