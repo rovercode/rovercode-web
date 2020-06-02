@@ -1,6 +1,11 @@
 """API views."""
+import logging
+
 from django.contrib.auth import get_user_model
-from rest_framework import viewsets, permissions, serializers, mixins
+from rest_framework import viewsets, permissions, serializers, mixins, status
+from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
+from rest_framework.response import Response
 
 from curriculum.models import Course
 from curriculum.models import Lesson
@@ -14,6 +19,8 @@ from mission_control.serializers import TagSerializer
 from mission_control.serializers import UserSerializer
 
 User = get_user_model()
+
+SUMO_LOGGER = logging.getLogger('sumo')
 
 
 class BlockDiagramViewSet(viewsets.ModelViewSet):
@@ -58,6 +65,20 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(
                 'You may only modify your own block diagrams')
         serializer.save()
+
+    @staticmethod
+    @action(detail=True, methods=['POST'])
+    def remix(request, **kwargs):
+        """Copy the block diagram for the user."""
+        bd = get_object_or_404(BlockDiagram, pk=kwargs.get('pk'))
+        bd.pk = None
+        bd.user = request.user
+        bd.save()
+
+        SUMO_LOGGER.info('Testing')
+
+        return Response(
+            BlockDiagramSerializer(bd).data, status.HTTP_200_OK)
 
 
 class UserViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

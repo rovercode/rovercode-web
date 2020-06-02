@@ -527,6 +527,30 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         bd = BlockDiagram.objects.first()
         self.assertTrue(bd.flagged)
 
+    def test_remix(self):
+        """Test remixing a block diagram."""
+        self.authenticate()
+        user = self.make_user()
+        bd1 = BlockDiagram.objects.create(
+            user=user,
+            name='test',
+            content='<xml></xml>'
+        )
+        response = self.post(
+            reverse('api:v1:blockdiagram-remix', kwargs={'pk': bd1.id}))
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(
+            response.json()['user']['username'], self.admin.username)
+        self.assertEqual(response.json()['name'], bd1.name)
+        self.assertEqual(response.json()['content'], bd1.content)
+
+    def test_remix_unknown(self):
+        """Test remixing an unknown block diagram."""
+        self.authenticate()
+        response = self.post(
+            reverse('api:v1:blockdiagram-remix', kwargs={'pk': 100}))
+        self.assertEqual(404, response.status_code)
+
 
 class TestCourseViewSet(BaseAuthenticatedTestCase):
     """Tests the course API view."""
