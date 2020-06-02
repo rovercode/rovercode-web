@@ -1,4 +1,5 @@
 """API views."""
+import json
 import logging
 
 from django.contrib.auth import get_user_model
@@ -71,11 +72,17 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
     def remix(request, **kwargs):
         """Copy the block diagram for the user."""
         bd = get_object_or_404(BlockDiagram, pk=kwargs.get('pk'))
+        source_id = bd.id
         bd.pk = None
         bd.user = request.user
         bd.save()
 
-        SUMO_LOGGER.info('Testing')
+        SUMO_LOGGER.info(json.dumps({
+            'event': 'remix',
+            'userId': request.user.id,
+            'sourceProgramId': source_id,
+            'newProgramId': bd.id,
+        }))
 
         return Response(
             BlockDiagramSerializer(bd).data, status.HTTP_200_OK)
