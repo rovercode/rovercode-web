@@ -3,6 +3,7 @@ import json
 import logging
 
 from django.contrib.auth import get_user_model
+from django.db.utils import IntegrityError
 from rest_framework import viewsets, permissions, serializers, mixins, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
@@ -72,10 +73,20 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
     def remix(request, **kwargs):
         """Copy the block diagram for the user."""
         bd = get_object_or_404(BlockDiagram, pk=kwargs.get('pk'))
+        if bd.user == request.user:
+            raise serializers.ValidationError(
+                'You are not allowed to remix your own program.',
+            )
+
         source_id = bd.id
         bd.pk = None
         bd.user = request.user
-        bd.save()
+        try:
+            bd.save()
+        except IntegrityError:
+            raise serializers.ValidationError(
+                'You have already remixed this program.',
+            )
 
         SUMO_LOGGER.info(json.dumps({
             'event': 'remix',

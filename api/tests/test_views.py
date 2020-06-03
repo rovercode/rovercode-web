@@ -551,6 +551,36 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             reverse('api:v1:blockdiagram-remix', kwargs={'pk': 100}))
         self.assertEqual(404, response.status_code)
 
+    def test_remix_own(self):
+        """Test remixing own block diagram."""
+        self.authenticate()
+        bd1 = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>'
+        )
+        response = self.post(
+            reverse('api:v1:blockdiagram-remix', kwargs={'pk': bd1.id}))
+        self.assertEqual(400, response.status_code)
+
+    def test_remix_again(self):
+        """Test remixing block diagram already remixed."""
+        self.authenticate()
+        user = self.make_user()
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>'
+        )
+        bd1 = BlockDiagram.objects.create(
+            user=user,
+            name='test',
+            content='<xml></xml>'
+        )
+        response = self.post(
+            reverse('api:v1:blockdiagram-remix', kwargs={'pk': bd1.id}))
+        self.assertEqual(400, response.status_code)
+
 
 class TestCourseViewSet(BaseAuthenticatedTestCase):
     """Tests the course API view."""
