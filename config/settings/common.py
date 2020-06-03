@@ -57,6 +57,7 @@ LOCAL_APPS = (
     'mission_control.apps.MissionControlConfig',
     'api.apps.ApiConfig',
     'authorize.apps.AuthorizeConfig',
+    'curriculum.apps.CurriculumConfig',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
