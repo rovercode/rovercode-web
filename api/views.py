@@ -3,6 +3,7 @@ import json
 import logging
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
 from rest_framework import viewsets, permissions, serializers, mixins, status
 from rest_framework.decorators import action
@@ -79,6 +80,12 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
             )
 
         source_id = bd.id
+        try:
+            bd.lesson = bd.reference_of
+        except ObjectDoesNotExist:
+            # Source is not a lesson reference
+            pass
+
         bd.pk = None
         bd.user = request.user
         try:

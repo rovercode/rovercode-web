@@ -543,6 +543,28 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             response.json()['user']['username'], self.admin.username)
         self.assertEqual(response.json()['name'], bd1.name)
         self.assertEqual(response.json()['content'], bd1.content)
+        self.assertIsNone(response.json()['lesson'])
+
+    def test_remix_reference(self):
+        """Test remixing a reference block diagram."""
+        self.authenticate()
+        user = self.make_user()
+        course = Course.objects.create(name='Test')
+        bd = BlockDiagram.objects.create(
+            user=user,
+            name='test',
+            content='<xml></xml>'
+        )
+        Lesson.objects.create(
+            reference=bd, sequence_number=1, course=course)
+        response = self.post(
+            reverse('api:v1:blockdiagram-remix', kwargs={'pk': bd.id}))
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(
+            response.json()['user']['username'], self.admin.username)
+        self.assertEqual(response.json()['name'], bd.name)
+        self.assertEqual(response.json()['content'], bd.content)
+        self.assertEqual(response.json()['lesson'], bd.reference_of.id)
 
     def test_remix_unknown(self):
         """Test remixing an unknown block diagram."""
