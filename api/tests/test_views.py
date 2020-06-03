@@ -544,6 +544,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(response.json()['name'], bd1.name)
         self.assertEqual(response.json()['content'], bd1.content)
         self.assertIsNone(response.json()['lesson'])
+        self.assertIsNone(response.json()['state'])
 
     def test_remix_reference(self):
         """Test remixing a reference block diagram."""
@@ -565,6 +566,9 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(response.json()['name'], bd.name)
         self.assertEqual(response.json()['content'], bd.content)
         self.assertEqual(response.json()['lesson'], bd.reference_of.id)
+        self.assertDictEqual(response.json()['state'], {
+            'progress': 'IN_PROGRESS',
+        })
 
     def test_remix_unknown(self):
         """Test remixing an unknown block diagram."""

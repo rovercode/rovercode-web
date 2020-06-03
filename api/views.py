@@ -12,6 +12,8 @@ from rest_framework.response import Response
 
 from curriculum.models import Course
 from curriculum.models import Lesson
+from curriculum.models import ProgressState
+from curriculum.models import State
 from curriculum.serializers import CourseSerializer
 from curriculum.serializers import LessonSerializer
 from mission_control.filters import BlockDiagramFilter
@@ -82,6 +84,7 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
         source_id = bd.id
         try:
             bd.lesson = bd.reference_of
+            bd.state = State.objects.create(progress=ProgressState.IN_PROGRESS)
         except ObjectDoesNotExist:
             # Source is not a lesson reference
             pass
