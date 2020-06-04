@@ -598,6 +598,11 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             name='test',
             content='<xml></xml>'
         )
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test (1)',
+            content='<xml></xml>'
+        )
         bd1 = BlockDiagram.objects.create(
             user=user,
             name='test',
@@ -605,7 +610,13 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         )
         response = self.post(
             reverse('api:v1:blockdiagram-remix', kwargs={'pk': bd1.id}))
-        self.assertEqual(400, response.status_code)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(
+            response.json()['user']['username'], self.admin.username)
+        self.assertEqual(response.json()['name'], f'{bd1.name} (2)')
+        self.assertEqual(response.json()['content'], bd1.content)
+        self.assertIsNone(response.json()['lesson'])
+        self.assertIsNone(response.json()['state'])
 
 
 class TestCourseViewSet(BaseAuthenticatedTestCase):

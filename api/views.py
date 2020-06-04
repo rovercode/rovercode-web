@@ -4,7 +4,6 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.utils import IntegrityError
 from rest_framework import viewsets, permissions, serializers, mixins, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
@@ -59,6 +58,17 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
     ordering = ('name',)
     search_fields = ('name',)
 
+    @staticmethod
+    def _find_unique_name(name, user):
+        """Find a unique name for the block diagram."""
+        number = 1
+        while True:
+            unique = f'{name} ({number})'
+            if BlockDiagram.objects.filter(user=user, name=unique).exists():
+                number += 1
+            else:
+                return unique
+
     def perform_create(self, serializer):
         """Perform the create operation."""
         user = self.request.user
@@ -76,7 +86,9 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
     def remix(request, **kwargs):
         """Copy the block diagram for the user."""
         bd = get_object_or_404(BlockDiagram, pk=kwargs.get('pk'))
-        if bd.user == request.user:
+
+        user = request.user
+        if bd.user == user:
             raise serializers.ValidationError(
                 'You are not allowed to remix your own program.',
             )
@@ -90,17 +102,15 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
             pass
 
         bd.pk = None
-        bd.user = request.user
-        try:
-            bd.save()
-        except IntegrityError:
-            raise serializers.ValidationError(
-                'You have already remixed this program.',
-            )
+        bd.user = user
+
+        if BlockDiagram.objects.filter(user=user, name=bd.name).exists():
+            bd.name = BlockDiagramViewSet._find_unique_name(bd.name, user)
+        bd.save()
 
         SUMO_LOGGER.info(json.dumps({
             'event': 'remix',
-            'userId': request.user.id,
+            'userId': user.id,
             'sourceProgramId': source_id,
             'newProgramId': bd.id,
         }))
