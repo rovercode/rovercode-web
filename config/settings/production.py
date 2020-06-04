@@ -182,7 +182,13 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
-        }
+        },
+        'sumologic': {
+            'level': 'INFO',
+            'class': 'mission_control.handlers.SumoHandler',
+            'host': env('SUMO_LOGGER_HOST'),
+            'url': env('SUMO_LOGGER_ENDPOINT'),
+        },
     },
     'loggers': {
         'django.db.backends': {
@@ -203,6 +209,11 @@ LOGGING = {
         'django.security.DisallowedHost': {
             'level': 'ERROR',
             'handlers': ['console', 'sentry'],
+            'propagate': False,
+        },
+        'sumo': {
+            'level': 'INFO',
+            'handlers': ['sumologic'],
             'propagate': False,
         },
     },
