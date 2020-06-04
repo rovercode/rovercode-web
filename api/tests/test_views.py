@@ -527,6 +527,97 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         bd = BlockDiagram.objects.first()
         self.assertTrue(bd.flagged)
 
+    def test_remix(self):
+        """Test remixing a block diagram."""
+        self.authenticate()
+        user = self.make_user()
+        bd1 = BlockDiagram.objects.create(
+            user=user,
+            name='test',
+            content='<xml></xml>'
+        )
+        response = self.post(
+            reverse('api:v1:blockdiagram-remix', kwargs={'pk': bd1.id}))
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(
+            response.json()['user']['username'], self.admin.username)
+        self.assertEqual(response.json()['name'], bd1.name)
+        self.assertEqual(response.json()['content'], bd1.content)
+        self.assertIsNone(response.json()['lesson'])
+        self.assertIsNone(response.json()['state'])
+
+    def test_remix_reference(self):
+        """Test remixing a reference block diagram."""
+        self.authenticate()
+        user = self.make_user()
+        course = Course.objects.create(name='Test')
+        bd = BlockDiagram.objects.create(
+            user=user,
+            name='test',
+            content='<xml></xml>'
+        )
+        Lesson.objects.create(
+            reference=bd, sequence_number=1, course=course)
+        response = self.post(
+            reverse('api:v1:blockdiagram-remix', kwargs={'pk': bd.id}))
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(
+            response.json()['user']['username'], self.admin.username)
+        self.assertEqual(response.json()['name'], bd.name)
+        self.assertEqual(response.json()['content'], bd.content)
+        self.assertEqual(response.json()['lesson'], bd.reference_of.id)
+        self.assertDictEqual(response.json()['state'], {
+            'progress': 'IN_PROGRESS',
+        })
+
+    def test_remix_unknown(self):
+        """Test remixing an unknown block diagram."""
+        self.authenticate()
+        response = self.post(
+            reverse('api:v1:blockdiagram-remix', kwargs={'pk': 100}))
+        self.assertEqual(404, response.status_code)
+
+    def test_remix_own(self):
+        """Test remixing own block diagram."""
+        self.authenticate()
+        bd1 = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>'
+        )
+        response = self.post(
+            reverse('api:v1:blockdiagram-remix', kwargs={'pk': bd1.id}))
+        self.assertEqual(400, response.status_code)
+
+    def test_remix_again(self):
+        """Test remixing block diagram already remixed."""
+        self.authenticate()
+        user = self.make_user()
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>'
+        )
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test (1)',
+            content='<xml></xml>'
+        )
+        bd1 = BlockDiagram.objects.create(
+            user=user,
+            name='test',
+            content='<xml></xml>'
+        )
+        response = self.post(
+            reverse('api:v1:blockdiagram-remix', kwargs={'pk': bd1.id}))
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(
+            response.json()['user']['username'], self.admin.username)
+        self.assertEqual(response.json()['name'], f'{bd1.name} (2)')
+        self.assertEqual(response.json()['content'], bd1.content)
+        self.assertIsNone(response.json()['lesson'])
+        self.assertIsNone(response.json()['state'])
+
 
 class TestCourseViewSet(BaseAuthenticatedTestCase):
     """Tests the course API view."""
