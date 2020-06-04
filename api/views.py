@@ -1,9 +1,18 @@
 """API views."""
+import json
+import logging
+
 from django.contrib.auth import get_user_model
-from rest_framework import viewsets, permissions, serializers, mixins
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import viewsets, permissions, serializers, mixins, status
+from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
+from rest_framework.response import Response
 
 from curriculum.models import Course
 from curriculum.models import Lesson
+from curriculum.models import ProgressState
+from curriculum.models import State
 from curriculum.serializers import CourseSerializer
 from curriculum.serializers import LessonSerializer
 from mission_control.filters import BlockDiagramFilter
@@ -14,6 +23,8 @@ from mission_control.serializers import TagSerializer
 from mission_control.serializers import UserSerializer
 
 User = get_user_model()
+
+SUMO_LOGGER = logging.getLogger('sumo')
 
 
 class BlockDiagramViewSet(viewsets.ModelViewSet):
@@ -47,6 +58,17 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
     ordering = ('name',)
     search_fields = ('name',)
 
+    @staticmethod
+    def _find_unique_name(name, user):
+        """Find a unique name for the block diagram."""
+        number = 1
+        while True:
+            unique = f'{name} ({number})'
+            if BlockDiagram.objects.filter(user=user, name=unique).exists():
+                number += 1
+            else:
+                return unique
+
     def perform_create(self, serializer):
         """Perform the create operation."""
         user = self.request.user
@@ -58,6 +80,43 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(
                 'You may only modify your own block diagrams')
         serializer.save()
+
+    @staticmethod
+    @action(detail=True, methods=['POST'])
+    def remix(request, **kwargs):
+        """Copy the block diagram for the user."""
+        bd = get_object_or_404(BlockDiagram, pk=kwargs.get('pk'))
+
+        user = request.user
+        if bd.user == user:
+            raise serializers.ValidationError(
+                'You are not allowed to remix your own program.',
+            )
+
+        source_id = bd.id
+        try:
+            bd.lesson = bd.reference_of
+            bd.state = State.objects.create(progress=ProgressState.IN_PROGRESS)
+        except ObjectDoesNotExist:
+            # Source is not a lesson reference
+            pass
+
+        bd.pk = None
+        bd.user = user
+
+        if BlockDiagram.objects.filter(user=user, name=bd.name).exists():
+            bd.name = BlockDiagramViewSet._find_unique_name(bd.name, user)
+        bd.save()
+
+        SUMO_LOGGER.info(json.dumps({
+            'event': 'remix',
+            'userId': user.id,
+            'sourceProgramId': source_id,
+            'newProgramId': bd.id,
+        }))
+
+        return Response(
+            BlockDiagramSerializer(bd).data, status.HTTP_200_OK)
 
 
 class UserViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
