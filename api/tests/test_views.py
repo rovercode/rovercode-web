@@ -619,6 +619,45 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertIsNone(response.json()['state'])
 
 
+class TestUserViewSet(BaseAuthenticatedTestCase):
+    """Tests the user API view."""
+
+    def test_modify(self):
+        """Test modifying user."""
+        self.authenticate()
+
+        self.assertTrue(
+            get_user_model().objects.get(id=self.admin.id).show_guide)
+
+        data = {
+            'show_guide': False,
+        }
+        response = self.client.put(reverse('api:v1:user-detail', kwargs={
+            'pk': self.admin.pk,
+        }), data)
+        self.assertEqual(200, response.status_code)
+        self.assertFalse(
+            get_user_model().objects.get(id=self.admin.id).show_guide)
+
+    def test_modify_other(self):
+        """Test modifying other user."""
+        self.authenticate()
+        user = self.make_user()
+
+        self.assertTrue(
+            get_user_model().objects.get(id=self.admin.id).show_guide)
+
+        data = {
+            'show_guide': False,
+        }
+        response = self.client.put(reverse('api:v1:user-detail', kwargs={
+            'pk': user.pk,
+        }), data)
+        self.assertEqual(400, response.status_code)
+        self.assertTrue(
+            get_user_model().objects.get(id=self.admin.id).show_guide)
+
+
 class TestCourseViewSet(BaseAuthenticatedTestCase):
     """Tests the course API view."""
 
