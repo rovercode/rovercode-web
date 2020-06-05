@@ -311,6 +311,7 @@ PROFANITY_CHECK_SERVICE_HOST = env('PROFANITY_CHECK_SERVICE_HOST', default='http
 JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=4),
     'JWT_ALLOW_REFRESH': True,
+    'JWT_PAYLOAD_HANDLER': 'rovercode_web.users.utils.jwt_payload_handler',
     'JWT_SECRET_KEY': env(
         'JWT_SECRET_KEY',
         default='ac9fb5054311bfeeefe79fbe31740850'
