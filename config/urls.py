@@ -12,7 +12,6 @@ from rest_framework.documentation import include_docs_urls
 
 urlpatterns = [
     # User management
-    url(r'^users/', include(('rovercode_web.users.urls', 'rovercode_web'), namespace='users')),
     url(r'^authorize/', include('allauth.urls')),
 
     url(r'^api/', include(('api.urls', 'api'), namespace='api')),
