@@ -25,6 +25,18 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('username', )
 
 
+class UserGuideSerializer(serializers.ModelSerializer):
+    """User model serializer."""
+
+    show_guide = serializers.BooleanField()
+
+    class Meta:
+        """Meta class."""
+
+        model = User
+        fields = ('show_guide', )
+
+
 class BlockDiagramSerializer(serializers.ModelSerializer):
     """Block diagram model serializer."""
 

@@ -20,7 +20,7 @@ from mission_control.models import BlockDiagram
 from mission_control.models import Tag
 from mission_control.serializers import BlockDiagramSerializer
 from mission_control.serializers import TagSerializer
-from mission_control.serializers import UserSerializer
+from mission_control.serializers import UserGuideSerializer
 
 User = get_user_model()
 
@@ -119,21 +119,27 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
             BlockDiagramSerializer(bd).data, status.HTTP_200_OK)
 
 
-class UserViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     """
-    API endpoint that allows users to be viewed.
+    API endpoint that allows user to be modified.
 
-    list:
-        Return all users.
+    update:
+        Update user.
+
+    partial_update:
+        Update user.
     """
 
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserGuideSerializer
     permission_classes = (permissions.IsAuthenticated, )
-    ordering_fields = ('username',)
-    ordering = ('username',)
-    search_fields = ('username',)
-    pagination_class = None
+    filter_backends = []
+
+    def perform_update(self, serializer):
+        """Perform the update operation."""
+        if self.get_object().id is not self.request.user.id:
+            raise serializers.ValidationError('You may only modify yourself')
+        serializer.save()
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
