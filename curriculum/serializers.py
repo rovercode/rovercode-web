@@ -27,6 +27,8 @@ class LessonSerializer(serializers.ModelSerializer):
     description = serializers.CharField(
         read_only=True, source='reference.description')
     sequence_number = serializers.IntegerField(read_only=True, min_value=0)
+    tutorial_link = serializers.URLField(read_only=True)
+    goals = serializers.CharField(read_only=True)
     active_bd = serializers.SerializerMethodField()
     active_bd_owned = serializers.SerializerMethodField()
     state = serializers.SerializerMethodField()
