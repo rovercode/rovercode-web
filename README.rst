@@ -1,10 +1,8 @@
-
-.. image:: https://i.imgur.com/BSzTTkF.png
-
-rovercode-web
+Rovercode API
 =============
 
-:License: GPLv3
+.. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
+      :target: https://www.gnu.org/licenses/gpl-3.0
 .. image:: https://img.shields.io/badge/chat-zulip-brightgreen.svg?style=flat
       :target: https://rovercode.zulipchat.com/
 .. image:: https://img.shields.io/badge/board-zenhub-blue.svg?style=flat
@@ -14,14 +12,14 @@ rovercode-web
       :alt: Built with Cookiecutter Django
 .. image:: https://api.travis-ci.org/rovercode/rovercode-web.svg
       :target: https://travis-ci.org/rovercode/rovercode-web
-.. image:: https://coveralls.io/repos/github/rovercode/rovercode-web/badge.svg?branch=development
-       :target: https://coveralls.io/github/rovercode/rovercode-web?branch=development
+.. image:: https://coveralls.io/repos/github/rovercode/rovercode-web/badge.svg?branch=alpha
+       :target: https://coveralls.io/github/rovercode/rovercode-web?branch=alpha
 
 rovercode is an open-source educational robotics platform. Students use our web-based drag-and-drop editor to create
 code that listens to the rover's sensors and controls its motors.
 
-rovercode is made up of serveral code repositories. You are currently viewing rovercode-web, the web application 
-that provides the drag-and-drop coding interface and user management. To learn about the other pieces of rovercode,
+rovercode is made up of several code repositories. You are currently viewing rovercode-web, the web application backend
+that provides the API for the `frontend <https://github.com/rovercode/rovercode-ui/>`_. To learn about the other pieces of rovercode,
 visit our `architecture documentation <https://contributor-docs.rovercode.com/architecture.html>`_, or start at `the
 root of Rovercode's documentation <https://contributor-docs.rovercode.com>`_.
 
@@ -39,7 +37,7 @@ Install `docker <https://docs.docker.com/engine/installation/>`_ and `docker-com
 
 Basic Commands
 --------------
-rovercode-web runs is built with Django. During development, you can do regular Django things like this:
+rovercode-web is built with Django. During development, you can do regular Django things like this:
 
 .. code-block:: bash
 
