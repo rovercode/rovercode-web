@@ -27,6 +27,8 @@ class Lesson(models.Model):
         on_delete=models.CASCADE,
         related_name='reference_of')
     sequence_number = models.PositiveSmallIntegerField()
+    tutorial_link = models.URLField(blank=True, null=True)
+    goals = models.TextField(blank=True, null=True)
 
     def __str__(self):
         """Convert the model to a human readable string."""

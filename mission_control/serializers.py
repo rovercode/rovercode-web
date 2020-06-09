@@ -48,6 +48,7 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
         required=False, allow_null=True, queryset=Lesson.objects.all())
     state = StateSerializer(read_only=True)
     reference_of = serializers.PrimaryKeyRelatedField(read_only=True)
+    flagged = serializers.BooleanField(read_only=True)
 
     class Meta:
         """Meta class."""
