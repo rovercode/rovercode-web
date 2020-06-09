@@ -619,6 +619,45 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertIsNone(response.json()['state'])
 
 
+class TestUserViewSet(BaseAuthenticatedTestCase):
+    """Tests the user API view."""
+
+    def test_modify(self):
+        """Test modifying user."""
+        self.authenticate()
+
+        self.assertTrue(
+            get_user_model().objects.get(id=self.admin.id).show_guide)
+
+        data = {
+            'show_guide': False,
+        }
+        response = self.client.put(reverse('api:v1:user-detail', kwargs={
+            'pk': self.admin.pk,
+        }), data)
+        self.assertEqual(200, response.status_code)
+        self.assertFalse(
+            get_user_model().objects.get(id=self.admin.id).show_guide)
+
+    def test_modify_other(self):
+        """Test modifying other user."""
+        self.authenticate()
+        user = self.make_user()
+
+        self.assertTrue(
+            get_user_model().objects.get(id=self.admin.id).show_guide)
+
+        data = {
+            'show_guide': False,
+        }
+        response = self.client.put(reverse('api:v1:user-detail', kwargs={
+            'pk': user.pk,
+        }), data)
+        self.assertEqual(400, response.status_code)
+        self.assertTrue(
+            get_user_model().objects.get(id=self.admin.id).show_guide)
+
+
 class TestCourseViewSet(BaseAuthenticatedTestCase):
     """Tests the course API view."""
 
@@ -651,9 +690,19 @@ class TestCourseViewSet(BaseAuthenticatedTestCase):
         course1 = Course.objects.create(name='Course1')
         course2 = Course.objects.create(name='Course2')
         lesson1 = Lesson.objects.create(
-            course=course1, sequence_number=1, reference=bd1)
+            course=course1,
+            sequence_number=1,
+            reference=bd1,
+            tutorial_link='https://lesson1.test/',
+            goals='Lesson 1 goals',
+        )
         lesson2 = Lesson.objects.create(
-            course=course2, sequence_number=2, reference=bd2)
+            course=course2,
+            sequence_number=2,
+            reference=bd2,
+            tutorial_link='https://lesson2.test/',
+            goals='Lesson 2 goals',
+        )
 
         state = State.objects.create(progress=ProgressState.COMPLETE)
         bd3 = BlockDiagram.objects.create(
@@ -681,6 +730,8 @@ class TestCourseViewSet(BaseAuthenticatedTestCase):
             'active_bd': lesson1.reference.pk,
             'active_bd_owned': False,
             'state': None,
+            'tutorial_link': lesson1.tutorial_link,
+            'goals': lesson1.goals,
         })
 
         self.assertEqual(response.json()['results'][1]['id'], course2.id)
@@ -694,6 +745,8 @@ class TestCourseViewSet(BaseAuthenticatedTestCase):
             'sequence_number': lesson2.sequence_number,
             'active_bd': bd3.pk,
             'active_bd_owned': True,
+            'tutorial_link': lesson2.tutorial_link,
+            'goals': lesson2.goals,
             'state': {
                 'progress': state.progress.name,
             },
