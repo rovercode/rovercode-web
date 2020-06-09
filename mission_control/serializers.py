@@ -25,6 +25,18 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('username', )
 
 
+class UserGuideSerializer(serializers.ModelSerializer):
+    """User model serializer."""
+
+    show_guide = serializers.BooleanField()
+
+    class Meta:
+        """Meta class."""
+
+        model = User
+        fields = ('show_guide', )
+
+
 class BlockDiagramSerializer(serializers.ModelSerializer):
     """Block diagram model serializer."""
 
@@ -36,6 +48,7 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
         required=False, allow_null=True, queryset=Lesson.objects.all())
     state = StateSerializer(read_only=True)
     reference_of = serializers.PrimaryKeyRelatedField(read_only=True)
+    flagged = serializers.BooleanField(read_only=True)
 
     class Meta:
         """Meta class."""

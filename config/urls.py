@@ -12,7 +12,6 @@ from rest_framework.documentation import include_docs_urls
 
 urlpatterns = [
     # User management
-    url(r'^users/', include(('rovercode_web.users.urls', 'rovercode_web'), namespace='users')),
     url(r'^authorize/', include('allauth.urls')),
 
     url(r'^api/', include(('api.urls', 'api'), namespace='api')),
@@ -29,14 +28,6 @@ urlpatterns = [
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
-    # This allows the error pages to be debugged during development, just visit
-    # these url in browser to see how these error pages look like.
-    urlpatterns += [
-        url(r'^400/$', default_views.bad_request, kwargs={'exception': Exception('Bad Request!')}),
-        url(r'^403/$', default_views.permission_denied, kwargs={'exception': Exception('Permission Denied')}),
-        url(r'^404/$', default_views.page_not_found, kwargs={'exception': Exception('Page not Found')}),
-        url(r'^500/$', default_views.server_error),
-    ]
     if 'debug_toolbar' in settings.INSTALLED_APPS:
         import debug_toolbar
 
