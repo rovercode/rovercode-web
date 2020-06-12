@@ -127,6 +127,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         """Test the block diagram API view filters on user exclude correctly."""
         self.authenticate()
         user1 = self.make_user('user1')
+        user2 = self.make_user('user2')
         bd = BlockDiagram.objects.create(
             user=self.admin,
             name='test1',
@@ -137,6 +138,14 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             name='test2',
             content='<xml></xml>'
         )
+        ref = BlockDiagram.objects.create(
+            user=user2,
+            name='test2',
+            content='<xml></xml>'
+        )
+        course = Course.objects.create(name='Course')
+        Lesson.objects.create(
+            course=course, sequence_number=1, reference=ref)
         response = self.get(
             reverse('api:v1:blockdiagram-list') +
             '?user__not=' + str(user1.id))
@@ -258,10 +267,37 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             reverse(
                 'api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
             json.dumps(data), content_type='application/json')
-        self.assertEqual(400, response.status_code)
-        self.assertEqual(
-            response.content,
-            b'["You may only modify your own block diagrams"]')
+        self.assertEqual(404, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, user.id)
+        self.assertEqual(BlockDiagram.objects.last().name, 'test1')
+
+    def test_bd_delete_as_valid_user(self):
+        """Test deleting block diagram as owner."""
+        self.authenticate()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        response = self.client.delete(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+        )
+        self.assertEqual(204, response.status_code)
+        self.assertFalse(BlockDiagram.objects.filter(id=bd.id).exists())
+
+    def test_bd_delete_as_invalid_user(self):
+        """Test deleting block diagram as another user."""
+        self.authenticate()
+        user = self.make_user()
+        bd = BlockDiagram.objects.create(
+            user=user,
+            name='test1',
+            content='<xml></xml>'
+        )
+        response = self.client.delete(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+        )
+        self.assertEqual(404, response.status_code)
         self.assertEqual(BlockDiagram.objects.last().user.id, user.id)
         self.assertEqual(BlockDiagram.objects.last().name, 'test1')
 

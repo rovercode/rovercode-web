@@ -50,7 +50,6 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
         Update a block diagram.
     """
 
-    queryset = BlockDiagram.objects.all()
     serializer_class = BlockDiagramSerializer
     permission_classes = (permissions.IsAuthenticated, )
     filterset_class = BlockDiagramFilter
@@ -69,17 +68,19 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
             else:
                 return unique
 
+    def get_queryset(self):
+        """Return the objects available for the operation."""
+        if self.action in ['update', 'partial_update', 'destroy']:
+            return BlockDiagram.objects.filter(user=self.request.user)
+        if self.action == 'list':
+            return BlockDiagram.objects.filter(reference_of=None)
+
+        return BlockDiagram.objects.all()
+
     def perform_create(self, serializer):
         """Perform the create operation."""
         user = self.request.user
         serializer.save(user=user)
-
-    def perform_update(self, serializer):
-        """Perform the update operation."""
-        if self.get_object().user.id is not self.request.user.id:
-            raise serializers.ValidationError(
-                'You may only modify your own block diagrams')
-        serializer.save()
 
     @staticmethod
     @action(detail=True, methods=['POST'])
