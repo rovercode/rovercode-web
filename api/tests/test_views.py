@@ -7,6 +7,7 @@ import json
 
 from django.contrib.auth import get_user_model
 from django.core import mail
+from django.test import override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient
 
@@ -653,6 +654,75 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(response.json()['content'], bd1.content)
         self.assertIsNone(response.json()['lesson'])
         self.assertIsNone(response.json()['state'])
+
+    @override_settings(SUPPORT_CONTACT='support@example.com')
+    def test_report(self):
+        """Test reporting a block diagram."""
+        self.authenticate()
+        user = self.make_user()
+        support = self.make_user('support')
+
+        bd1 = BlockDiagram.objects.create(
+            user=user,
+            name='test',
+            content='<xml></xml>'
+        )
+        self.assertEqual(0, BlockDiagram.objects.filter(user=support).count())
+        self.assertEqual(0, len(mail.outbox))
+
+        data = {
+            'description': 'Something went wrong',
+        }
+        response = self.post(
+            reverse('api:v1:blockdiagram-report', kwargs={'pk': bd1.id}),
+            data=data
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, BlockDiagram.objects.filter(user=support).count())
+        self.assertEqual(
+            f'{bd1.id} - test',
+            BlockDiagram.objects.filter(user=support).last().name
+        )
+        self.assertEqual(1, len(mail.outbox))
+        self.assertIn('Something went wrong', mail.outbox[0].body)
+        self.assertIn(f'{bd1.id}:{bd1.name}', mail.outbox[0].body)
+
+    @override_settings(SUPPORT_CONTACT='support@example.com')
+    def test_report_again(self):
+        """Test reporting a block diagram already reported."""
+        self.authenticate()
+        user = self.make_user()
+        support = self.make_user('support')
+
+        bd1 = BlockDiagram.objects.create(
+            user=user,
+            name='test',
+            content='<xml></xml>'
+        )
+        BlockDiagram.objects.create(
+            user=support,
+            name=f'{bd1.id} - test',
+            content='<xml></xml>'
+        )
+        self.assertEqual(1, BlockDiagram.objects.filter(user=support).count())
+        self.assertEqual(0, len(mail.outbox))
+
+        data = {
+            'description': 'Something went wrong',
+        }
+        response = self.post(
+            reverse('api:v1:blockdiagram-report', kwargs={'pk': bd1.id}),
+            data=data
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, BlockDiagram.objects.filter(user=support).count())
+        self.assertEqual(
+            f'{bd1.id} - test (1)',
+            BlockDiagram.objects.filter(user=support).last().name
+        )
+        self.assertEqual(1, len(mail.outbox))
+        self.assertIn('Something went wrong', mail.outbox[0].body)
+        self.assertIn(f'{bd1.id}:{bd1.name}', mail.outbox[0].body)
 
 
 class TestUserViewSet(BaseAuthenticatedTestCase):
