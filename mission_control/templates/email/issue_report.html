@@ -1,0 +1,7 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans %}
+Program issue reported for user {{ user }}.
+Program {{ id }}:{{ name }} has the following issue:
+{{ description }}
+{% endblocktrans %}
+{% endautoescape %}
