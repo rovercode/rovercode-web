@@ -76,7 +76,14 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
         if self.action in ['update', 'partial_update', 'destroy']:
             return BlockDiagram.objects.filter(user=self.request.user)
         if self.action == 'list':
-            return BlockDiagram.objects.filter(reference_of=None)
+            support = User.objects.get(email=settings.SUPPORT_CONTACT)
+
+            bds = BlockDiagram.objects.filter(reference_of=None)
+
+            if self.request.user == support:
+                return bds
+
+            return bds.exclude(user=support)
 
         return BlockDiagram.objects.all()
 
