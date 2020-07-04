@@ -7,6 +7,7 @@ import json
 
 from django.contrib.auth import get_user_model
 from django.core import mail
+from django.test import override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient
 
@@ -30,11 +31,11 @@ class BaseAuthenticatedTestCase(TestCase):
         )
         self.client = APIClient()
 
-    def authenticate(self):
+    def authenticate(self, username='administrator', password='password'):
         """Authenticate the test client."""
         credentials = {
-            'username': 'administrator',
-            'password': 'password',
+            'username': username,
+            'password': password,
         }
         response = self.client.post(
             reverse('api:api-token-auth'),
@@ -47,12 +48,14 @@ class BaseAuthenticatedTestCase(TestCase):
             HTTP_AUTHORIZATION='JWT {0}'.format(response.json()['token']))
 
 
+@override_settings(SUPPORT_CONTACT='support@example.com')
 class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
     """Tests the block diagram API view."""
 
     def setUp(self):
         """Initialize the tests."""
         super().setUp()
+        self.support = self.make_user(username='support', password='password')
         self.patcher = patch('requests.post')
         self.mock_post = self.patcher.start()
         self.mock_post.return_value.status_code = 404
@@ -76,6 +79,12 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             name='test1',
             content='<xml></xml>'
         )
+        # Should not be in the list
+        BlockDiagram.objects.create(
+            user=self.support,
+            name='1 - test',
+            content='<xml></xml>'
+        )
         response = self.get(reverse('api:v1:blockdiagram-list'))
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()['total_pages'])
@@ -97,29 +106,28 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 
     def test_bd_user_filter(self):
         """Test the block diagram API view filters on user correctly."""
-        self.authenticate()
-        user1 = self.make_user('user1')
+        self.authenticate(username='support')
         BlockDiagram.objects.create(
             user=self.admin,
             name='test1',
             content='<xml></xml>'
         )
         bd = BlockDiagram.objects.create(
-            user=user1,
-            name='test2',
+            user=self.support,
+            name='1 - test',
             content='<xml></xml>'
         )
         response = self.get(
             reverse('api:v1:blockdiagram-list') +
-            '?user=' + str(user1.id))
+            '?user=' + str(self.support.id))
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()['total_pages'])
         self.assertEqual(1, len(response.json()['results']))
         self.assertEqual(response.json()['results'][0]['id'], bd.id)
         self.assertDictEqual(response.json()['results'][0]['user'], {
-            'username': user1.username,
+            'username': self.support.username,
         })
-        self.assertEqual(response.json()['results'][0]['name'], 'test2')
+        self.assertEqual(response.json()['results'][0]['name'], '1 - test')
         self.assertEqual(
             response.json()['results'][0]['content'], '<xml></xml>')
 
@@ -653,6 +661,75 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(response.json()['content'], bd1.content)
         self.assertIsNone(response.json()['lesson'])
         self.assertIsNone(response.json()['state'])
+
+    def test_report(self):
+        """Test reporting a block diagram."""
+        self.authenticate()
+        user = self.make_user()
+
+        bd1 = BlockDiagram.objects.create(
+            user=user,
+            name='test',
+            content='<xml></xml>'
+        )
+        self.assertEqual(
+            0, BlockDiagram.objects.filter(user=self.support).count())
+        self.assertEqual(0, len(mail.outbox))
+
+        data = {
+            'description': 'Something went wrong',
+        }
+        response = self.post(
+            reverse('api:v1:blockdiagram-report', kwargs={'pk': bd1.id}),
+            data=data
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(
+            1, BlockDiagram.objects.filter(user=self.support).count())
+        self.assertEqual(
+            f'{bd1.id} - test',
+            BlockDiagram.objects.filter(user=self.support).last().name
+        )
+        self.assertEqual(1, len(mail.outbox))
+        self.assertIn('Something went wrong', mail.outbox[0].body)
+        self.assertIn(f'{bd1.id}:{bd1.name}', mail.outbox[0].body)
+
+    def test_report_again(self):
+        """Test reporting a block diagram already reported."""
+        self.authenticate()
+        user = self.make_user()
+
+        bd1 = BlockDiagram.objects.create(
+            user=user,
+            name='test',
+            content='<xml></xml>'
+        )
+        BlockDiagram.objects.create(
+            user=self.support,
+            name=f'{bd1.id} - test',
+            content='<xml></xml>'
+        )
+        self.assertEqual(
+            1, BlockDiagram.objects.filter(user=self.support).count())
+        self.assertEqual(0, len(mail.outbox))
+
+        data = {
+            'description': 'Something went wrong',
+        }
+        response = self.post(
+            reverse('api:v1:blockdiagram-report', kwargs={'pk': bd1.id}),
+            data=data
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(
+            2, BlockDiagram.objects.filter(user=self.support).count())
+        self.assertEqual(
+            f'{bd1.id} - test (1)',
+            BlockDiagram.objects.filter(user=self.support).last().name
+        )
+        self.assertEqual(1, len(mail.outbox))
+        self.assertIn('Something went wrong', mail.outbox[0].body)
+        self.assertIn(f'{bd1.id}:{bd1.name}', mail.outbox[0].body)
 
 
 class TestUserViewSet(BaseAuthenticatedTestCase):

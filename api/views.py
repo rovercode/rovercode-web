@@ -2,8 +2,11 @@
 import json
 import logging
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
+from django.template import loader
 from rest_framework import viewsets, permissions, serializers, mixins, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
@@ -73,7 +76,14 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
         if self.action in ['update', 'partial_update', 'destroy']:
             return BlockDiagram.objects.filter(user=self.request.user)
         if self.action == 'list':
-            return BlockDiagram.objects.filter(reference_of=None)
+            support = User.objects.get(email=settings.SUPPORT_CONTACT)
+
+            bds = BlockDiagram.objects.filter(reference_of=None)
+
+            if self.request.user == support:
+                return bds
+
+            return bds.exclude(user=support)
 
         return BlockDiagram.objects.all()
 
@@ -118,6 +128,50 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
 
         return Response(
             BlockDiagramSerializer(bd).data, status.HTTP_200_OK)
+
+    @staticmethod
+    @action(detail=True, methods=['POST'])
+    def report(request, **kwargs):
+        """Report issues with block diagram."""
+        bd = get_object_or_404(BlockDiagram, pk=kwargs.get('pk'))
+        description = request.data.get('description')
+
+        user = request.user
+
+        source_id = bd.id
+        source_name = bd.name
+
+        bd.pk = None
+        bd.name = f'{source_id} - {bd.name}'
+        support = User.objects.get(email=settings.SUPPORT_CONTACT)
+        bd.user = support
+
+        if BlockDiagram.objects.filter(user=support, name=bd.name).exists():
+            bd.name = BlockDiagramViewSet._find_unique_name(bd.name, support)
+        bd.save()
+
+        body = loader.render_to_string('email/issue_report.html', {
+            'user': user,
+            'id': source_id,
+            'name': source_name,
+            'description': description,
+        })
+
+        send_mail(
+            'Program Issue Reported',
+            body,
+            settings.DEFAULT_FROM_EMAIL,
+            [settings.SUPPORT_CONTACT]
+        )
+
+        SUMO_LOGGER.info(json.dumps({
+            'event': 'report',
+            'userId': user.id,
+            'sourceProgramId': source_id,
+            'newProgramId': bd.id,
+        }))
+
+        return Response(status.HTTP_200_OK)
 
 
 class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
