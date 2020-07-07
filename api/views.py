@@ -58,7 +58,7 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
     filterset_class = BlockDiagramFilter
     ordering_fields = ('user', 'name')
     ordering = ('name',)
-    search_fields = ('name',)
+    search_fields = ('name', 'user__username')
 
     @staticmethod
     def _find_unique_name(name, user):
