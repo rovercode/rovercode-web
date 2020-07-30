@@ -132,7 +132,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             response.json()['results'][0]['content'], '<xml></xml>')
 
     def test_bd_user_exclude_filter(self):
-        """Test the block diagram API view filters on user exclude correctly."""
+        """Test the block diagram API view filters on user exclude."""
         self.authenticate()
         user1 = self.make_user('user1')
         user2 = self.make_user('user2')
@@ -372,7 +372,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 
         # Add the tag
         data = {
-            'owner_tags': ['a'*100],
+            'owner_tags': ['a' * 100],
         }
         response = self.client.patch(
             reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),

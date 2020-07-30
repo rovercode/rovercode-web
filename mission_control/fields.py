@@ -15,7 +15,7 @@ class TagStringRelatedField(serializers.StringRelatedField):
         if len(data) < 3:
             raise serializers.ValidationError(
                 'Tags must be at least 3 characters')
-        elif len(data) > 30:
+        if len(data) > 30:
             raise serializers.ValidationError(
                 'Tags must be at most 30 characters')
 
