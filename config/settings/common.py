@@ -307,6 +307,7 @@ SOCIALACCOUNT_PROVIDERS = {
 # OTHER SERVICES
 # ------------------------------------------------------------------------------
 PROFANITY_CHECK_SERVICE_HOST = env('PROFANITY_CHECK_SERVICE_HOST', default='http://profanity-check:8000')
+SUBSCRIPTION_SERVICE_HOST = env('SUBSCRIPTION_SERVICE_HOST', default='http://localhost:3000')
 
 # JWT CONFIGURATION
 # ------------------------------------------------------------------------------
