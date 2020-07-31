@@ -25,7 +25,7 @@ class TestUtils(TestCase):
         )
         payload = jwt_payload_handler(self.user)
         self.assertEqual(len(responses.calls), 1)
-        self.assertEqual(payload['tier'], '1')
+        self.assertEqual(payload['tier'], 1)
 
     @responses.activate
     def test_jwt_payload(self):
@@ -39,4 +39,4 @@ class TestUtils(TestCase):
         payload = jwt_payload_handler(self.user)
         self.assertEqual(len(responses.calls), 1)
         self.assertEqual(payload['show_guide'], self.user.show_guide)
-        self.assertEqual(payload['tier'], '2')
+        self.assertEqual(payload['tier'], 2)

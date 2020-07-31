@@ -24,13 +24,14 @@ def jwt_payload_handler(user):
             headers={'Authorization': f'JWT {auth_jwt}'}
         )
         data = response.json()
-        payload['tier'] = data['subscription']['plan']
+        payload['tier'] = int(data['subscription']['plan'])
     except (
         json.decoder.JSONDecodeError,
         KeyError,
+        ValueError,
         requests.exceptions.ConnectionError
     ):
         # If unable to determine tier, set to lowest
-        payload['tier'] = '1'
+        payload['tier'] = 1
 
     return payload
