@@ -14,7 +14,7 @@ class Course(models.Model):
 
     def __str__(self):
         """Convert the model to a human readable string."""
-        return self.name
+        return str(self.name)
 
 
 class Lesson(models.Model):

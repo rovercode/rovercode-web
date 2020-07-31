@@ -4,6 +4,7 @@ from unittest.mock import patch
 from test_plus.test import TestCase
 
 import json
+import responses
 
 from django.contrib.auth import get_user_model
 from django.core import mail
@@ -31,8 +32,17 @@ class BaseAuthenticatedTestCase(TestCase):
         )
         self.client = APIClient()
 
+    @responses.activate
+    @override_settings(SUBSCRIPTION_SERVICE_HOST='http://test.test')
     def authenticate(self, username='administrator', password='password'):
         """Authenticate the test client."""
+        user = get_user_model().objects.get(username=username)
+        responses.add(
+            responses.GET,
+            f'http://test.test/api/v1/customer/{user.id}/',
+            json={'subscription': {'plan': '2'}},
+            status=200
+        )
         credentials = {
             'username': username,
             'password': password,
@@ -43,6 +53,7 @@ class BaseAuthenticatedTestCase(TestCase):
             content_type='application/json')
 
         self.assertEqual(200, response.status_code)
+        self.assertEqual(len(responses.calls), 1)
 
         self.client.credentials(
             HTTP_AUTHORIZATION='JWT {0}'.format(response.json()['token']))
@@ -132,7 +143,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             response.json()['results'][0]['content'], '<xml></xml>')
 
     def test_bd_user_exclude_filter(self):
-        """Test the block diagram API view filters on user exclude correctly."""
+        """Test the block diagram API view filters on user exclude."""
         self.authenticate()
         user1 = self.make_user('user1')
         user2 = self.make_user('user2')
@@ -372,7 +383,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 
         # Add the tag
         data = {
-            'owner_tags': ['a'*100],
+            'owner_tags': ['a' * 100],
         }
         response = self.client.patch(
             reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
