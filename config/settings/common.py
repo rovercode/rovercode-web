@@ -336,3 +336,5 @@ SILENCED_SYSTEM_CHECKS = [
     # Not using Django admin
     'admin.E408',
 ]
+
+FREE_TIER_PROGRAM_LIMIT = env('FREE_TIER_PROGRAM_LIMIT', default=5)
