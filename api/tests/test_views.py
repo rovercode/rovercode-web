@@ -821,6 +821,7 @@ class TestCourseViewSet(BaseAuthenticatedTestCase):
             reference=bd1,
             tutorial_link='https://lesson1.test/',
             goals='Lesson 1 goals',
+            tier=1,
         )
         lesson2 = Lesson.objects.create(
             course=course2,
@@ -828,6 +829,7 @@ class TestCourseViewSet(BaseAuthenticatedTestCase):
             reference=bd2,
             tutorial_link='https://lesson2.test/',
             goals='Lesson 2 goals',
+            tier=2,
         )
 
         state = State.objects.create(progress=ProgressState.COMPLETE)
@@ -858,6 +860,7 @@ class TestCourseViewSet(BaseAuthenticatedTestCase):
             'state': None,
             'tutorial_link': lesson1.tutorial_link,
             'goals': lesson1.goals,
+            'tier': 1,
         })
 
         self.assertEqual(response.json()['results'][1]['id'], course2.id)
@@ -876,4 +879,5 @@ class TestCourseViewSet(BaseAuthenticatedTestCase):
             'state': {
                 'progress': state.progress.name,
             },
+            'tier': 2,
         })
