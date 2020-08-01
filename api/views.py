@@ -11,6 +11,7 @@ from rest_framework import viewsets, permissions, serializers, mixins, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from rest_framework_jwt.settings import api_settings
 
 from curriculum.models import Course
 from curriculum.models import Lesson
@@ -71,6 +72,20 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
             else:
                 return unique
 
+    @staticmethod
+    def _is_over_limit(request):
+        """Determine if the user is over the limit of programs."""
+        claims = api_settings.JWT_DECODE_HANDLER(request.auth)
+        tier = claims.get('tier', 1)
+        user_program_count = BlockDiagram.objects.filter(
+            user=request.user
+        ).count()
+        free_limit = settings.FREE_TIER_PROGRAM_LIMIT
+        if tier == 1 and user_program_count >= free_limit:
+            return True
+
+        return False
+
     def get_queryset(self):
         """Return the objects available for the operation."""
         if self.action in ['update', 'partial_update', 'destroy']:
@@ -89,6 +104,11 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """Perform the create operation."""
+        if self._is_over_limit(self.request):
+            raise serializers.ValidationError(
+                'You are over the limit of programs allowed.',
+            )
+
         user = self.request.user
         serializer.save(user=user)
 
@@ -96,6 +116,11 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['POST'])
     def remix(request, **kwargs):
         """Copy the block diagram for the user."""
+        if BlockDiagramViewSet._is_over_limit(request):
+            raise serializers.ValidationError(
+                'You are over the limit of programs allowed.',
+            )
+
         bd = get_object_or_404(BlockDiagram, pk=kwargs.get('pk'))
 
         user = request.user
