@@ -26,7 +26,7 @@ class TestHandlers(TestCase):
         """Test external user create failure."""
         responses.add(
             responses.POST,
-            f'http://test.test/api/v1/customer/',
+            'http://test.test/api/v1/customer/',
             status=503
         )
         self.make_user()
@@ -37,7 +37,7 @@ class TestHandlers(TestCase):
         """Test external user created on new user."""
         responses.add(
             responses.POST,
-            f'http://test.test/api/v1/customer/',
+            'http://test.test/api/v1/customer/',
             status=200
         )
         user = self.make_user()
