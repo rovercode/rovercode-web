@@ -6,8 +6,10 @@ from test_plus.test import TestCase
 import json
 import responses
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core import mail
+from django.db.models.signals import post_save
 from django.test import override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient
@@ -25,6 +27,8 @@ class BaseAuthenticatedTestCase(TestCase):
 
     def setUp(self):
         """Initialize the tests."""
+        post_save.disconnect(
+            sender=settings.AUTH_USER_MODEL, dispatch_uid='new_user')
         self.admin = get_user_model().objects.create_user(
             username='administrator',
             email='admin@example.com',
