@@ -7,3 +7,7 @@ class UsersConfig(AppConfig):
 
     name = 'rovercode_web.users'
     verbose_name = "Users"
+
+    def ready(self):
+        """Run operations required after app is loaded."""
+        import rovercode_web.users.signals.handlers  # noqa
