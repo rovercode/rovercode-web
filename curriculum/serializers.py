@@ -32,6 +32,7 @@ class LessonSerializer(serializers.ModelSerializer):
     active_bd = serializers.SerializerMethodField()
     active_bd_owned = serializers.SerializerMethodField()
     state = serializers.SerializerMethodField()
+    tier = serializers.IntegerField(read_only=True)
 
     class Meta:
         """Meta class."""

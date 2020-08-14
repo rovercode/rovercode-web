@@ -1,3 +1,4 @@
+"""Adapters tests."""
 from test_plus.test import TestCase
 
 from django.test.client import RequestFactory
@@ -9,6 +10,7 @@ class TestAdapters(TestCase):
     """Tests the adapters."""
 
     def setUp(self):
+        """Initialize the tests."""
         self.factory = RequestFactory()
 
     def test_account_adapter(self):
