@@ -4,9 +4,12 @@ from unittest.mock import patch
 from test_plus.test import TestCase
 
 import json
+import responses
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core import mail
+from django.db.models.signals import post_save
 from django.test import override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient
@@ -24,6 +27,8 @@ class BaseAuthenticatedTestCase(TestCase):
 
     def setUp(self):
         """Initialize the tests."""
+        post_save.disconnect(
+            sender=settings.AUTH_USER_MODEL, dispatch_uid='new_user')
         self.admin = get_user_model().objects.create_user(
             username='administrator',
             email='admin@example.com',
@@ -31,8 +36,18 @@ class BaseAuthenticatedTestCase(TestCase):
         )
         self.client = APIClient()
 
-    def authenticate(self, username='administrator', password='password'):
+    @responses.activate
+    @override_settings(SUBSCRIPTION_SERVICE_HOST='http://test.test')
+    def authenticate(self, username='administrator', password='password',
+                     tier=2):
         """Authenticate the test client."""
+        user = get_user_model().objects.get(username=username)
+        responses.add(
+            responses.GET,
+            f'http://test.test/api/v1/customer/{user.id}/',
+            json={'subscription': {'plan': str(tier)}},
+            status=200
+        )
         credentials = {
             'username': username,
             'password': password,
@@ -43,12 +58,14 @@ class BaseAuthenticatedTestCase(TestCase):
             content_type='application/json')
 
         self.assertEqual(200, response.status_code)
+        self.assertEqual(len(responses.calls), 1)
 
         self.client.credentials(
             HTTP_AUTHORIZATION='JWT {0}'.format(response.json()['token']))
 
 
 @override_settings(SUPPORT_CONTACT='support@example.com')
+@override_settings(FREE_TIER_PROGRAM_LIMIT=1)
 class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
     """Tests the block diagram API view."""
 
@@ -65,6 +82,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         super().tearDown()
         self.patcher.stop()
 
+    @override_settings(FREE_TIER_PROGRAM_LIMIT=7)
     def test_bd(self):
         """Test the block diagram API view displays the correct items."""
         self.authenticate()
@@ -88,6 +106,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         response = self.get(reverse('api:v1:blockdiagram-list'))
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()['total_pages'])
+        self.assertEqual(7, response.json()['free_max'])
         self.assertEqual(2, len(response.json()['results']))
         self.assertEqual(response.json()['results'][0]['id'], bd1.id)
         self.assertDictEqual(response.json()['results'][0]['user'], {
@@ -132,7 +151,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             response.json()['results'][0]['content'], '<xml></xml>')
 
     def test_bd_user_exclude_filter(self):
-        """Test the block diagram API view filters on user exclude correctly."""
+        """Test the block diagram API view filters on user exclude."""
         self.authenticate()
         user1 = self.make_user('user1')
         user2 = self.make_user('user2')
@@ -175,6 +194,11 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 
     def test_bd_create(self):
         """Test creating block diagram sets user."""
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
         self.authenticate()
         data = {
             'name': 'test',
@@ -189,6 +213,23 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         model_tags = [t.name for t in BlockDiagram.objects.last().tags.all()]
         self.assertIn('tag1', model_tags)
         self.assertIn('tag 2', model_tags)
+
+    def test_bd_create_over_limit(self):
+        """Test disallow create block diagram when over limit."""
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>'
+        )
+        self.authenticate(tier=1)
+        data = {
+            'name': 'test',
+            'content': '<xml></xml>',
+            'owner_tags': ['tag1', 'tag 2'],
+        }
+        response = self.client.post(
+            reverse('api:v1:blockdiagram-list'), data)
+        self.assertEqual(400, response.status_code)
 
     def test_bd_create_name_exist(self):
         """Test creating block diagram when name already exists."""
@@ -372,7 +413,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 
         # Add the tag
         data = {
-            'owner_tags': ['a'*100],
+            'owner_tags': ['a' * 100],
         }
         response = self.client.patch(
             reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
@@ -589,6 +630,24 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(response.json()['content'], bd1.content)
         self.assertIsNone(response.json()['lesson'])
         self.assertIsNone(response.json()['state'])
+
+    def test_remix_over_limit(self):
+        """Test disallow remixing a block diagram when over limit."""
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        self.authenticate(tier=1)
+        user = self.make_user()
+        bd1 = BlockDiagram.objects.create(
+            user=user,
+            name='test',
+            content='<xml></xml>'
+        )
+        response = self.post(
+            reverse('api:v1:blockdiagram-remix', kwargs={'pk': bd1.id}))
+        self.assertEqual(400, response.status_code)
 
     def test_remix_reference(self):
         """Test remixing a reference block diagram."""
@@ -808,6 +867,7 @@ class TestCourseViewSet(BaseAuthenticatedTestCase):
             reference=bd1,
             tutorial_link='https://lesson1.test/',
             goals='Lesson 1 goals',
+            tier=1,
         )
         lesson2 = Lesson.objects.create(
             course=course2,
@@ -815,6 +875,7 @@ class TestCourseViewSet(BaseAuthenticatedTestCase):
             reference=bd2,
             tutorial_link='https://lesson2.test/',
             goals='Lesson 2 goals',
+            tier=2,
         )
 
         state = State.objects.create(progress=ProgressState.COMPLETE)
@@ -845,6 +906,7 @@ class TestCourseViewSet(BaseAuthenticatedTestCase):
             'state': None,
             'tutorial_link': lesson1.tutorial_link,
             'goals': lesson1.goals,
+            'tier': 1,
         })
 
         self.assertEqual(response.json()['results'][1]['id'], course2.id)
@@ -863,4 +925,5 @@ class TestCourseViewSet(BaseAuthenticatedTestCase):
             'state': {
                 'progress': state.progress.name,
             },
+            'tier': 2,
         })

@@ -14,7 +14,7 @@ class Course(models.Model):
 
     def __str__(self):
         """Convert the model to a human readable string."""
-        return self.name
+        return str(self.name)
 
 
 class Lesson(models.Model):
@@ -29,6 +29,7 @@ class Lesson(models.Model):
     sequence_number = models.PositiveSmallIntegerField()
     tutorial_link = models.URLField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
+    tier = models.PositiveSmallIntegerField(default=2)
 
     def __str__(self):
         """Convert the model to a human readable string."""

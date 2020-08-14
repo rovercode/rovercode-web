@@ -1,11 +1,14 @@
 """Authorize test views."""
+import re
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
+from django.test import override_settings
 from django.urls import reverse
 from test_plus.test import TestCase
+import responses
 
 from allauth.socialaccount.models import SocialApp
 from allauth.socialaccount.models import SocialLogin
@@ -92,10 +95,18 @@ class CallbackUrlTestCase(TestCase):
 
         self.assertEqual(connect.get_response().status_code, 200)
 
+    @responses.activate
     @patch.object(SocialLoginSerializer, 'validate')
     @patch.object(SocialLogin, 'verify_and_unstash_state')
+    @override_settings(SUBSCRIPTION_SERVICE_HOST='http://test.test')
     def test_github_login(self, mock_verify, mock_validate):
         """Test the Github login returns a JWT."""
+        responses.add(
+            responses.GET,
+            re.compile(r'http://test.test/api/v1/customer/\d+/'),
+            json={'subscription': {'plan': '2'}},
+            status=200
+        )
         mock_validate.return_value = {
             'user': self.admin,
         }
@@ -116,12 +127,21 @@ class CallbackUrlTestCase(TestCase):
         })
 
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(responses.calls), 1)
         self.assertIn('token', response.json())
 
+    @responses.activate
     @patch.object(SocialLoginSerializer, 'validate')
     @patch.object(SocialLogin, 'verify_and_unstash_state')
+    @override_settings(SUBSCRIPTION_SERVICE_HOST='http://test.test')
     def test_google_login(self, mock_verify, mock_validate):
         """Test the Google login returns a JWT."""
+        responses.add(
+            responses.GET,
+            re.compile(r'http://test.test/api/v1/customer/\d+/'),
+            json={'subscription': {'plan': '2'}},
+            status=200
+        )
         mock_validate.return_value = {
             'user': self.admin,
         }
@@ -142,6 +162,7 @@ class CallbackUrlTestCase(TestCase):
         })
 
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(responses.calls), 1)
         self.assertIn('token', response.json())
 
     @patch.object(SocialLogin, 'verify_and_unstash_state')
