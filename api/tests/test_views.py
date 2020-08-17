@@ -82,7 +82,6 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         super().tearDown()
         self.patcher.stop()
 
-    @override_settings(FREE_TIER_PROGRAM_LIMIT=7)
     def test_bd(self):
         """Test the block diagram API view displays the correct items."""
         self.authenticate()
@@ -106,7 +105,6 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         response = self.get(reverse('api:v1:blockdiagram-list'))
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()['total_pages'])
-        self.assertEqual(7, response.json()['free_max'])
         self.assertEqual(2, len(response.json()['results']))
         self.assertEqual(response.json()['results'][0]['id'], bd1.id)
         self.assertDictEqual(response.json()['results'][0]['user'], {
