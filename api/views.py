@@ -6,6 +6,8 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
+from django.http import HttpResponseForbidden
+from django.http import JsonResponse
 from django.template import loader
 from rest_framework import viewsets, permissions, serializers, mixins, status
 from rest_framework.decorators import action
@@ -220,6 +222,23 @@ class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
         if self.get_object().id is not self.request.user.id:
             raise serializers.ValidationError('You may only modify yourself')
         serializer.save()
+
+    @staticmethod
+    @action(detail=True, methods=['GET'])
+    def stats(request, **kwargs):
+        """Get user statistics."""
+        user = get_object_or_404(User, pk=kwargs.get('pk'))
+        if user != request.user:
+            return HttpResponseForbidden()
+
+        stats = {
+            'block_diagram': {
+                'count': BlockDiagram.objects.filter(user=user).count(),
+                'allowed': settings.FREE_TIER_PROGRAM_LIMIT,
+            },
+        }
+
+        return JsonResponse(stats)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):

@@ -829,6 +829,52 @@ class TestUserViewSet(BaseAuthenticatedTestCase):
         self.assertTrue(
             get_user_model().objects.get(id=self.admin.id).show_guide)
 
+    @override_settings(FREE_TIER_PROGRAM_LIMIT=3)
+    def test_stats(self):
+        """Test getting user statistics."""
+        self.authenticate()
+
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test2',
+            content='<xml></xml>'
+        )
+
+        response = self.client.get(reverse('api:v1:user-stats', kwargs={
+            'pk': self.admin.pk,
+        }))
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, response.json()['block_diagram']['count'])
+        self.assertEqual(3, response.json()['block_diagram']['allowed'])
+
+    def test_stats_other_user(self):
+        """Test getting other user's statistics."""
+        self.authenticate()
+        user = self.make_user()
+
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test2',
+            content='<xml></xml>'
+        )
+
+        response = self.client.get(reverse('api:v1:user-stats', kwargs={
+            'pk': user.pk,
+        }))
+
+        self.assertEqual(403, response.status_code)
+
 
 class TestCourseViewSet(BaseAuthenticatedTestCase):
     """Tests the course API view."""
