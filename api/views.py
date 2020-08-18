@@ -234,7 +234,7 @@ class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
         stats = {
             'block_diagram': {
                 'count': BlockDiagram.objects.filter(user=user).count(),
-                'allowed': settings.FREE_TIER_PROGRAM_LIMIT,
+                'limit': settings.FREE_TIER_PROGRAM_LIMIT,
             },
         }
 

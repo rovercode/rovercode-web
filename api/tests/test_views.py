@@ -861,7 +861,7 @@ class TestUserViewSet(BaseAuthenticatedTestCase):
 
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, response.json()['block_diagram']['count'])
-        self.assertEqual(3, response.json()['block_diagram']['allowed'])
+        self.assertEqual(3, response.json()['block_diagram']['limit'])
 
     def test_stats_other_user(self):
         """Test getting other user's statistics."""
