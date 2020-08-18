@@ -82,7 +82,6 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         super().tearDown()
         self.patcher.stop()
 
-    @override_settings(FREE_TIER_PROGRAM_LIMIT=7)
     def test_bd(self):
         """Test the block diagram API view displays the correct items."""
         self.authenticate()
@@ -106,7 +105,6 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         response = self.get(reverse('api:v1:blockdiagram-list'))
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()['total_pages'])
-        self.assertEqual(7, response.json()['free_max'])
         self.assertEqual(2, len(response.json()['results']))
         self.assertEqual(response.json()['results'][0]['id'], bd1.id)
         self.assertDictEqual(response.json()['results'][0]['user'], {
@@ -794,6 +792,18 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
 class TestUserViewSet(BaseAuthenticatedTestCase):
     """Tests the user API view."""
 
+    def setUp(self):
+        """Initialize the tests."""
+        super().setUp()
+        self.patcher = patch('requests.post')
+        self.mock_post = self.patcher.start()
+        self.mock_post.return_value.status_code = 404
+
+    def tearDown(self):
+        """Tear down the tests."""
+        super().tearDown()
+        self.patcher.stop()
+
     def test_modify(self):
         """Test modifying user."""
         self.authenticate()
@@ -828,6 +838,52 @@ class TestUserViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(400, response.status_code)
         self.assertTrue(
             get_user_model().objects.get(id=self.admin.id).show_guide)
+
+    @override_settings(FREE_TIER_PROGRAM_LIMIT=3)
+    def test_stats(self):
+        """Test getting user statistics."""
+        self.authenticate()
+
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test2',
+            content='<xml></xml>'
+        )
+
+        response = self.client.get(reverse('api:v1:user-stats', kwargs={
+            'pk': self.admin.pk,
+        }))
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, response.json()['block_diagram']['count'])
+        self.assertEqual(3, response.json()['block_diagram']['limit'])
+
+    def test_stats_other_user(self):
+        """Test getting other user's statistics."""
+        self.authenticate()
+        user = self.make_user()
+
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test2',
+            content='<xml></xml>'
+        )
+
+        response = self.client.get(reverse('api:v1:user-stats', kwargs={
+            'pk': user.pk,
+        }))
+
+        self.assertEqual(403, response.status_code)
 
 
 class TestCourseViewSet(BaseAuthenticatedTestCase):
