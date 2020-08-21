@@ -5,10 +5,10 @@ import logging
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import send_mail
 from django.http import HttpResponseForbidden
 from django.http import JsonResponse
 from django.template import loader
+from freshdesk.api import API
 from rest_framework import viewsets, permissions, serializers, mixins, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
@@ -31,6 +31,11 @@ from mission_control.serializers import UserGuideSerializer
 User = get_user_model()
 
 SUMO_LOGGER = logging.getLogger('sumo')
+FD_API = API(
+    settings.FRESHDESK_DOMAIN,
+    settings.FRESHDESK_KEY,
+    version=2
+)
 
 
 class BlockDiagramViewSet(viewsets.ModelViewSet):
@@ -184,11 +189,12 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
             'description': description,
         })
 
-        send_mail(
+        FD_API.tickets.create_ticket(
             'Program Issue Reported',
-            body,
-            settings.DEFAULT_FROM_EMAIL,
-            [settings.SUPPORT_CONTACT]
+            email=user.email,
+            description=body,
+            type='Problem',
+            tags=['program']
         )
 
         SUMO_LOGGER.info(json.dumps({
