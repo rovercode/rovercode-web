@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 from test_plus.test import TestCase
 
+from freshdesk.v2.api import TicketAPI
 import json
 import responses
 
@@ -719,7 +720,8 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertIsNone(response.json()['lesson'])
         self.assertIsNone(response.json()['state'])
 
-    def test_report(self):
+    @patch.object(TicketAPI, 'create_ticket')
+    def test_report(self, mock_create_ticket):
         """Test reporting a block diagram."""
         self.authenticate()
         user = self.make_user()
@@ -747,11 +749,18 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             f'{bd1.id} - test',
             BlockDiagram.objects.filter(user=self.support).last().name
         )
-        self.assertEqual(1, len(mail.outbox))
-        self.assertIn('Something went wrong', mail.outbox[0].body)
-        self.assertIn(f'{bd1.id}:{bd1.name}', mail.outbox[0].body)
+        self.assertTrue(mock_create_ticket.called)
+        self.assertIn(
+            'Something went wrong',
+            mock_create_ticket.call_args[1]['description']
+        )
+        self.assertIn(
+            f'{bd1.id}:{bd1.name}',
+            mock_create_ticket.call_args[1]['description']
+        )
 
-    def test_report_again(self):
+    @patch.object(TicketAPI, 'create_ticket')
+    def test_report_again(self, mock_create_ticket):
         """Test reporting a block diagram already reported."""
         self.authenticate()
         user = self.make_user()
@@ -784,9 +793,15 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             f'{bd1.id} - test (1)',
             BlockDiagram.objects.filter(user=self.support).last().name
         )
-        self.assertEqual(1, len(mail.outbox))
-        self.assertIn('Something went wrong', mail.outbox[0].body)
-        self.assertIn(f'{bd1.id}:{bd1.name}', mail.outbox[0].body)
+        self.assertTrue(mock_create_ticket.called)
+        self.assertIn(
+            'Something went wrong',
+            mock_create_ticket.call_args[1]['description']
+        )
+        self.assertIn(
+            f'{bd1.id}:{bd1.name}',
+            mock_create_ticket.call_args[1]['description']
+        )
 
 
 class TestUserViewSet(BaseAuthenticatedTestCase):
