@@ -803,6 +803,49 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             mock_create_ticket.call_args[1]['description']
         )
 
+    def test_get_blockdiagram(self):
+        """Test getting block diagram."""
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        course = Course.objects.create(name='Course1')
+        Lesson.objects.create(
+            course=course,
+            sequence_number=1,
+            reference=bd,
+            tutorial_link='https://lesson1.test/',
+            goals='Lesson 1 goals',
+            tier=2,
+        )
+        self.authenticate(username='support')
+        response = self.get(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.id}))
+        self.assertEqual(200, response.status_code)
+        self.assertEqual('test1', response.json()['name'])
+
+    def test_get_blockdiagram_disallow(self):
+        """Test getting block diagram when blocked by tier."""
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        course = Course.objects.create(name='Course1')
+        Lesson.objects.create(
+            course=course,
+            sequence_number=1,
+            reference=bd,
+            tutorial_link='https://lesson1.test/',
+            goals='Lesson 1 goals',
+            tier=2,
+        )
+        self.authenticate(username='support', tier=1)
+        response = self.get(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.id}))
+        self.assertEqual(404, response.status_code)
+
 
 class TestUserViewSet(BaseAuthenticatedTestCase):
     """Tests the user API view."""
