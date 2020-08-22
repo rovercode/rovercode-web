@@ -5,6 +5,7 @@ import logging
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from django.http import HttpResponseForbidden
 from django.http import JsonResponse
 from django.template import loader
@@ -107,7 +108,11 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
 
             return bds.exclude(user=support)
 
-        return BlockDiagram.objects.all()
+        claims = api_settings.JWT_DECODE_HANDLER(self.request.auth)
+        return BlockDiagram.objects.filter(
+            Q(reference_of__tier__lte=claims.get('tier', 1)) |
+            Q(reference_of=None)
+        )
 
     def perform_create(self, serializer):
         """Perform the create operation."""
