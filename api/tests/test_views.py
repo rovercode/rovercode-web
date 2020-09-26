@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 from test_plus.test import TestCase
 
+from freshdesk.v2.api import TicketAPI
 import json
 import responses
 
@@ -82,7 +83,6 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         super().tearDown()
         self.patcher.stop()
 
-    @override_settings(FREE_TIER_PROGRAM_LIMIT=7)
     def test_bd(self):
         """Test the block diagram API view displays the correct items."""
         self.authenticate()
@@ -106,7 +106,6 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         response = self.get(reverse('api:v1:blockdiagram-list'))
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()['total_pages'])
-        self.assertEqual(7, response.json()['free_max'])
         self.assertEqual(2, len(response.json()['results']))
         self.assertEqual(response.json()['results'][0]['id'], bd1.id)
         self.assertDictEqual(response.json()['results'][0]['user'], {
@@ -721,7 +720,8 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertIsNone(response.json()['lesson'])
         self.assertIsNone(response.json()['state'])
 
-    def test_report(self):
+    @patch.object(TicketAPI, 'create_ticket')
+    def test_report(self, mock_create_ticket):
         """Test reporting a block diagram."""
         self.authenticate()
         user = self.make_user()
@@ -749,11 +749,18 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             f'{bd1.id} - test',
             BlockDiagram.objects.filter(user=self.support).last().name
         )
-        self.assertEqual(1, len(mail.outbox))
-        self.assertIn('Something went wrong', mail.outbox[0].body)
-        self.assertIn(f'{bd1.id}:{bd1.name}', mail.outbox[0].body)
+        self.assertTrue(mock_create_ticket.called)
+        self.assertIn(
+            'Something went wrong',
+            mock_create_ticket.call_args[1]['description']
+        )
+        self.assertIn(
+            f'{bd1.id}:{bd1.name}',
+            mock_create_ticket.call_args[1]['description']
+        )
 
-    def test_report_again(self):
+    @patch.object(TicketAPI, 'create_ticket')
+    def test_report_again(self, mock_create_ticket):
         """Test reporting a block diagram already reported."""
         self.authenticate()
         user = self.make_user()
@@ -786,13 +793,74 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             f'{bd1.id} - test (1)',
             BlockDiagram.objects.filter(user=self.support).last().name
         )
-        self.assertEqual(1, len(mail.outbox))
-        self.assertIn('Something went wrong', mail.outbox[0].body)
-        self.assertIn(f'{bd1.id}:{bd1.name}', mail.outbox[0].body)
+        self.assertTrue(mock_create_ticket.called)
+        self.assertIn(
+            'Something went wrong',
+            mock_create_ticket.call_args[1]['description']
+        )
+        self.assertIn(
+            f'{bd1.id}:{bd1.name}',
+            mock_create_ticket.call_args[1]['description']
+        )
+
+    def test_get_blockdiagram(self):
+        """Test getting block diagram."""
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        course = Course.objects.create(name='Course1')
+        Lesson.objects.create(
+            course=course,
+            sequence_number=1,
+            reference=bd,
+            tutorial_link='https://lesson1.test/',
+            goals='Lesson 1 goals',
+            tier=2,
+        )
+        self.authenticate(username='support')
+        response = self.get(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.id}))
+        self.assertEqual(200, response.status_code)
+        self.assertEqual('test1', response.json()['name'])
+
+    def test_get_blockdiagram_disallow(self):
+        """Test getting block diagram when blocked by tier."""
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        course = Course.objects.create(name='Course1')
+        Lesson.objects.create(
+            course=course,
+            sequence_number=1,
+            reference=bd,
+            tutorial_link='https://lesson1.test/',
+            goals='Lesson 1 goals',
+            tier=2,
+        )
+        self.authenticate(username='support', tier=1)
+        response = self.get(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.id}))
+        self.assertEqual(404, response.status_code)
 
 
 class TestUserViewSet(BaseAuthenticatedTestCase):
     """Tests the user API view."""
+
+    def setUp(self):
+        """Initialize the tests."""
+        super().setUp()
+        self.patcher = patch('requests.post')
+        self.mock_post = self.patcher.start()
+        self.mock_post.return_value.status_code = 404
+
+    def tearDown(self):
+        """Tear down the tests."""
+        super().tearDown()
+        self.patcher.stop()
 
     def test_modify(self):
         """Test modifying user."""
@@ -828,6 +896,52 @@ class TestUserViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(400, response.status_code)
         self.assertTrue(
             get_user_model().objects.get(id=self.admin.id).show_guide)
+
+    @override_settings(FREE_TIER_PROGRAM_LIMIT=3)
+    def test_stats(self):
+        """Test getting user statistics."""
+        self.authenticate()
+
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test2',
+            content='<xml></xml>'
+        )
+
+        response = self.client.get(reverse('api:v1:user-stats', kwargs={
+            'pk': self.admin.pk,
+        }))
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, response.json()['block_diagram']['count'])
+        self.assertEqual(3, response.json()['block_diagram']['limit'])
+
+    def test_stats_other_user(self):
+        """Test getting other user's statistics."""
+        self.authenticate()
+        user = self.make_user()
+
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test1',
+            content='<xml></xml>'
+        )
+        BlockDiagram.objects.create(
+            user=self.admin,
+            name='test2',
+            content='<xml></xml>'
+        )
+
+        response = self.client.get(reverse('api:v1:user-stats', kwargs={
+            'pk': user.pk,
+        }))
+
+        self.assertEqual(403, response.status_code)
 
 
 class TestCourseViewSet(BaseAuthenticatedTestCase):
