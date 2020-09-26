@@ -308,6 +308,8 @@ SOCIALACCOUNT_PROVIDERS = {
 # ------------------------------------------------------------------------------
 PROFANITY_CHECK_SERVICE_HOST = env('PROFANITY_CHECK_SERVICE_HOST', default='http://profanity-check:8000')
 SUBSCRIPTION_SERVICE_HOST = env('SUBSCRIPTION_SERVICE_HOST', default='http://localhost:3000')
+FRESHDESK_DOMAIN = env('FRESHDESK_DOMAIN', default='domain.freshdesk.com')
+FRESHDESK_KEY = env('FRESHDESK_KEY', default='abcdefg1234567')
 
 # JWT CONFIGURATION
 # ------------------------------------------------------------------------------
