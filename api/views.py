@@ -9,12 +9,14 @@ from django.db.models import Q
 from django.http import HttpResponseForbidden
 from django.http import JsonResponse
 from django.template import loader
-from freshdesk.api import API
 from rest_framework import viewsets, permissions, serializers, mixins, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework_jwt.settings import api_settings
+from zenpy import Zenpy
+from zenpy.lib.api_objects import Ticket
+from zenpy.lib.api_objects import User as ZendeskUser
 
 from curriculum.models import Course
 from curriculum.models import Lesson
@@ -32,11 +34,11 @@ from mission_control.serializers import UserGuideSerializer
 User = get_user_model()
 
 SUMO_LOGGER = logging.getLogger('sumo')
-FD_API = API(
-    settings.FRESHDESK_DOMAIN,
-    settings.FRESHDESK_KEY,
-    version=2
-)
+ZENDESK = Zenpy(**{
+    'email': settings.ZENDESK_EMAIL,
+    'token': settings.ZENDESK_TOKEN,
+    'subdomain': settings.ZENDESK_SUBDOMAIN,
+})
 
 
 class BlockDiagramViewSet(viewsets.ModelViewSet):
@@ -194,12 +196,14 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
             'description': description,
         })
 
-        FD_API.tickets.create_ticket(
-            'Program Issue Reported',
-            email=user.email,
-            description=body,
-            type='Problem',
-            tags=['program']
+        ZENDESK.tickets.create(
+            Ticket(
+                subject='Program Issue Reported',
+                description=body,
+                type='problem',
+                tags=['program'],
+                requester=ZendeskUser(name=user.username, email=user.email),
+            )
         )
 
         SUMO_LOGGER.info(json.dumps({
