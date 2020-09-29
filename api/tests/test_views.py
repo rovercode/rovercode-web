@@ -3,9 +3,9 @@ from unittest.mock import patch
 
 from test_plus.test import TestCase
 
-from freshdesk.v2.api import TicketAPI
 import json
 import responses
+from zenpy.lib.api import TicketApi
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -720,7 +720,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertIsNone(response.json()['lesson'])
         self.assertIsNone(response.json()['state'])
 
-    @patch.object(TicketAPI, 'create_ticket')
+    @patch.object(TicketApi, 'create')
     def test_report(self, mock_create_ticket):
         """Test reporting a block diagram."""
         self.authenticate()
@@ -752,14 +752,14 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertTrue(mock_create_ticket.called)
         self.assertIn(
             'Something went wrong',
-            mock_create_ticket.call_args[1]['description']
+            mock_create_ticket.call_args[0][0].description
         )
         self.assertIn(
             f'{bd1.id}:{bd1.name}',
-            mock_create_ticket.call_args[1]['description']
+            mock_create_ticket.call_args[0][0].description
         )
 
-    @patch.object(TicketAPI, 'create_ticket')
+    @patch.object(TicketApi, 'create')
     def test_report_again(self, mock_create_ticket):
         """Test reporting a block diagram already reported."""
         self.authenticate()
@@ -796,11 +796,11 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertTrue(mock_create_ticket.called)
         self.assertIn(
             'Something went wrong',
-            mock_create_ticket.call_args[1]['description']
+            mock_create_ticket.call_args[0][0].description
         )
         self.assertIn(
             f'{bd1.id}:{bd1.name}',
-            mock_create_ticket.call_args[1]['description']
+            mock_create_ticket.call_args[0][0].description
         )
 
     def test_get_blockdiagram(self):
