@@ -168,7 +168,7 @@ LOGGING = {
     'disable_existing_loggers': True,
     'root': {
         'level': 'WARNING',
-        'handlers': ['sentry'],
+        'handlers': ['console'],
     },
     'formatters': {
         'verbose': {
@@ -195,14 +195,9 @@ LOGGING = {
             'handlers': ['console'],
             'propagate': False,
         },
-        'sentry.errors': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': False,
-        },
         'django.security.DisallowedHost': {
             'level': 'ERROR',
-            'handlers': ['console', 'sentry'],
+            'handlers': ['console'],
             'propagate': False,
         },
         'sumo': {
