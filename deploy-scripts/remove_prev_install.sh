@@ -1,12 +1,15 @@
 #!/bin/bash
+if [ "$DEPLOYMENT_GROUP_NAME" == "beta-rovercode-web" ]; then
+  export TAG=beta
+elif [ "$DEPLOYMENT_GROUP_NAME" == "alpha-rovercode-web" ]; then
+  export TAG=alpha
+else
+  export TAG=prod
+fi
+
 if [ -d /home/ubuntu/rovercode-web ]; then
     pushd /home/ubuntu/rovercode-web > /dev/null
-    docker-compose down
+    TAG=$TAG docker-compose down --rmi all
     popd > /dev/null
     rm -rf /home/ubuntu/rovercode-web
-    set +e
-    docker stop $(docker ps -a -q)
-    docker rm $(docker ps -a -q)
-    docker rmi $(docker images -q)
-    set -e
 fi
