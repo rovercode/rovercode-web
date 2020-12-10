@@ -234,7 +234,7 @@ class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
 
     def perform_update(self, serializer):
         """Perform the update operation."""
-        if self.get_object().id is not self.request.user.id:
+        if self.get_object().id != self.request.user.id:
             raise serializers.ValidationError('You may only modify yourself')
         serializer.save()
 
