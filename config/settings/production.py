@@ -159,7 +159,7 @@ SENTRY_DSN = env('DJANGO_SENTRY_DSN')
 sentry_sdk.init(
     dsn=SENTRY_DSN,
     integrations=[DjangoIntegration()],
-    traces_sample_rate=1.0,
+    traces_sample_rate=0.5,
     send_default_pii=True
 )
 
