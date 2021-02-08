@@ -6,7 +6,7 @@ from test_plus.test import TestCase
 
 import responses
 
-from rovercode_web.users.utils import jwt_payload_handler
+from rovercode_web.users.utils import JwtSerializer
 
 
 @override_settings(SUBSCRIPTION_SERVICE_HOST='http://test.test')
@@ -27,7 +27,7 @@ class TestUtils(TestCase):
             f'http://test.test/api/v1/customer/{self.user.id}/',
             status=503
         )
-        payload = jwt_payload_handler(self.user)
+        payload = JwtSerializer.get_token(self.user)
         self.assertEqual(len(responses.calls), 1)
         self.assertEqual(payload['tier'], 1)
 
@@ -40,7 +40,7 @@ class TestUtils(TestCase):
             json={'subscription': {'plan': '2'}},
             status=200
         )
-        payload = jwt_payload_handler(self.user)
+        payload = JwtSerializer.get_token(self.user)
         self.assertEqual(len(responses.calls), 1)
         self.assertEqual(payload['show_guide'], self.user.show_guide)
         self.assertEqual(payload['tier'], 2)

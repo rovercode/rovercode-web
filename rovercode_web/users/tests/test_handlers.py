@@ -30,7 +30,7 @@ class TestHandlers(TestCase):
             status=503
         )
         self.make_user()
-        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(len(responses.calls), 2)
 
     @responses.activate
     def test_external_user_create(self):
@@ -41,9 +41,9 @@ class TestHandlers(TestCase):
             status=200
         )
         user = self.make_user()
-        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(len(responses.calls), 2)
 
         # Updating a user should do nothing
         user.email = 'test@example.com'
         user.save()
-        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(len(responses.calls), 2)
