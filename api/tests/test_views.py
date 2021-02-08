@@ -62,7 +62,7 @@ class BaseAuthenticatedTestCase(TestCase):
         self.assertEqual(len(responses.calls), 1)
 
         self.client.credentials(
-            HTTP_AUTHORIZATION='JWT {0}'.format(response.json()['token']))
+            HTTP_AUTHORIZATION='JWT {0}'.format(response.json()['access']))
 
 
 @override_settings(SUPPORT_CONTACT='support@example.com')
