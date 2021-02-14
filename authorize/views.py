@@ -22,6 +22,20 @@ class JsonAdapterView(OAuth2LoginView):
         })
 
 
+class SocialLoginViewWithNextParam(SocialLoginView):
+    """Add the 'next' parameter to the response."""
+
+    def post(self, request, *args, **kwargs):
+        """Process login. Provide the `next` parameter if it exists."""
+        state, _ = self.request.session.get(
+            'socialaccount_state', (None, None))
+
+        response = super().post(request, *args, **kwargs)
+        response.data['next_url'] = state.get('next') if state else None
+
+        return response
+
+
 class GitHubAdapter(GitHubOAuth2Adapter):
     """Customize the callback url to point to the frontend route."""
 
@@ -32,7 +46,7 @@ class GitHubAdapter(GitHubOAuth2Adapter):
         return settings.SOCIAL_CALLBACK_URL.format(service='github')
 
 
-class GitHubLogin(SocialLoginView):
+class GitHubLogin(SocialLoginViewWithNextParam):
     """Log the user in. Creates a new user account if it doesn't exist yet."""
 
     adapter_class = GitHubOAuth2Adapter
@@ -51,7 +65,7 @@ class GoogleAdapter(GoogleOAuth2Adapter):
         return settings.SOCIAL_CALLBACK_URL.format(service='google')
 
 
-class GoogleLogin(SocialLoginView):
+class GoogleLogin(SocialLoginViewWithNextParam):
     """Log the user in. Creates a new user account if it doesn't exist yet."""
 
     adapter_class = GoogleOAuth2Adapter
