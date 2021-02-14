@@ -109,6 +109,12 @@ class CallbackUrlTestCase(TestCase):
         social_app.sites.add(Site.objects.first())
         social_app.save()
 
+        session = self.client.session
+        session['socialaccount_state'] = {
+            'next': '/test/url',
+        }, None
+        session.save()
+
         response = self.client.post(reverse('jwt:github_callback_login'), {
             'state': '1234',
             'code': '5678'
@@ -117,6 +123,8 @@ class CallbackUrlTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(responses.calls), 1)
         self.assertIn('access_token', response.json())
+        self.assertIn('next_url', response.json())
+        self.assertEqual(response.json()['next_url'], '/test/url')
 
     @responses.activate
     @patch.object(SocialLoginSerializer, 'validate')
@@ -144,6 +152,12 @@ class CallbackUrlTestCase(TestCase):
         social_app.sites.add(Site.objects.first())
         social_app.save()
 
+        session = self.client.session
+        session['socialaccount_state'] = {
+            'next': '/test/url',
+        }, None
+        session.save()
+
         response = self.client.post(reverse('jwt:google_callback_login'), {
             'state': '1234',
             'code': '5678'
@@ -152,6 +166,8 @@ class CallbackUrlTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(responses.calls), 1)
         self.assertIn('access_token', response.json())
+        self.assertIn('next_url', response.json())
+        self.assertEqual(response.json()['next_url'], '/test/url')
 
     @patch.object(SocialLogin, 'verify_and_unstash_state')
     def test_state_validation(self, mock_verify):
