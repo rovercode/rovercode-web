@@ -1,99 +1,74 @@
 """Authorize views."""
 from django.conf import settings
-from django.utils.translation import gettext as _
+from django.http import JsonResponse
 
-from allauth.socialaccount.models import SocialLogin
-from allauth.socialaccount.providers.base import AuthAction
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.providers.oauth2.views import OAuth2LoginView
-from rest_auth.registration.views import SocialConnectView, SocialLoginView
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
+from dj_rest_auth.registration.views import SocialLoginView
 
 from .serializers import CallbackSerializer
 
 
-class BaseLogin(APIView):
-    """Base login view."""
+class JsonAdapterView(OAuth2LoginView):
+    """View that returns the authorization URL for the service."""
 
-    permission_classes = (AllowAny,)
-
-    def post(self, request):
-        """Return the URL of provider's authentication server."""
-        adapter = self.adapter_class(request)
-        provider = adapter.get_provider()
-        app = provider.get_app(request)
-        view = OAuth2LoginView()
-        view.request = request
-        view.adapter = adapter
-        client = view.get_client(request, app)
-        action = AuthAction.AUTHENTICATE
-        auth_params = provider.get_auth_params(request, action)
-        client.state = SocialLogin.stash_state(request)
-        url = client.get_redirect_url(adapter.authorize_url, auth_params)
-        return Response({'url': url})
+    def dispatch(self, request, *args, **kwargs):
+        """Return the url."""
+        response = super().dispatch(request, *args, **kwargs)
+        return JsonResponse({
+            'url': response.url,
+        })
 
 
-class BaseCallbackConnect(SocialConnectView):
-    """Base callback connect."""
+class SocialLoginViewWithNextParam(SocialLoginView):
+    """Add the 'next' parameter to the response."""
 
-    def get_response(self):
-        """Get the connection response."""
-        return Response({'detail': _('Connection completed.')})
+    def post(self, request, *args, **kwargs):
+        """Process login. Provide the `next` parameter if it exists."""
+        state, _ = self.request.session.get(
+            'socialaccount_state', (None, None))
+
+        response = super().post(request, *args, **kwargs)
+        response.data['next_url'] = state.get('next') if state else None
+
+        return response
 
 
-class GitHubCallbackMixin:
-    """Callback setup for Github."""
+class GitHubAdapter(GitHubOAuth2Adapter):
+    """Customize the callback url to point to the frontend route."""
 
-    adapter_class = GitHubOAuth2Adapter
-    client_class = OAuth2Client
-    serializer_class = CallbackSerializer
-
-    @property
-    def callback_url(self):
-        """Github callback URL."""
+    @staticmethod
+    def get_callback_url(request, app):
+        """Return the frontend github callback route."""
+        del request, app
         return settings.SOCIAL_CALLBACK_URL.format(service='github')
 
 
-class GitHubCallbackCreate(GitHubCallbackMixin, SocialLoginView):
+class GitHubLogin(SocialLoginViewWithNextParam):
     """Log the user in. Creates a new user account if it doesn't exist yet."""
 
-
-class GitHubCallbackConnect(GitHubCallbackMixin, BaseCallbackConnect):
-    """Connect a provider's user account to the currently logged in user."""
-
-
-class GitHubLogin(BaseLogin):
-    """Login setup for Github."""
-
     adapter_class = GitHubOAuth2Adapter
+    client_class = OAuth2Client
+    serializer_class = CallbackSerializer
+    callback_url = settings.SOCIAL_CALLBACK_URL.format(service='github')
 
 
-class GoogleCallbackMixin:
-    """Callback setup for Google."""
+class GoogleAdapter(GoogleOAuth2Adapter):
+    """Customize the callback url to point to the frontend route."""
+
+    @staticmethod
+    def get_callback_url(request, app):
+        """Return the frontend google callback route."""
+        del request, app
+        return settings.SOCIAL_CALLBACK_URL.format(service='google')
+
+
+class GoogleLogin(SocialLoginViewWithNextParam):
+    """Log the user in. Creates a new user account if it doesn't exist yet."""
 
     adapter_class = GoogleOAuth2Adapter
     client_class = OAuth2Client
     serializer_class = CallbackSerializer
-
-    @property
-    def callback_url(self):
-        """Google callback URL."""
-        return settings.SOCIAL_CALLBACK_URL.format(service='google')
-
-
-class GoogleCallbackCreate(GoogleCallbackMixin, SocialLoginView):
-    """Log the user in. Creates a new user account if it doesn't exist yet."""
-
-
-class GoogleCallbackConnect(GoogleCallbackMixin, BaseCallbackConnect):
-    """Connect a provider's user account to the currently logged in user."""
-
-
-class GoogleLogin(BaseLogin):
-    """Login setup for Github."""
-
-    adapter_class = GoogleOAuth2Adapter
+    callback_url = settings.SOCIAL_CALLBACK_URL.format(service='google')

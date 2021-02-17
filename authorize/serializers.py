@@ -3,7 +3,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext as _
 
 from allauth.socialaccount.models import SocialLogin
-from rest_auth.registration.serializers import SocialLoginSerializer
+from dj_rest_auth.registration.serializers import SocialLoginSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
