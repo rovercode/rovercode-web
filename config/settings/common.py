@@ -328,7 +328,7 @@ SIMPLE_JWT = {
 }
 
 REST_AUTH_SERIALIZERS = {
-    'JWT_TOKEN_CLAIMS_SERIALIZER': 'rovercode_web.users.utils.JwtSerializer',
+    'JWT_TOKEN_CLAIMS_SERIALIZER': 'rovercode_web.users.utils.JwtObtainPairSerializer',
 }
 
 # Enables django-rest-auth to use JWT tokens instead of regular tokens.

@@ -9,7 +9,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.views import TokenVerifyView
 
-from rovercode_web.users.utils import JwtSerializer
+from rovercode_web.users.utils import JwtObtainPairSerializer
+from rovercode_web.users.utils import JwtRefreshSerializer
 
 from . import views
 
@@ -25,17 +26,17 @@ router.register(r'users', views.UserViewSet)
 urlpatterns = [
     url(
         r'^api-token-auth/',
-        TokenObtainPairView.as_view(serializer_class=JwtSerializer),
+        TokenObtainPairView.as_view(serializer_class=JwtObtainPairSerializer),
         name='api-token-auth'
     ),
     url(
         r'^api-token-verify/',
-        TokenVerifyView.as_view(serializer_class=JwtSerializer),
+        TokenVerifyView.as_view(),
         name='api-token-verify'
     ),
     url(
         r'^api-token-refresh/',
-        TokenRefreshView.as_view(serializer_class=JwtSerializer),
+        TokenRefreshView.as_view(serializer_class=JwtRefreshSerializer),
         name='api-token-refresh'
     ),
     url(r'^v1/', include((router.urls, 'api'), namespace='v1')),

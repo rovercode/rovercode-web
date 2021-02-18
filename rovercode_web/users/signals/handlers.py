@@ -4,7 +4,7 @@ import logging
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from rovercode_web.users.utils import JwtSerializer
+from rovercode_web.users.utils import JwtObtainPairSerializer
 
 import requests
 
@@ -17,7 +17,7 @@ def create_new_user(sender, instance, created, **kwargs):
     if not created:
         return
 
-    token = JwtSerializer.get_token(instance)
+    token = JwtObtainPairSerializer.get_token(instance)
     token['admin'] = True
     auth_jwt = str(token)
 
