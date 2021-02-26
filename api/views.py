@@ -13,7 +13,6 @@ from rest_framework import viewsets, permissions, serializers, mixins, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from rest_framework_jwt.settings import api_settings
 from zenpy import Zenpy
 from zenpy.lib.api_objects import Ticket
 from zenpy.lib.api_objects import User as ZendeskUser
@@ -85,7 +84,7 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
     @staticmethod
     def _is_over_limit(request):
         """Determine if the user is over the limit of programs."""
-        claims = api_settings.JWT_DECODE_HANDLER(request.auth)
+        claims = request.auth
         tier = claims.get('tier', 1)
         user_program_count = BlockDiagram.objects.filter(
             user=request.user
@@ -110,7 +109,7 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
 
             return bds.exclude(user=support)
 
-        claims = api_settings.JWT_DECODE_HANDLER(self.request.auth)
+        claims = self.request.auth
         return BlockDiagram.objects.filter(
             Q(reference_of__tier__lte=claims.get('tier', 1)) |
             Q(reference_of=None)

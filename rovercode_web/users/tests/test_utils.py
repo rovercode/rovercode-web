@@ -5,8 +5,10 @@ from django.test import override_settings
 from test_plus.test import TestCase
 
 import responses
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from rovercode_web.users.utils import jwt_payload_handler
+from rovercode_web.users.utils import JwtObtainPairSerializer
+from rovercode_web.users.utils import JwtRefreshSerializer
 
 
 @override_settings(SUBSCRIPTION_SERVICE_HOST='http://test.test')
@@ -27,7 +29,7 @@ class TestUtils(TestCase):
             f'http://test.test/api/v1/customer/{self.user.id}/',
             status=503
         )
-        payload = jwt_payload_handler(self.user)
+        payload = JwtObtainPairSerializer.get_token(self.user)
         self.assertEqual(len(responses.calls), 1)
         self.assertEqual(payload['tier'], 1)
 
@@ -40,7 +42,27 @@ class TestUtils(TestCase):
             json={'subscription': {'plan': '2'}},
             status=200
         )
-        payload = jwt_payload_handler(self.user)
+        payload = JwtObtainPairSerializer.get_token(self.user)
         self.assertEqual(len(responses.calls), 1)
         self.assertEqual(payload['show_guide'], self.user.show_guide)
         self.assertEqual(payload['tier'], 2)
+
+    @responses.activate
+    def test_jwt_refresh_payload(self):
+        """Test refreshing the JWT payload."""
+        responses.add(
+            responses.GET,
+            f'http://test.test/api/v1/customer/{self.user.id}/',
+            json={'subscription': {'plan': '2'}},
+            status=200
+        )
+        refresh_token = RefreshToken.for_user(self.user)
+        refresh_token['show_guide'] = self.user.show_guide
+        serializer = JwtRefreshSerializer(data={
+            'refresh': str(refresh_token),
+        })
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(len(responses.calls), 1)
+        token = RefreshToken(serializer.validated_data['refresh'])
+        self.assertEqual(token['show_guide'], self.user.show_guide)
+        self.assertEqual(token['tier'], 2)

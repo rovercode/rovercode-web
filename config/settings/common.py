@@ -40,8 +40,10 @@ DJANGO_APPS = (
 )
 THIRD_PARTY_APPS = (
     'crispy_forms',  # Form layouts
+    'dj_rest_auth',
     'allauth',  # registration
     'allauth.account',  # registration
+    'dj_rest_auth.registration',
     'allauth.socialaccount',  # registration
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.google',
@@ -278,7 +280,7 @@ ADMIN_URL = r'^admin/'
 # ------------------------------------------------------------------------------
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
@@ -314,14 +316,19 @@ ZENDESK_SUBDOMAIN = env('ZENDESK_SUBDOMAIN', default='domain.zendesk.com')
 
 # JWT CONFIGURATION
 # ------------------------------------------------------------------------------
-JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=4),
-    'JWT_ALLOW_REFRESH': True,
-    'JWT_PAYLOAD_HANDLER': 'rovercode_web.users.utils.jwt_payload_handler',
-    'JWT_SECRET_KEY': env(
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(hours=4),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'AUTH_HEADER_TYPES': ('JWT',),
+    'SIGNING_KEY': env(
         'JWT_SECRET_KEY',
         default='ac9fb5054311bfeeefe79fbe31740850'
     ),
+}
+
+REST_AUTH_SERIALIZERS = {
+    'JWT_TOKEN_CLAIMS_SERIALIZER': 'rovercode_web.users.utils.JwtObtainPairSerializer',
 }
 
 # Enables django-rest-auth to use JWT tokens instead of regular tokens.
