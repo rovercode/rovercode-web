@@ -150,12 +150,19 @@ class BlockDiagramViewSet(viewsets.ModelViewSet):
             # Source is not a lesson reference
             pass
 
+        blog_questions = bd.blog_questions.all()
+
         bd.pk = None
         bd.user = user
 
         if BlockDiagram.objects.filter(user=user, name=bd.name).exists():
             bd.name = BlockDiagramViewSet._find_unique_name(bd.name, user)
         bd.save()
+
+        for q in blog_questions:
+            q.pk = None
+            q.block_diagram = bd
+            q.save()
 
         SUMO_LOGGER.info(json.dumps({
             'event': 'remix',
