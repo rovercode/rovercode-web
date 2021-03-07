@@ -760,6 +760,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(blog_questions[0]['question'], 'How did you do it?')
         self.assertIsNone(blog_questions[0]['answer'])
         self.assertEqual(blog_questions[0]['sequence_number'], 2)
+        self.assertTrue(blog_questions[0]['required'])
         self.assertDictEqual(response.json()['state'], {
             'progress': 'IN_PROGRESS',
         })

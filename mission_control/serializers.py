@@ -45,12 +45,19 @@ class BlockDiagramBlogQuestionReadSerializer(serializers.ModelSerializer):
     question = serializers.StringRelatedField(source='blog_question')
     answer = serializers.StringRelatedField(source='blog_answer')
     sequence_number = serializers.IntegerField(read_only=True, min_value=0)
+    required = serializers.BooleanField(read_only=True)
 
     class Meta:
         """Meta class."""
 
         model = BlockDiagramBlogQuestion
-        fields = ('id', 'question', 'answer', 'sequence_number')
+        fields = (
+            'id',
+            'question',
+            'answer',
+            'sequence_number',
+            'required',
+        )
 
 
 class BlockDiagramBlogQuestionWriteSerializer(serializers.ModelSerializer):
