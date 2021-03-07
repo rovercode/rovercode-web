@@ -457,7 +457,8 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         bdbq = BlockDiagramBlogQuestion.objects.create(
             block_diagram=bd,
             blog_question=bq,
-            required=True
+            required=True,
+            sequence_number=1
         )
 
         # Add the answers
@@ -500,7 +501,8 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         BlockDiagramBlogQuestion.objects.create(
             block_diagram=bd,
             blog_question=bq,
-            required=True
+            required=True,
+            sequence_number=1
         )
 
         # Add the answers
@@ -740,7 +742,8 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         bdbq = BlockDiagramBlogQuestion.objects.create(
             block_diagram=bd,
             blog_question=bq,
-            required=True
+            required=True,
+            sequence_number=2
         )
         BlogAnswer.objects.create(
             block_diagram_blog_question=bdbq, answer='Very carefully')
@@ -756,6 +759,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(1, len(blog_questions))
         self.assertEqual(blog_questions[0]['question'], 'How did you do it?')
         self.assertIsNone(blog_questions[0]['answer'])
+        self.assertEqual(blog_questions[0]['sequence_number'], 2)
         self.assertDictEqual(response.json()['state'], {
             'progress': 'IN_PROGRESS',
         })

@@ -53,6 +53,7 @@ class TestBlockDiagramBlogQuestion(BaseBlockDiagramTestCase):
         bdbq = BlockDiagramBlogQuestion.objects.create(
             block_diagram=self.bd,
             blog_question=bq,
-            required=True
+            required=True,
+            sequence_number=1
         )
         self.assertEqual(str(bdbq), 'test: How did you do it?')

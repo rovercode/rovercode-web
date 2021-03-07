@@ -67,6 +67,7 @@ class BlockDiagramBlogQuestion(models.Model):
         BlockDiagram, related_name='blog_questions', on_delete=models.CASCADE)
     blog_question = models.ForeignKey(BlogQuestion, on_delete=models.CASCADE)
     required = models.BooleanField(default=False)
+    sequence_number = models.PositiveSmallIntegerField()
 
     class Meta:
         """Meta class."""
