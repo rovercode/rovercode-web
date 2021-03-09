@@ -1,6 +1,7 @@
 """Mission Control serializers."""
 import re
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
@@ -10,6 +11,7 @@ from .fields import TagStringRelatedField
 from .models import BlockDiagram
 from .models import BlockDiagramBlogQuestion
 from .models import BlogAnswer
+from .models import BlogQuestion
 from .models import Tag
 
 NAME_REGEX = re.compile(r'\((?P<number>\d)\)$')
@@ -137,6 +139,15 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
         validated_data['name'] = name
 
         block_diagram = super().create(validated_data)
+
+        # Add default blog question if none exist
+        if block_diagram.blog_questions.count() == 0:
+            BlockDiagramBlogQuestion.objects.create(
+                block_diagram=block_diagram,
+                blog_question=BlogQuestion.objects.get(
+                    id=settings.DEFAULT_BLOG_QUESTION_ID),
+                sequence_number=1,
+            )
 
         for tag in owner_tags:
             block_diagram.owner_tags.add(tag)

@@ -70,6 +70,7 @@ class BaseAuthenticatedTestCase(TestCase):
 
 @override_settings(SUPPORT_CONTACT='support@example.com')
 @override_settings(FREE_TIER_PROGRAM_LIMIT=1)
+@override_settings(DEFAULT_BLOG_QUESTION_ID=12)
 class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
     """Tests the block diagram API view."""
 
@@ -80,6 +81,8 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.patcher = patch('requests.post')
         self.mock_post = self.patcher.start()
         self.mock_post.return_value.status_code = 404
+        self.default_question = BlogQuestion.objects.create(
+            id=12, question='Default question')
 
     def tearDown(self):
         """Tear down the tests."""
@@ -215,6 +218,9 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         model_tags = [t.name for t in BlockDiagram.objects.last().tags.all()]
         self.assertIn('tag1', model_tags)
         self.assertIn('tag 2', model_tags)
+        self.assertEqual(1, BlockDiagramBlogQuestion.objects.count())
+        self.assertEqual(
+            12, BlockDiagramBlogQuestion.objects.first().blog_question.id)
 
     def test_bd_create_over_limit(self):
         """Test disallow create block diagram when over limit."""
