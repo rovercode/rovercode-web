@@ -48,3 +48,53 @@ class Tag(models.Model):
     def __str__(self):
         """Convert the model to a human readable string."""
         return str(self.name)
+
+
+class BlogQuestion(models.Model):
+    """Questions for the user."""
+
+    question = models.CharField(max_length=128)
+
+    def __str__(self):
+        """Convert the model to a human readable string."""
+        return str(self.question)
+
+
+class BlockDiagramBlogQuestion(models.Model):
+    """Blog question for a block diagram."""
+
+    block_diagram = models.ForeignKey(
+        BlockDiagram, related_name='blog_questions', on_delete=models.CASCADE)
+    blog_question = models.ForeignKey(BlogQuestion, on_delete=models.CASCADE)
+    required = models.BooleanField(default=False)
+    sequence_number = models.PositiveSmallIntegerField()
+
+    class Meta:
+        """Meta class."""
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=['block_diagram', 'blog_question'],
+                name='unique_bd_blog_question',
+            ),
+        ]
+
+    def __str__(self):
+        """Convert the model to a human readable string."""
+        return f'{self.block_diagram}: {self.blog_question}'
+
+
+class BlogAnswer(models.Model):
+    """Answer from the user."""
+
+    block_diagram_blog_question = models.OneToOneField(
+        BlockDiagramBlogQuestion,
+        related_name='blog_answer',
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    answer = models.TextField()
+
+    def __str__(self):
+        """Convert the model to a human readable string."""
+        return str(self.answer)

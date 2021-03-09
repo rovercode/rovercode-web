@@ -20,6 +20,9 @@ from curriculum.models import Lesson
 from curriculum.models import ProgressState
 from curriculum.models import State
 from mission_control.models import BlockDiagram
+from mission_control.models import BlockDiagramBlogQuestion
+from mission_control.models import BlogAnswer
+from mission_control.models import BlogQuestion
 from mission_control.models import Tag
 
 
@@ -67,6 +70,7 @@ class BaseAuthenticatedTestCase(TestCase):
 
 @override_settings(SUPPORT_CONTACT='support@example.com')
 @override_settings(FREE_TIER_PROGRAM_LIMIT=1)
+@override_settings(DEFAULT_BLOG_QUESTION_ID=12)
 class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
     """Tests the block diagram API view."""
 
@@ -77,6 +81,8 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.patcher = patch('requests.post')
         self.mock_post = self.patcher.start()
         self.mock_post.return_value.status_code = 404
+        self.default_question = BlogQuestion.objects.create(
+            id=12, question='Default question')
 
     def tearDown(self):
         """Tear down the tests."""
@@ -212,6 +218,9 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         model_tags = [t.name for t in BlockDiagram.objects.last().tags.all()]
         self.assertIn('tag1', model_tags)
         self.assertIn('tag 2', model_tags)
+        self.assertEqual(1, BlockDiagramBlogQuestion.objects.count())
+        self.assertEqual(
+            12, BlockDiagramBlogQuestion.objects.first().blog_question.id)
 
     def test_bd_create_over_limit(self):
         """Test disallow create block diagram when over limit."""
@@ -440,6 +449,81 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(400, response.status_code)
         self.assertEqual(0, BlockDiagram.objects.get(id=bd.id).tags.count())
 
+    def test_bd_update_add_blog_answers(self):
+        """Test updating block diagram to add blog answers."""
+        self.authenticate()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+        )
+        self.assertEqual(0, BlockDiagram.objects.get(id=bd.id).tags.count())
+
+        bq = BlogQuestion.objects.create(question='How did you do it?')
+        bdbq = BlockDiagramBlogQuestion.objects.create(
+            block_diagram=bd,
+            blog_question=bq,
+            required=True,
+            sequence_number=1
+        )
+
+        # Add the answers
+        data = {
+            'blog_answers': [{
+                'id': bdbq.id,
+                'answer': 'Very carefully',
+            }],
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
+        self.assertEqual(BlockDiagram.objects.last().name, 'test')
+        self.assertEqual(
+            BlockDiagramBlogQuestion.objects.get(
+                id=bdbq.id
+            ).blog_answer.answer,
+            'Very carefully',
+        )
+
+        response = self.client.get(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json()['blog_questions'][0]['answer'], 'Very carefully')
+
+    def test_bd_update_add_blog_answers_invalid_question(self):
+        """Test updating block diagram to add answer to invalid question."""
+        self.authenticate()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+        )
+        self.assertEqual(0, BlockDiagram.objects.get(id=bd.id).tags.count())
+
+        bq = BlogQuestion.objects.create(question='How did you do it?')
+        BlockDiagramBlogQuestion.objects.create(
+            block_diagram=bd,
+            blog_question=bq,
+            required=True,
+            sequence_number=1
+        )
+
+        # Add the answers
+        data = {
+            'blog_answers': [{
+                'id': -1,
+                'answer': 'Very carefully',
+            }],
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+        self.assertIn('blog_answers', response.json())
+
     def test_bd_tag_filter(self):
         """Test the block diagram API view filters on tags correctly."""
         self.authenticate()
@@ -660,6 +744,15 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         )
         Lesson.objects.create(
             reference=bd, sequence_number=1, course=course)
+        bq = BlogQuestion.objects.create(question='How did you do it?')
+        bdbq = BlockDiagramBlogQuestion.objects.create(
+            block_diagram=bd,
+            blog_question=bq,
+            required=True,
+            sequence_number=2
+        )
+        BlogAnswer.objects.create(
+            block_diagram_blog_question=bdbq, answer='Very carefully')
         response = self.post(
             reverse('api:v1:blockdiagram-remix', kwargs={'pk': bd.id}))
         self.assertEqual(200, response.status_code)
@@ -668,6 +761,12 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(response.json()['name'], bd.name)
         self.assertEqual(response.json()['content'], bd.content)
         self.assertEqual(response.json()['lesson'], bd.reference_of.id)
+        blog_questions = response.json()['blog_questions']
+        self.assertEqual(1, len(blog_questions))
+        self.assertEqual(blog_questions[0]['question'], 'How did you do it?')
+        self.assertIsNone(blog_questions[0]['answer'])
+        self.assertEqual(blog_questions[0]['sequence_number'], 2)
+        self.assertTrue(blog_questions[0]['required'])
         self.assertDictEqual(response.json()['state'], {
             'progress': 'IN_PROGRESS',
         })
