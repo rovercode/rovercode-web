@@ -7,7 +7,9 @@ from rest_framework import serializers
 
 from curriculum.models import Lesson
 from curriculum.serializers import StateSerializer
+from .fields import StringChoiceField
 from .fields import TagStringRelatedField
+from .fields import UserStringRelatedField
 from .models import BlockDiagram
 from .models import BlockDiagramBlogQuestion
 from .models import BlogAnswer
@@ -91,6 +93,9 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
         read_only=True, many=True)
     blog_answers = BlockDiagramBlogQuestionWriteSerializer(
         required=False, many=True)
+    share_type = StringChoiceField(
+        required=False, choices=BlockDiagram.SHARE_CHOICES)
+    share_users = UserStringRelatedField(required=False, many=True)
 
     class Meta:
         """Meta class."""

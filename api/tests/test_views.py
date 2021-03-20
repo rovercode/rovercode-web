@@ -93,16 +93,20 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         """Test the block diagram API view displays the correct items."""
         self.authenticate()
         user = self.make_user()
+        share_user = self.make_user(username='share')
         bd1 = BlockDiagram.objects.create(
             user=self.admin,
             name='test',
-            content='<xml></xml>'
+            content='<xml></xml>',
+            share_type=BlockDiagram.PRIVATE,
         )
         bd2 = BlockDiagram.objects.create(
             user=user,
             name='test1',
-            content='<xml></xml>'
+            content='<xml></xml>',
+            share_type=BlockDiagram.USERS,
         )
+        bd2.share_users.add(share_user)
         # Should not be in the list
         BlockDiagram.objects.create(
             user=self.support,
@@ -120,6 +124,9 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(response.json()['results'][0]['name'], 'test')
         self.assertEqual(
             response.json()['results'][0]['content'], '<xml></xml>')
+        self.assertEqual(
+            response.json()['results'][0]['share_type'], 'Private')
+        self.assertEqual(0, len(response.json()['results'][0]['share_users']))
         self.assertEqual(response.json()['results'][1]['id'], bd2.id)
         self.assertDictEqual(response.json()['results'][1]['user'], {
             'username': user.username,
@@ -127,6 +134,12 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(response.json()['results'][1]['name'], 'test1')
         self.assertEqual(
             response.json()['results'][1]['content'], '<xml></xml>')
+        self.assertEqual(response.json()['results'][1]['share_type'], 'Users')
+        self.assertEqual(1, len(response.json()['results'][1]['share_users']))
+        self.assertEqual(
+            response.json()['results'][1]['share_users'][0],
+            share_user.username
+        )
 
     def test_bd_user_filter(self):
         """Test the block diagram API view filters on user correctly."""
@@ -523,6 +536,142 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             json.dumps(data), content_type='application/json')
         self.assertEqual(400, response.status_code)
         self.assertIn('blog_answers', response.json())
+
+    def test_bd_update_add_share_users(self):
+        """Test updating block diagram to add share users."""
+        self.authenticate()
+        share1 = self.make_user(username='share1')
+        share2 = self.make_user(username='share2')
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+        )
+        self.assertEqual(
+            0, BlockDiagram.objects.get(id=bd.id).share_users.count())
+
+        # Add the share users
+        data = {
+            'share_users': ['share1', 'share2'],
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
+        self.assertEqual(BlockDiagram.objects.last().name, 'test')
+        self.assertEqual(2, BlockDiagram.objects.last().share_users.count())
+
+        response = self.client.get(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(2, len(response.json()['share_users']))
+        self.assertEqual(response.json()['share_users'][0], share1.username)
+        self.assertEqual(response.json()['share_users'][1], share2.username)
+
+    def test_bd_update_remove_share_users(self):
+        """Test updating block diagram to add share users."""
+        self.authenticate()
+        share1 = self.make_user(username='share1')
+        share2 = self.make_user(username='share2')
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+        )
+        bd.share_users.set([share1, share2])
+        self.assertEqual(
+            2, BlockDiagram.objects.get(id=bd.id).share_users.count())
+
+        # Add the share users
+        data = {
+            'share_users': ['share1'],
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
+        self.assertEqual(BlockDiagram.objects.last().name, 'test')
+        self.assertEqual(1, BlockDiagram.objects.last().share_users.count())
+
+        response = self.client.get(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(1, len(response.json()['share_users']))
+        self.assertEqual(response.json()['share_users'][0], 'share1')
+
+    def test_bd_update_invalid_share_users(self):
+        """Test updating block diagram to add invalid share users."""
+        self.authenticate()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+        )
+        self.assertEqual(
+            0, BlockDiagram.objects.get(id=bd.id).share_users.count())
+
+        # Add the share users
+        data = {
+            'share_users': ['share1'],
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(0, BlockDiagram.objects.last().share_users.count())
+
+    def test_bd_update_change_share_type(self):
+        """Test updating block diagram to change share type."""
+        self.authenticate()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+            share_type=BlockDiagram.PRIVATE,
+        )
+
+        # Change the type
+        data = {
+            'share_type': 'Cohort',
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
+        self.assertEqual(BlockDiagram.objects.last().name, 'test')
+        self.assertEqual(
+            BlockDiagram.objects.last().share_type, BlockDiagram.COHORT)
+
+        response = self.client.get(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['share_type'], 'Cohort')
+
+    def test_bd_update_change_invalid_share_type(self):
+        """Test updating block diagram to change to invalid share type."""
+        self.authenticate()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+            share_type=BlockDiagram.PRIVATE,
+        )
+
+        # Change the type
+        data = {
+            'share_type': '--Error--',
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
+        self.assertEqual(BlockDiagram.objects.last().name, 'test')
+        self.assertEqual(
+            BlockDiagram.objects.last().share_type, BlockDiagram.PRIVATE)
 
     def test_bd_tag_filter(self):
         """Test the block diagram API view filters on tags correctly."""
