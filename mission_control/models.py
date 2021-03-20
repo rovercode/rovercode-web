@@ -9,7 +9,6 @@ User = get_user_model()
 class BlockDiagram(models.Model):
     """Attributes to describe a single block diagram."""
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     PRIVATE = 1
     PUBLIC = 2
     COHORT = 3
@@ -21,6 +20,8 @@ class BlockDiagram(models.Model):
         (USERS, 'Users'),
     ]
 
+    user = models.ForeignKey(
+        User, related_name='block_diagrams', on_delete=models.CASCADE)
     name = models.TextField()
     content = models.TextField()
     description = models.TextField(blank=True, null=True)
