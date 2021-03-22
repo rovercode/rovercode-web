@@ -9,7 +9,17 @@ User = get_user_model()
 class BlockDiagram(models.Model):
     """Attributes to describe a single block diagram."""
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    PRIVATE = 1
+    PUBLIC = 2
+    COHORT = 3
+    SHARE_CHOICES = [
+        (PRIVATE, 'Private'),
+        (PUBLIC, 'Public'),
+        (COHORT, 'Cohort'),
+    ]
+
+    user = models.ForeignKey(
+        User, related_name='block_diagrams', on_delete=models.CASCADE)
     name = models.TextField()
     content = models.TextField()
     description = models.TextField(blank=True, null=True)
@@ -23,6 +33,12 @@ class BlockDiagram(models.Model):
         related_name='block_diagrams')
     state = models.ForeignKey(
         'curriculum.State', on_delete=models.SET_NULL, blank=True, null=True)
+    share_type = models.PositiveSmallIntegerField(
+        choices=SHARE_CHOICES,
+        default=PRIVATE,
+    )
+    share_users = models.ManyToManyField(
+        User, related_name='shared_block_diagrams', blank=True)
 
     class Meta:
         """Meta class."""
