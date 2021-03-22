@@ -98,13 +98,13 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
             user=self.admin,
             name='test',
             content='<xml></xml>',
-            share_type=BlockDiagram.PRIVATE,
+            share_type=BlockDiagram.PUBLIC,
         )
         bd2 = BlockDiagram.objects.create(
             user=user,
             name='test1',
             content='<xml></xml>',
-            share_type=BlockDiagram.USERS,
+            share_type=BlockDiagram.PRIVATE,
         )
         bd2.share_users.add(share_user)
         # Should not be in the list
@@ -125,7 +125,7 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(
             response.json()['results'][0]['content'], '<xml></xml>')
         self.assertEqual(
-            response.json()['results'][0]['share_type'], 'Private')
+            response.json()['results'][0]['share_type'], 'Public')
         self.assertEqual(0, len(response.json()['results'][0]['share_users']))
         self.assertEqual(response.json()['results'][1]['id'], bd2.id)
         self.assertDictEqual(response.json()['results'][1]['user'], {
@@ -134,7 +134,8 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(response.json()['results'][1]['name'], 'test1')
         self.assertEqual(
             response.json()['results'][1]['content'], '<xml></xml>')
-        self.assertEqual(response.json()['results'][1]['share_type'], 'Users')
+        self.assertEqual(
+            response.json()['results'][1]['share_type'], 'Private')
         self.assertEqual(1, len(response.json()['results'][1]['share_users']))
         self.assertEqual(
             response.json()['results'][1]['share_users'][0],

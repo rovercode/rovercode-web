@@ -12,12 +12,10 @@ class BlockDiagram(models.Model):
     PRIVATE = 1
     PUBLIC = 2
     COHORT = 3
-    USERS = 4
     SHARE_CHOICES = [
         (PRIVATE, 'Private'),
         (PUBLIC, 'Public'),
         (COHORT, 'Cohort'),
-        (USERS, 'Users'),
     ]
 
     user = models.ForeignKey(
