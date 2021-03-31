@@ -68,7 +68,7 @@ class BlockDiagramBlogQuestionWriteSerializer(serializers.ModelSerializer):
     """BlockDiagramBlogQuestion model write serializer."""
 
     id = serializers.IntegerField()
-    answer = serializers.CharField()
+    answer = serializers.CharField(allow_blank=True)
 
     class Meta:
         """Meta class."""
@@ -163,10 +163,15 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
         """Update answers to blog questions."""
         blog_answers = validated_data.pop('blog_answers', [])
         for answer in blog_answers:
-            blog_answer, _ = BlogAnswer.objects.get_or_create(
-                block_diagram_blog_question_id=answer['id'])
-            blog_answer.answer = answer['answer']
-            blog_answer.save()
+            blog_answer, created = BlogAnswer.objects.get_or_create(
+                block_diagram_blog_question_id=answer['id'], defaults={
+                    'answer': answer['answer'],
+                })
+            if not answer['answer']:
+                blog_answer.delete()
+            elif not created:
+                blog_answer.answer = answer['answer']
+                blog_answer.save()
 
         return super().update(instance, validated_data)
 

@@ -507,6 +507,101 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(
             response.json()['blog_questions'][0]['answer'], 'Very carefully')
 
+    def test_bd_update_change_blog_answers(self):
+        """Test updating block diagram to add blog answers."""
+        self.authenticate()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+        )
+        self.assertEqual(0, BlockDiagram.objects.get(id=bd.id).tags.count())
+
+        bq = BlogQuestion.objects.create(question='How did you do it?')
+        bdbq = BlockDiagramBlogQuestion.objects.create(
+            block_diagram=bd,
+            blog_question=bq,
+            required=True,
+            sequence_number=1
+        )
+        BlogAnswer.objects.create(
+            block_diagram_blog_question=bdbq,
+            answer='Initial Answer',
+        )
+
+        # Add the answers
+        data = {
+            'blog_answers': [{
+                'id': bdbq.id,
+                'answer': 'Very carefully',
+            }],
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
+        self.assertEqual(BlockDiagram.objects.last().name, 'test')
+        self.assertEqual(
+            BlockDiagramBlogQuestion.objects.get(
+                id=bdbq.id
+            ).blog_answer.answer,
+            'Very carefully',
+        )
+
+        response = self.client.get(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json()['blog_questions'][0]['answer'], 'Very carefully')
+
+    def test_bd_update_clear_blog_answers(self):
+        """Test updating block diagram to clear blog answers."""
+        self.authenticate()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+        )
+        self.assertEqual(0, BlockDiagram.objects.get(id=bd.id).tags.count())
+
+        bq = BlogQuestion.objects.create(question='How did you do it?')
+        bdbq = BlockDiagramBlogQuestion.objects.create(
+            block_diagram=bd,
+            blog_question=bq,
+            required=True,
+            sequence_number=1
+        )
+        BlogAnswer.objects.create(
+            block_diagram_blog_question=bdbq,
+            answer='Initial Answer',
+        )
+
+        # clear the answers
+        data = {
+            'blog_answers': [{
+                'id': bdbq.id,
+                'answer': '',
+            }],
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(BlockDiagram.objects.last().user.id, self.admin.id)
+        self.assertEqual(BlockDiagram.objects.last().name, 'test')
+        self.assertFalse(
+            hasattr(
+                BlockDiagramBlogQuestion.objects.get(id=bdbq.id),
+                'blog_answer',
+            )
+        )
+
+        response = self.client.get(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.json()['blog_questions'][0]['answer'])
+
     def test_bd_update_add_blog_answers_invalid_question(self):
         """Test updating block diagram to add answer to invalid question."""
         self.authenticate()
