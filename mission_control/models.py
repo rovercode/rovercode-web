@@ -9,7 +9,17 @@ User = get_user_model()
 class BlockDiagram(models.Model):
     """Attributes to describe a single block diagram."""
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    PRIVATE = 1
+    PUBLIC = 2
+    COHORT = 3
+    SHARE_CHOICES = [
+        (PRIVATE, 'Private'),
+        (PUBLIC, 'Public'),
+        (COHORT, 'Cohort'),
+    ]
+
+    user = models.ForeignKey(
+        User, related_name='block_diagrams', on_delete=models.CASCADE)
     name = models.TextField()
     content = models.TextField()
     description = models.TextField(blank=True, null=True)
@@ -23,6 +33,12 @@ class BlockDiagram(models.Model):
         related_name='block_diagrams')
     state = models.ForeignKey(
         'curriculum.State', on_delete=models.SET_NULL, blank=True, null=True)
+    share_type = models.PositiveSmallIntegerField(
+        choices=SHARE_CHOICES,
+        default=PRIVATE,
+    )
+    share_users = models.ManyToManyField(
+        User, related_name='shared_block_diagrams', blank=True)
 
     class Meta:
         """Meta class."""
@@ -48,3 +64,53 @@ class Tag(models.Model):
     def __str__(self):
         """Convert the model to a human readable string."""
         return str(self.name)
+
+
+class BlogQuestion(models.Model):
+    """Questions for the user."""
+
+    question = models.CharField(max_length=128)
+
+    def __str__(self):
+        """Convert the model to a human readable string."""
+        return str(self.question)
+
+
+class BlockDiagramBlogQuestion(models.Model):
+    """Blog question for a block diagram."""
+
+    block_diagram = models.ForeignKey(
+        BlockDiagram, related_name='blog_questions', on_delete=models.CASCADE)
+    blog_question = models.ForeignKey(BlogQuestion, on_delete=models.CASCADE)
+    required = models.BooleanField(default=False)
+    sequence_number = models.PositiveSmallIntegerField()
+
+    class Meta:
+        """Meta class."""
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=['block_diagram', 'blog_question'],
+                name='unique_bd_blog_question',
+            ),
+        ]
+
+    def __str__(self):
+        """Convert the model to a human readable string."""
+        return f'{self.block_diagram}: {self.blog_question}'
+
+
+class BlogAnswer(models.Model):
+    """Answer from the user."""
+
+    block_diagram_blog_question = models.OneToOneField(
+        BlockDiagramBlogQuestion,
+        related_name='blog_answer',
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    answer = models.TextField()
+
+    def __str__(self):
+        """Convert the model to a human readable string."""
+        return str(self.answer)
