@@ -1,13 +1,19 @@
 """Mission Control serializers."""
 import re
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from curriculum.models import Lesson
 from curriculum.serializers import StateSerializer
+from .fields import StringChoiceField
 from .fields import TagStringRelatedField
+from .fields import UserStringRelatedField
 from .models import BlockDiagram
+from .models import BlockDiagramBlogQuestion
+from .models import BlogAnswer
+from .models import BlogQuestion
 from .models import Tag
 
 NAME_REGEX = re.compile(r'\((?P<number>\d)\)$')
@@ -37,6 +43,40 @@ class UserGuideSerializer(serializers.ModelSerializer):
         fields = ('show_guide', )
 
 
+class BlockDiagramBlogQuestionReadSerializer(serializers.ModelSerializer):
+    """BlockDiagramBlogQuestion model read serializer."""
+
+    question = serializers.StringRelatedField(source='blog_question')
+    answer = serializers.StringRelatedField(source='blog_answer')
+    sequence_number = serializers.IntegerField(read_only=True, min_value=0)
+    required = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        """Meta class."""
+
+        model = BlockDiagramBlogQuestion
+        fields = (
+            'id',
+            'question',
+            'answer',
+            'sequence_number',
+            'required',
+        )
+
+
+class BlockDiagramBlogQuestionWriteSerializer(serializers.ModelSerializer):
+    """BlockDiagramBlogQuestion model write serializer."""
+
+    id = serializers.IntegerField()
+    answer = serializers.CharField(allow_blank=True)
+
+    class Meta:
+        """Meta class."""
+
+        model = BlockDiagramBlogQuestion
+        fields = ('id', 'answer')
+
+
 class BlockDiagramSerializer(serializers.ModelSerializer):
     """Block diagram model serializer."""
 
@@ -49,6 +89,13 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
     state = StateSerializer(read_only=True)
     reference_of = serializers.PrimaryKeyRelatedField(read_only=True)
     flagged = serializers.BooleanField(read_only=True)
+    blog_questions = BlockDiagramBlogQuestionReadSerializer(
+        read_only=True, many=True)
+    blog_answers = BlockDiagramBlogQuestionWriteSerializer(
+        required=False, many=True)
+    share_type = StringChoiceField(
+        required=False, choices=BlockDiagram.SHARE_CHOICES)
+    share_users = UserStringRelatedField(required=False, many=True)
 
     class Meta:
         """Meta class."""
@@ -60,6 +107,19 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
     def get_tags(obj):
         """All tags for the block diagram."""
         return [str(tag) for tag in obj.tags.all()]
+
+    @staticmethod
+    def validate_blog_answers(value):
+        """Check that the answer is to a valid question."""
+        ids = list(map(lambda answer: answer.get('id'), value))
+        id_count = len(ids)
+        obj_count = BlockDiagramBlogQuestion.objects.filter(id__in=ids).count()
+        if id_count != obj_count:
+            raise serializers.ValidationError(
+                'At least one question does not exist for this block diagram',
+            )
+
+        return value
 
     def create(self, validated_data):
         """Check for name conflict and create unique name if necessary."""
@@ -85,10 +145,35 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
 
         block_diagram = super().create(validated_data)
 
+        # Add default blog question if none exist
+        if block_diagram.blog_questions.count() == 0:
+            BlockDiagramBlogQuestion.objects.create(
+                block_diagram=block_diagram,
+                blog_question=BlogQuestion.objects.get(
+                    id=settings.DEFAULT_BLOG_QUESTION_ID),
+                sequence_number=1,
+            )
+
         for tag in owner_tags:
             block_diagram.owner_tags.add(tag)
 
         return block_diagram
+
+    def update(self, instance, validated_data):
+        """Update answers to blog questions."""
+        blog_answers = validated_data.pop('blog_answers', [])
+        for answer in blog_answers:
+            blog_answer, created = BlogAnswer.objects.get_or_create(
+                block_diagram_blog_question_id=answer['id'], defaults={
+                    'answer': answer['answer'],
+                })
+            if not answer['answer']:
+                blog_answer.delete()
+            elif not created:
+                blog_answer.answer = answer['answer']
+                blog_answer.save()
+
+        return super().update(instance, validated_data)
 
 
 class TagSerializer(serializers.ModelSerializer):

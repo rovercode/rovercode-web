@@ -22,8 +22,8 @@ RUN python -m spacy download en
 
 WORKDIR /usr/local/lib/python3.6/site-packages/profanity_filter/data/
 
-RUN wget https://cgit.freedesktop.org/libreoffice/dictionaries/plain/en/en_US.aff
-RUN wget https://cgit.freedesktop.org/libreoffice/dictionaries/plain/en/en_US.dic
+RUN wget https://raw.githubusercontent.com/LibreOffice/dictionaries/master/en/en_US.aff
+RUN wget https://raw.githubusercontent.com/LibreOffice/dictionaries/master/en/en_US.dic
 RUN mv en_US.aff en.aff
 RUN mv en_US.dic en.dic
 
