@@ -633,6 +633,49 @@ class TestBlockDiagramViewSet(BaseAuthenticatedTestCase):
         self.assertEqual(400, response.status_code)
         self.assertIn('blog_answers', response.json())
 
+    def test_bd_update_add_blog_answers_wrong_question(self):
+        """Test updating block diagram to add answer to wrong question."""
+        self.authenticate()
+        user = self.make_user()
+        bd = BlockDiagram.objects.create(
+            user=self.admin,
+            name='test',
+            content='<xml></xml>',
+        )
+        bd2 = BlockDiagram.objects.create(
+            user=user,
+            name='test',
+            content='<xml></xml>',
+        )
+        self.assertEqual(0, BlockDiagram.objects.get(id=bd.id).tags.count())
+
+        bq = BlogQuestion.objects.create(question='How did you do it?')
+        BlockDiagramBlogQuestion.objects.create(
+            block_diagram=bd,
+            blog_question=bq,
+            required=True,
+            sequence_number=1
+        )
+        bdbq = BlockDiagramBlogQuestion.objects.create(
+            block_diagram=bd2,
+            blog_question=bq,
+            required=True,
+            sequence_number=1
+        )
+
+        # Add the answers
+        data = {
+            'blog_answers': [{
+                'id': bdbq.id,
+                'answer': 'Very carefully',
+            }],
+        }
+        response = self.client.patch(
+            reverse('api:v1:blockdiagram-detail', kwargs={'pk': bd.pk}),
+            json.dumps(data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+        self.assertIn('blog_answers', response.json())
+
     def test_bd_update_add_share_users(self):
         """Test updating block diagram to add share users."""
         self.authenticate()
