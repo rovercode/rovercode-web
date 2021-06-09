@@ -108,12 +108,12 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
         """All tags for the block diagram."""
         return [str(tag) for tag in obj.tags.all()]
 
-    @staticmethod
-    def validate_blog_answers(value):
+    def validate_blog_answers(self, value):
         """Check that the answer is to a valid question."""
         ids = list(map(lambda answer: answer.get('id'), value))
         id_count = len(ids)
-        obj_count = BlockDiagramBlogQuestion.objects.filter(id__in=ids).count()
+        obj_count = BlockDiagramBlogQuestion.objects.filter(
+            id__in=ids, block_diagram=self.instance).count()
         if id_count != obj_count:
             raise serializers.ValidationError(
                 'At least one question does not exist for this block diagram',
