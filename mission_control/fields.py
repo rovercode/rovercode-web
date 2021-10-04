@@ -30,9 +30,9 @@ class UserStringRelatedField(serializers.StringRelatedField):
         """Convert username string into the the primary key for the user."""
         try:
             user = User.objects.get(username=data)
-        except User.DoesNotExist:
+        except User.DoesNotExist as e:
             raise serializers.ValidationError(
-                f'User \'{data}\' does not exist')
+                f'User \'{data}\' does not exist') from e
 
         return user.pk
 

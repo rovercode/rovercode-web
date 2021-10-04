@@ -33,7 +33,7 @@ class Lesson(models.Model):
 
     def __str__(self):
         """Convert the model to a human readable string."""
-        return '{}:{}'.format(self.course.name, self.reference.name)
+        return f'{self.course.name}:{self.reference.name}'
 
 
 class ProgressState(IntEnum):

@@ -18,7 +18,7 @@ class SumoHandler(logging.Handler):
         """Send to sumologic."""
         try:
             requests.post(
-                'https://{}{}'.format(self.host, self.url),
+                f'https://{self.host}{self.url}',
                 json=json.loads(record.getMessage())
             )
         except Exception:  # pylint: disable=broad-except

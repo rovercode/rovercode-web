@@ -136,10 +136,10 @@ class BlockDiagramSerializer(serializers.ModelSerializer):
         while BlockDiagram.objects.filter(name=name, user=user).exists():
             if number is None:
                 number = 1
-                name = '{} ({})'.format(name, number)
+                name = f'{name} ({number})'
             else:
                 number += 1
-                name = re.sub(NAME_REGEX, '({})'.format(number), name)
+                name = re.sub(NAME_REGEX, f'({number})', name)
 
         validated_data['name'] = name
 
