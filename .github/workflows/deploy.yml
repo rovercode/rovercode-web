@@ -1,0 +1,54 @@
+name: Deploy
+on:
+  push:
+    branches:
+    - alpha
+    - development
+    - master
+
+jobs:
+  ecr:
+    name: ECR
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Get branch name
+      id: branch-name
+      uses: tj-actions/branch-names@v4.5
+
+    - name: Deploy to ECR
+      run: bash ecr-deploy.sh ${{ steps.branch-name.outputs.current_branch }}
+
+  docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        pip install pipenv==11.10.1
+        pipenv install --ignore-pipfile --dev
+
+    - name: Build documentation
+      run: make -C docs html
+
+    - name: Deploy documentation
+      if: success() && github.ref == 'ref/head/master'
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read
+      env:
+        AWS_S3_BUCKET: rovercode-contrib-docs
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: 'us-east-2'
+        SOURCE_DIR: 'docs/_build/html'
+        DEST_DIR: 'rovercode-web/master'
