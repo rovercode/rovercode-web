@@ -16,6 +16,9 @@ jobs:
       id: branch-name
       uses: tj-actions/branch-names@v4.5
 
+    - name: Check out code
+      uses: actions/checkout@v2
+
     - name: Deploy to ECR
       run: bash ecr-deploy.sh ${{ steps.branch-name.outputs.current_branch }}
 
@@ -38,7 +41,9 @@ jobs:
         pipenv install --ignore-pipfile --dev
 
     - name: Build documentation
-      run: make -C docs html
+      run: |
+        pipenv shell
+        make -C docs html
 
     - name: Deploy documentation
       if: success() && github.ref == 'ref/head/master'
