@@ -46,9 +46,7 @@ jobs:
     - name: Build documentation
       env:
         SHELL: '/bin/bash'
-      run: |
-        pipenv shell
-        make -C docs html
+      run: make SPHINXBUILD="pipenv run sphinx-build" -C docs html
 
     - name: Deploy documentation
       if: success() && github.ref == 'ref/head/master'
