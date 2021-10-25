@@ -41,7 +41,9 @@ jobs:
         pipenv install --ignore-pipfile --dev
 
     - name: Build documentation
-      run: make -C docs html
+      run: |
+        pipenv shell
+        make -C docs html
 
     - name: Deploy documentation
       if: success() && github.ref == 'ref/head/master'
