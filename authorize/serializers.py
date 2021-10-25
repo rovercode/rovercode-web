@@ -22,7 +22,7 @@ class CallbackSerializer(SocialLoginSerializer):
                 value,
             )
         # Allauth raises PermissionDenied if the validation fails
-        except PermissionDenied:
-            raise ValidationError(_('State did not match.'))
+        except PermissionDenied as e:
+            raise ValidationError(_('State did not match.')) from e
 
         return value

@@ -1,5 +1,3 @@
 [run]
 source = rovercode_web/, mission_control/, api/, authorize/, curriculum/
 omit = *migrations*, *tests*, *templates*, *static*
-plugins =
-    django_coverage_plugin

@@ -1,0 +1,67 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_USE_AWS_SSL: false
+      DATABASE_URL: 'postgres://postgres:postgres@localhost:5432/test'
+
+    services:
+      postgres:
+        image: postgres:9.4
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        pip install pipenv==11.10.1
+        pipenv install --ignore-pipfile --dev
+
+    - name: Run tests
+      run: pipenv run py.test --cov-report=
+
+    - name: Coveralls
+      if: success()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        pip install coverage~=4.5.4 coveralls
+        coveralls --service=github
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        pip install pipenv==11.10.1
+        pipenv install --ignore-pipfile --dev
+
+    - name: Run linter
+      run: pipenv run prospector
