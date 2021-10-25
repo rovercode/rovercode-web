@@ -9,4 +9,4 @@ else
   export TAG=prod
 fi
 
-cd /home/ubuntu/rovercode-web && docker-compose build && docker-compose up -d
+cd /home/ubuntu/rovercode-web && docker-compose --project-name=rovercode build && docker-compose --project-name=rovercode up -d

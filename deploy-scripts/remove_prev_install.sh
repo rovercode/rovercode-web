@@ -9,7 +9,7 @@ fi
 
 if [ -d /home/ubuntu/rovercode-web ]; then
     pushd /home/ubuntu/rovercode-web > /dev/null
-    TAG=$TAG docker-compose down --rmi all
+    TAG=$TAG docker-compose --project-name=rovercode down --rmi all
     popd > /dev/null
     rm -rf /home/ubuntu/rovercode-web
 fi
